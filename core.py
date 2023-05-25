@@ -20,36 +20,17 @@ app = Flask(__name__)
 def index(name=None):
     return redirect("/op/IM")
 
-
-@app.route("/lite")
-def lite(name=None):
+@app.route("/op/<code>")
+def oppage(code = "IF", name=None):
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
     if not os.path.exists(json_path):
-        mk_alpha = pendulum.today("Asia/Shanghai").add(hours=9,minutes=30)
-        remain = (mk_alpha - now).total_seconds()+10
+        mk_alpha = pendulum.today("Asia/Shanghai").add(hours=9,minutes=30,seconds=10)
+        remain = (mk_alpha - now).total_seconds()
         return render_template('pedding.html',name=name, remain = str(remain))
-    # get sum of vol from sina_option_data
-    with open(json_path, 'r', encoding='utf-8') as file:
-        option_dict = json.load(file)
-    last_time = option_dict['now']
-    now_list = option_dict['now_list']
-    pcr_300_list = option_dict['pcr_300']
-    berry_300_list = option_dict['berry_300']
+    return render_template('op_'+code+'.html', name=name)
 
 
-    readme =  "30 -50- 70  ==   70 -90- 110"
-    context = { 'now': now_str,
-            'last_time': last_time,
-            'now_list': now_list,
-            'pcr_300': pcr_300_list[-1],
-            'berry_300': berry_300_list[-1],
-            'pcr_300_list': pcr_300_list,
-            'berry_300_list': berry_300_list,
-            'readme': readme,
-        }
-    return render_template('lite.html', name=name, **context)
-    #return "<p>"+ str(now) +"    ==> "+ pretty_output + " % </p>"
 
 @app.route("/api/remain")
 def api_remain(name=None):
@@ -94,31 +75,6 @@ def api_remain(name=None):
     return str(int(remain))
 
 
-@app.route("/api/lite")
-def api_lite(name=None):
-    now = pendulum.now("Asia/Shanghai")
-    now_str = now.to_datetime_string()
-    # get sum of vol from sina_option_data
-    with open(json_path, 'r', encoding='utf-8') as file:
-        option_dict = json.load(file)
-    last_time = option_dict['now']
-    now_list = option_dict['now_list'][-600:]
-    pcr_300_list = option_dict['pcr_300'][-600:]
-    berry_300_list = option_dict['berry_300'][-600:]
-
-    # print(now, " %.2f"% (output*100)," %")
-    readme =  "30 -50- 70  ==   70 -90- 110"
-    context = { 'now': now_str,
-            'last_time': last_time,
-            'now_list': now_list,
-            'pcr_300': round(pcr_300_list[-1],2),
-            'berry_300': round(berry_300_list[-1],2),
-            'pcr_300_list': pcr_300_list,
-            'berry_300_list': berry_300_list,
-            'readme': readme,
-        }
-    return json.dumps(context)
-
 @app.route("/api/op")
 def api_op(name=None):
     now = pendulum.now("Asia/Shanghai")
@@ -137,8 +93,6 @@ def api_op(name=None):
     pcr_500_list = option_dict['pcr_500']
     berry_500_list = option_dict['berry_500']
 
-
-    # print(now, " %.2f"% (output*100)," %")
     readme =  "30 -50- 70  ==   70 -90- 110"
     context = { 'now': now_str,
             'last_time': last_time,
@@ -161,57 +115,7 @@ def api_op(name=None):
         }
     return json.dumps(context)
 
-@app.route("/op/<code>")
-def oppage(code = "IF", name=None):
-    now = pendulum.now("Asia/Shanghai")
-    now_str = now.to_datetime_string()
-    if not os.path.exists(json_path):
-        mk_alpha = pendulum.today("Asia/Shanghai").add(hours=9,minutes=30,seconds=10)
-        remain = (mk_alpha - now).total_seconds()
-        return render_template('pedding.html',name=name, remain = str(remain))
-    return render_template('op_'+code+'.html', name=name)
 
-def fetch_sum(op_list):
-    names_url = "http://hq.sinajs.cn/list=" + ",".join(op_list)
-    res = requests.get(names_url, headers=SINA)
-    res_str = res.text
-    #hq_str_op_list = re.findall('="[A-Z_0-9,]*";',res_str)
-    hq_str_op_list = re.findall('CON_OP_\d*',res_str)
-    #print(hq_str_op_list)
-
-    detail_url = "http://hq.sinajs.cn/list=" + ",".join(hq_str_op_list)
-    res = requests.get(detail_url, headers=SINA)
-    res_str = res.text
-    #print(res_str)
-    hq_str_con_op_list = re.findall('="[\w,. -:购沽月]*',res_str)
-    #print("========")
-    vol_sum = 0
-    for oneline in hq_str_con_op_list:
-        tmp_list = oneline.split(",")
-        print(tmp_list)
-        vol_sum += int(tmp_list[41])
-    return vol_sum
-
-def fetch_lite(op_name):
-    # get sum of vol from one op_name
-    with open("sina_option.json", 'r', encoding='utf-8') as file:
-        sina_option_dict = json.load(file)
-    # sina_option_dict = json.loads(db.get("sina_option.json"))
-    hq_str_op_list = sina_option_dict[op_name]
-    detail_url = "http://hq.sinajs.cn/list=" + ",".join(hq_str_op_list)
-    res = requests.get(detail_url, headers=SINA)
-    res_str = res.text
-    print(res_str)
-    hq_str_con_op_list = re.findall('="[\w,. -:购沽月]*',res_str)
-    print("========")
-    vol_sum = 0
-    for oneline in hq_str_con_op_list:
-        tmp_list = oneline.split(",")
-        if len(tmp_list) < 41:
-            continue
-        print(tmp_list)
-        vol_sum += int(tmp_list[41])
-    return vol_sum
 if __name__ == '__main__':
     app.run(debug=True,port=8009)
 #
