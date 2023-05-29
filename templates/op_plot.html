@@ -311,6 +311,24 @@
                   width: 3
                 }
             };
+            var traceCurAM= {
+                x: [this.now],
+                y: [this.berry_300],
+                xaxis: 'x1',
+                yaxis: 'y1',
+                mode: 'markers',
+                type: 'scatter',
+                marker: { color: '#FF00FF' ,width:10 }
+            };
+            var traceCurPM= {
+                x: [this.now],
+                y: [this.berry_300],
+                xaxis: 'x1',
+                yaxis: 'y1',
+                mode: 'markers',
+                type: 'scatter',
+                marker: { color: '#FF00FF' ,width:10 }
+            };
             var layout = {
               showlegend: false,
               title: 'Poke PCR Optimized',
@@ -334,7 +352,7 @@
               },
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             };
-            var plot_set = [traceIFAM, traceIFPM,tracelineAM,tracelinePM];
+            var plot_set = [traceIFAM, traceIFPM,tracelineAM,tracelinePM,traceCurAM, traceCurPM];
             // var plot_set = [traceIF];
             Plotly.newPlot(chart, plot_set, layout)
           }
