@@ -331,7 +331,7 @@
             };
             var layout = {
               showlegend: false,
-              title: 'Poke PCR Optimized',
+              // title: 'Poke PCR Optimized',
               xaxis: {
                 // data: this.chartdatax,
                 title: 'AM',
@@ -349,6 +349,11 @@
                 range: [this.now.slice(0, 11) + "12:59:00", this.now.slice(0, 11) + "15:01:00"],
               },
               yaxis2: {
+              },
+              margin: {
+                l:40,
+                r:40,
+                t:20,
               },
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             };
