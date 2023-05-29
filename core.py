@@ -52,6 +52,11 @@ def api_remain(name=None):
     # refresh remain per half-hour
     # if now.minute % 30 == 0:
     #     print(("JQData Remains => ",personal.jq_remains()))
+    json_path = os.path.join("data", "sina_option_data.json")
+    if not os.path.exists(json_path) and now > mk_alpha:
+        print("Market Closed. Holiday")
+        return ""
+
 
     #check market is closed
     # store it in redis by daily run tool
@@ -74,6 +79,61 @@ def api_remain(name=None):
         print("update to tomorrow")
     return str(int(remain))
 
+@app.route("/api/touch")
+def api_touch(name=None):
+    now = pendulum.now("Asia/Shanghai")
+    dawn = pendulum.today("Asia/Shanghai")
+    mk_mu = dawn.add(hours=9,minutes=20)
+    mk_nu = dawn.add(hours=9,minutes=25)
+    mk_alpha = dawn.add(hours=9,minutes=30,seconds=20)
+    # mk_margin = dawn.add(hours=9,minutes=30,seconds=10)
+    mk_beta = dawn.add(hours=11,minutes=30)
+    mk_gamma = dawn.add(hours=13,minutes=0)
+    mk_delta = dawn.add(hours=15,minutes=0)
+    mk_zeta = pendulum.tomorrow("Asia/Shanghai")
+    remain = 0
+
+    """
+        mu nu  9:30  alpha beta  12  gamma  delta  16 zeta
+    """
+    if now.day_of_week == pendulum.SATURDAY or now.day_of_week == pendulum.SUNDAY:
+        context = { 'status': '310',
+                'now': now.to_datetime_string(),
+                'remain': '',
+        }
+        return json.dumps(context)
+
+    json_path = os.path.join("data", "sina_option_data.json")
+    if not os.path.exists(json_path) and now > mk_alpha:
+        context = { 'status': '310',
+                'now': now.to_datetime_string(),
+                'remain': 0,
+        }
+        return json.dumps(context)
+
+    if now < mk_alpha:
+        print(["remain (s) ",(mk_alpha - now).total_seconds()])
+        status = '301'
+        remain = (mk_alpha - now).total_seconds()
+    elif now < mk_beta:
+        status = '200'
+    elif now < mk_gamma:
+        print(["remain (s) ",(mk_gamma - now).total_seconds()])
+        status = '302'
+        remain = (mk_gamma - now).total_seconds()
+    elif now < mk_delta:
+        status = '200'
+    else:
+        print("Market Closed")
+        print(["remain to end (s) ",(mk_zeta - now).total_seconds()])
+        status = '303'
+        remain = (mk_zeta - now).total_seconds()
+        print("update to tomorrow")
+    context = { 'status': status,
+                'now': now.to_datetime_string(),
+                'remain': remain,
+    }
+    return json.dumps(context)
 
 @app.route("/api/op")
 def api_op(name=None):
