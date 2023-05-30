@@ -241,19 +241,10 @@
             .then(function () { });
         },
         pushdata() {
-          if (that.now_list.length > 300){
-            // release 9:30 - 9:50 data, useless
-            this.chartdatax = that.now_list.slice(240)
-            this.chartIHdatay = that.berry_50_list.slice(240)
-            this.chartIFdatay = that.berry_300_list.slice(240)
-            this.chartICdatay = that.berry_500_list.slice(240)
-          }
-          else{
-            this.chartdatax = that.now_list
-            this.chartIHdatay = that.berry_50_list
-            this.chartIFdatay = that.berry_300_list
-            this.chartICdatay = that.berry_500_list
-          }
+          this.chartdatax = that.now_list
+          this.chartIHdatay = that.berry_50_list
+          this.chartIFdatay = that.berry_300_list
+          this.chartICdatay = that.berry_500_list
           // this.getEchart();
           this.getplotly();
 

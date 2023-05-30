@@ -228,7 +228,8 @@ def hold_period():
         else:
             print("Market Closed")
             print(["remain to end (s) ",(mk_zeta - now).total_seconds()])
-            time.sleep((mk_zeta - now).total_seconds())
+            time.sleep((mk_zeta - now).total_seconds() + 3600)
+            # sleep @ 1:00
             exit(0)
 
 
