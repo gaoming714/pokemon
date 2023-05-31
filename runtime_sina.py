@@ -113,6 +113,11 @@ def launch():
 
 
     # print(option_dict)
+    if now.hour <= 9 and now.minute <= 33:
+        option_dict['berry_50'][-1] = 50
+        option_dict['berry_300'][-1] = 50
+        option_dict['berry_500'][-1] = 50
+
     with open(json_path, 'w', encoding='utf-8') as file:
         json.dump(option_dict, file, ensure_ascii=False)
 
