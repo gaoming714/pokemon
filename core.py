@@ -25,8 +25,8 @@ def oppage(code = "IF", name=None):
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
     if not os.path.exists(json_path):
-        mk_alpha = pendulum.today("Asia/Shanghai").add(hours=9,minutes=30,seconds=10)
-        remain = (mk_alpha - now).total_seconds()
+        mk_margin = pendulum.today("Asia/Shanghai").add(hours=9,minutes=34,seconds=0)
+        remain = (mk_margin - now).total_seconds()
         return render_template('pedding.html',name=name, remain = str(remain))
     return render_template('op_'+code+'.html', name=name)
 

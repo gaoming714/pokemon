@@ -28,16 +28,20 @@ def launch():
 
     # now_online, pct_300 = fetch_stock("sh000300")
     now_online = fetch_time()
-    pct_50 = fetch_future("nf_IH0")
-    pct_300 = fetch_future("nf_IF0")
-    pct_500 = fetch_future("nf_IC0")
+    # pct_50 = fetch_future("nf_IH0")
+    # pct_300 = fetch_future("nf_IF0")
+    # pct_500 = fetch_future("nf_IC0")
+    pct_50 = fetch_stock("sh000016")
+    pct_300 = fetch_stock("sh000300")
+    pct_500 = fetch_future("nf_IF0")
+    # pct_500 = fetch_stock("sh000905")
     # https://hq.sinajs.cn/list=nf_IC0,nf_IF0
     vol_up_50 = fetch_op_sum('op_up_50')
     vol_down_50 = fetch_op_sum('op_down_50')
     vol_up_300 = fetch_op_sum('op_up_300')
     vol_down_300 = fetch_op_sum('op_down_300')
-    vol_up_500 = fetch_op_sum('op_up_500')
-    vol_down_500 = fetch_op_sum('op_down_500')
+    vol_up_500 = fetch_op_sum('op_up_300')
+    vol_down_500 = fetch_op_sum('op_down_300')
 
     if vol_up_300 == 0:
         return
@@ -164,20 +168,20 @@ def fetch_stock(code):
     res_price = float(res_list[3])
     res_pct = (res_price - res_yest) / res_yest * 100
     res_now = res_list[30] + " " + res_list[31]
-    return res_now, res_pct
+    return res_pct
 
 def fetch_time():
-    detail_url = "http://hq.sinajs.cn/list=" + "nf_IF0"
+    detail_url = "http://hq.sinajs.cn/list=" + "sh000300"
     res = requests.get(detail_url, headers=SINA)
     res_str = res.text
     res_tmp_list = res_str.split("=\"")[-1]
     res_list = res_tmp_list.split(",")
-    res_name = res_list[-1]
-    res_open = float(res_list[0])
-    res_yest = float(res_list[14])
+    res_name = res_list[0]
+    res_open = float(res_list[1])
+    res_yest = float(res_list[2])
     res_price = float(res_list[3])
     res_pct = (res_price - res_yest) / res_yest * 100
-    res_now = res_list[36] + " " + res_list[37]
+    res_now = res_list[30] + " " + res_list[31]
     return res_now
 
 def fetch_future(code):
@@ -194,7 +198,9 @@ def fetch_future(code):
     res_now = res_list[36] + " " + res_list[37]
     return res_pct
 
+
 #var hq_str_sh510300="沪深300ETF,4.103,4.103,4.030,4.106,4.024,4.031,4.032,683648627,2776624903.000,136700,4.031,35200,4.030,306800,4.029,1011700,4.028,161900,4.027,461200,4.032,221400,4.033,103900,4.034,117800,4.035,111800,4.036,2023-04-21,15:00:01,00,";
+#var hq_str_sh000300="沪深300,3827.1634,3837.7531,3801.3870,3827.1634,3781.4034,0,0,105929375,202331293564,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2023-05-31,14:40:11,00,";
 #var hq_str_nf_IH0="2663.000,2666.000,2637.000,2644.400,19752,52338702.000,38880.000,0.000,0.000,2932.000,2399.200,0.000,0.000,2661.400,2665.600,42815.000,2644.400,3,0.000,0,0.000,0,0.000,0,0.000,0,2644.600,2,0.000,0,0.000,0,0.000,0,0.000,0,2023-04-24,11:25:59,0,1,,,,,,,,,2649.793,上证50指数期货连续";
 
 
