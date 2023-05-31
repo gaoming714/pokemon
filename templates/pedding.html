@@ -15,8 +15,8 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
-  <!-- Main CSS -->
-  <link href="{{ url_for('static', filename='preloader.css') }}" rel="stylesheet" />
+    <!-- Main CSS -->
+    <link href="{{ url_for('static', filename='preloader.css') }}" rel="stylesheet" />
 
     <script src="https://cdn.bootcdn.net/ajax/libs/moment.js/2.29.1/moment.js"></script>
 
@@ -211,22 +211,25 @@
 </head>
 
 <body id="t" class="offline" data-new-gr-c-s-check-loaded="8.905.0" data-gr-ext-installed="">
-      <!-- Start preloader -->
-      <div class="preloader bg-dark flex-column justify-content-center align-items-center">
+    <!-- Start preloader -->
+    <div class="preloader bg-dark flex-column justify-content-center align-items-center">
         <svg id="loader-logo" xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 64 78.4">
-            <path fill="#fff" d="M10,0h1.2V11.2H0V10A10,10,0,0,1,10,0Z"/>
-            <rect fill="none" stroke="#fff" stroke-width="11.2" x="40" y="17.6" width="0" height="25.6"/>
-            <rect fill="none" stroke="#fff" stroke-opacity="0.4" stroke-width="11.2" x="23" y="35.2" width="0" height="25.6"/>
-            <path fill="#fff" d="M52.8,35.2H64V53.8a7,7,0,0,1-7,7H52.8V35.2Z"/>
-            <rect fill="none" stroke="#fff" stroke-width="11.2" x="6" y="52.8" width="0" height="25.6"/>
-            <path fill="#fff" d="M52.8,0H57a7,7,0,0,1,7,7h0v4.2H52.8V0Z"/>
-            <rect fill="none" stroke="#fff" stroke-opacity="0.4" stroke-width="11.2" x="57.8" y="17.6" width="0" height="11.2"/>
-            <rect fill="none" stroke="#0d6efd" stroke-width="11.2" x="6" y="35.2" width="0" height="11.2"/>
-            <rect fill="none" stroke="#fff" stroke-width="11.2" x="40.2" y="49.6" width="0" height="11.2"/>
-            <path fill="#fff" d="M17.6,67.2H28.8v1.2a10,10,0,0,1-10,10H17.6V67.2Z"/>
-            <rect fill="none" stroke="#0d6efd" stroke-opacity="0.4" stroke-width="28.8" x="31.6" width="0" height="11.2"/>
-            <rect fill="none" stroke="#fff" x="14" stroke-width="28.8" y="17.6" width="0" height="11.2"/>
-          </svg>
+            <path fill="#fff" d="M10,0h1.2V11.2H0V10A10,10,0,0,1,10,0Z" />
+            <rect fill="none" stroke="#fff" stroke-width="11.2" x="40" y="17.6" width="0" height="25.6" />
+            <rect fill="none" stroke="#fff" stroke-opacity="0.4" stroke-width="11.2" x="23" y="35.2" width="0"
+                height="25.6" />
+            <path fill="#fff" d="M52.8,35.2H64V53.8a7,7,0,0,1-7,7H52.8V35.2Z" />
+            <rect fill="none" stroke="#fff" stroke-width="11.2" x="6" y="52.8" width="0" height="25.6" />
+            <path fill="#fff" d="M52.8,0H57a7,7,0,0,1,7,7h0v4.2H52.8V0Z" />
+            <rect fill="none" stroke="#fff" stroke-opacity="0.4" stroke-width="11.2" x="57.8" y="17.6" width="0"
+                height="11.2" />
+            <rect fill="none" stroke="#0d6efd" stroke-width="11.2" x="6" y="35.2" width="0" height="11.2" />
+            <rect fill="none" stroke="#fff" stroke-width="11.2" x="40.2" y="49.6" width="0" height="11.2" />
+            <path fill="#fff" d="M17.6,67.2H28.8v1.2a10,10,0,0,1-10,10H17.6V67.2Z" />
+            <rect fill="none" stroke="#0d6efd" stroke-opacity="0.4" stroke-width="28.8" x="31.6" width="0"
+                height="11.2" />
+            <rect fill="none" stroke="#fff" x="14" stroke-width="28.8" y="17.6" width="0" height="11.2" />
+        </svg>
     </div>
     <!-- End preloader -->
     <div class="container">
@@ -251,14 +254,15 @@
             </div>
             <div id="message">
                 <div id="app" class="container">
-                    <h1>未开始请等待 <span v-if="timer >= 0" v-text="timer"></span> <span v-if="timer >= 0" >(s)</span><span v-text="msg"></span></h1>
+                    <h1>未开始请等待 <span v-if="timer >= 0" v-text="timer"></span> <span v-if="timer >= 0">(s)</span><span
+                            v-text="msg"></span></h1>
                     <h1>指标工作时间为 9:34 - 15:00</h1>
                 </div>
                 <p>
                     🏠管理员反馈：<a
                         href="#">微信：gaoming714</a><br />或者<br />🐱‍🐉玩一会小恐龙快跑&nbsp;&nbsp;&nbsp;&nbsp;(源码来自Chromium)<br />按<span>空格(space)</span>
-                        <!-- <span>上(↑)</span><span>下(↓)</span><span>左(←)</span><span>右(→)</span> -->
-                        键试试
+                    <!-- <span>上(↑)</span><span>下(↓)</span><span>左(←)</span><span>右(→)</span> -->
+                    键试试
                 </p>
                 <p id="github">
                     B站:<a href="https://space.bilibili.com/30978137" target="_blank">野生的妙蛙种子</a>
@@ -322,14 +326,14 @@
                 this.fetch();
                 // console.log(this.timer);
                 setInterval(() => {
-                    if (this.timer > 0){
+                    if (this.timer > 0) {
                         this.timer--;
                     }
-                    else if (this.timer > -10){
+                    else if (this.timer > -10) {
                         this.timer--;
                         this.msg = "--准备数据--"
                     }
-                    else{
+                    else {
                         this.msg = "--未开盘--"
                     }
                 }, 1000);
@@ -354,24 +358,24 @@
         Vue.createApp(App).mount("#app");
     </script>
 
-  <!-- preloader need -->
-  <script src="https://cdn.bootcdn.net/ajax/libs/vivus/0.4.6/vivus.min.js"></script>
+    <!-- preloader need -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/vivus/0.4.6/vivus.min.js"></script>
 
-  <!-- Start preloader -->
-  <script type="text/javascript">
-    var preloader = document.querySelector('.preloader');
-    if(preloader) {
+    <!-- Start preloader -->
+    <script type="text/javascript">
+        var preloader = document.querySelector('.preloader');
+        if (preloader) {
 
-        const animations = ['oneByOne', 'delayed', 'sync', 'scenario'];
+            const animations = ['oneByOne', 'delayed', 'sync', 'scenario'];
 
-        new Vivus('loader-logo', {duration: 50, type: 'oneByOne'}, function () {});
+            new Vivus('loader-logo', { duration: 50, type: 'oneByOne' }, function () { });
 
-        setTimeout(function() {
-            preloader.classList.add('show');
-        }, 1500);
-    }
-  </script>
-  <!-- End preloader -->
+            setTimeout(function () {
+                preloader.classList.add('show');
+            }, 1500);
+        }
+    </script>
+    <!-- End preloader -->
 
 </body>
 <grammarly-desktop-integration data-grammarly-shadow-root="true"></grammarly-desktop-integration>
