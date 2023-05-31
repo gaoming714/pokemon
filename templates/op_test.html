@@ -264,7 +264,7 @@
               },
               name: 'IF 510300',
             };
-            var traceICPM = {
+            var traceIFPM = {
               x: this.chartdatax,
               y: this.chartIFdatay,
               xaxis: 'x2',
@@ -274,7 +274,7 @@
                 color: '#0d6efd',
                 width: 2
               },
-              name: 'IC 510500',
+              name: 'IC 510300',
             };
             var traceICAM = {
               x: this.chartdatax,
@@ -288,7 +288,7 @@
               },
               name: 'IC 510500',
             };
-            var traceIFPM = {
+            var traceICPM = {
               x: this.chartdatax,
               y: this.chartICdatay,
               xaxis: 'x2',
@@ -298,7 +298,7 @@
                 color: '#228B22',
                 width: 2
               },
-              name: 'IF 510300',
+              name: 'IF 510500',
             };
             var tracelineAM= {
                 x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "11:30:00"],
@@ -372,7 +372,7 @@
               },
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             };
-            var plot_set = [traceIFAM, traceIFPM,tracelineAM,tracelinePM,traceCurAM, traceCurPM, traceICAM, traceIFPM];
+            var plot_set = [traceIFAM, traceIFPM,tracelineAM,tracelinePM,traceCurAM, traceCurPM, traceICAM, traceICPM];
             // var plot_set = [traceIF];
             Plotly.newPlot(chart, plot_set, layout)
           }
