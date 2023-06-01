@@ -28,20 +28,20 @@ def launch():
 
     # now_online, pct_300 = fetch_stock("sh000300")
     now_online = fetch_time()
-    pct_50 = fetch_future("nf_IH0")
-    pct_300 = fetch_future("nf_IF0")
-    pct_500 = fetch_future("nf_IC0")
-    # pct_50 = fetch_stock("sh000016")
-    # pct_300 = fetch_stock("sh000300")
+    # pct_50 = fetch_future("nf_IH0")
+    # pct_300 = fetch_future("nf_IF0")
     # pct_500 = fetch_future("nf_IF0")
-    # pct_500 = fetch_stock("sh000905")
+    pct_50 = fetch_stock("sh000016")
+    pct_300 = fetch_stock("sh000300")
+    # pct_500 = fetch_future("nf_IF0")
+    pct_500 = fetch_stock("sh000905")
     # https://hq.sinajs.cn/list=nf_IC0,nf_IF0
     vol_up_50 = fetch_op_sum('op_up_50')
     vol_down_50 = fetch_op_sum('op_down_50')
     vol_up_300 = fetch_op_sum('op_up_300')
     vol_down_300 = fetch_op_sum('op_down_300')
-    vol_up_500 = fetch_op_sum('op_up_300')
-    vol_down_500 = fetch_op_sum('op_down_300')
+    vol_up_500 = fetch_op_sum('op_up_500')
+    vol_down_500 = fetch_op_sum('op_down_500')
 
     if vol_up_300 == 0:
         return
@@ -110,8 +110,8 @@ def launch():
     # option_dict['op_down_500'].append(vol_down_500)
     option_dict['pct_500'].append(pct_500)
     pcr_500 = vol_down_500 / vol_up_500 * 100
-    mid_500 = vol_down_500 / vol_up_500 * 100 - 0
-    berry_500 = (pct_500 * 50) + mid_500
+    mid_500 = vol_down_500 / vol_up_500 * 100 - 40
+    berry_500 = (pct_500 * 10) + mid_500
     option_dict['pcr_500'].append(pcr_500)
     option_dict['berry_500'].append(berry_500)
 
