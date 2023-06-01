@@ -12,5 +12,5 @@ apps:
     args        : ""
     cwd         : ""
     interpreter : "bash"
-    out_file    : "log/pm2_shadow.log"
-    error_file  : "log/pm2_shadow.log"
+    out_file    : "log/pm2_sina.log"
+    error_file  : "log/pm2_sina.log"
