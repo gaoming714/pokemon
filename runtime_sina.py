@@ -28,12 +28,12 @@ def launch():
 
     # now_online, pct_300 = fetch_stock("sh000300")
     now_online = fetch_time()
-    # pct_50 = fetch_future("nf_IH0")
-    # pct_300 = fetch_future("nf_IF0")
-    # pct_500 = fetch_future("nf_IC0")
-    pct_50 = fetch_stock("sh000016")
-    pct_300 = fetch_stock("sh000300")
-    pct_500 = fetch_future("nf_IF0")
+    pct_50 = fetch_future("nf_IH0")
+    pct_300 = fetch_future("nf_IF0")
+    pct_500 = fetch_future("nf_IC0")
+    # pct_50 = fetch_stock("sh000016")
+    # pct_300 = fetch_stock("sh000300")
+    # pct_500 = fetch_future("nf_IF0")
     # pct_500 = fetch_stock("sh000905")
     # https://hq.sinajs.cn/list=nf_IC0,nf_IF0
     vol_up_50 = fetch_op_sum('op_up_50')
