@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index(name=None):
-    return redirect("/op/IM")
+    return redirect("/op/plot")
 
 @app.route("/op/<code>")
 def oppage(code = "IF", name=None):
