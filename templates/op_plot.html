@@ -7,10 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
 
-  <!-- <semantic CSS> -->
-  <link href="https://cdn.bootcdn.net/ajax/libs/semantic-ui/2.5.0/semantic.min.css" rel="stylesheet" />
   <!-- Bootstrap CSS -->
   <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
+  <!-- <semantic CSS> -->
+  <link href="https://cdn.bootcdn.net/ajax/libs/semantic-ui/2.5.0/semantic.min.css" rel="stylesheet" />
   <!-- Main CSS -->
   <link href="{{ url_for('static', filename='preloader.css') }}" rel="stylesheet" />
 
@@ -55,9 +55,12 @@
         </a>
         <div class="ui labeled button" tabindex="0">
           <div class="ui basic blue button">
-            <i class="fork icon"></i> Forks
+            <a class="ui basic" href="https://github.com/gaoming714/pokemon" target="_blank">
+              <i class="fork icon"></i>Forks
+            </a>
           </div>
-          <a class="ui basic left pointing blue label" href="http://www.sse.com.cn/assortment/options/date/">
+          <a class="ui basic left pointing blue label" href="http://www.sse.com.cn/assortment/options/date/"
+            target="_blank">
             上海证券交易所-期权统计
           </a>
         </div>
@@ -181,7 +184,6 @@
           now: null,
           now_list: [],
           readme: null,
-          chartdata: [],
           chartdatax: [],
           chartIHdatay: [],
           chartIFdatay: [],

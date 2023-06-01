@@ -7,10 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
 
-  <!-- <semantic CSS> -->
-  <link href="https://cdn.bootcdn.net/ajax/libs/semantic-ui/2.5.0/semantic.min.css" rel="stylesheet" />
   <!-- Bootstrap CSS -->
   <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
+  <!-- <semantic CSS> -->
+  <link href="https://cdn.bootcdn.net/ajax/libs/semantic-ui/2.5.0/semantic.min.css" rel="stylesheet" />
   <!-- Main CSS -->
   <link href="{{ url_for('static', filename='preloader.css') }}" rel="stylesheet" />
 
@@ -181,7 +181,6 @@
           now: null,
           now_list: [],
           readme: null,
-          chartdata: [],
           chartdatax: [],
           chartIHdatay: [],
           chartIFdatay: [],
@@ -254,6 +253,30 @@
         getplotly() {
           chart = document.getElementById('chart');
           if (chart) {
+            var traceIHAM = {
+              x: this.chartdatax,
+              y: this.chartIHdatay,
+              xaxis: 'x1',
+              yaxis: 'y1',
+              mode: 'lines',
+              line: {
+                color: '#f25022',
+                width: 2
+              },
+              name: 'IF 510300',
+            };
+            var traceIHPM = {
+              x: this.chartdatax,
+              y: this.chartIHdatay,
+              xaxis: 'x2',
+              yaxis: 'y2',
+              mode: 'lines',
+              line: {
+                color: '#f25022',
+                width: 2
+              },
+              name: 'IC 510300',
+            };
             var traceIFAM = {
               x: this.chartdatax,
               y: this.chartIFdatay,
@@ -261,7 +284,7 @@
               yaxis: 'y1',
               mode: 'lines',
               line: {
-                color: '#0d6efd',
+                color: '#00a4ef',
                 width: 2
               },
               name: 'IF 510300',
@@ -273,7 +296,7 @@
               yaxis: 'y2',
               mode: 'lines',
               line: {
-                color: '#0d6efd',
+                color: '#00a4ef',
                 width: 2
               },
               name: 'IC 510300',
@@ -285,7 +308,7 @@
               yaxis: 'y1',
               mode: 'lines',
               line: {
-                color: '#228B22',
+                color: '#7fba00',
                 width: 2
               },
               name: 'IC 510500',
@@ -297,7 +320,7 @@
               yaxis: 'y2',
               mode: 'lines',
               line: {
-                color: '#228B22',
+                color: '#7fba00',
                 width: 2
               },
               name: 'IF 510500',
@@ -368,13 +391,13 @@
               yaxis2: {
               },
               margin: {
-                l: 35,
-                r: 35,
+                l: 40,
+                r: 40,
                 t: 20,
               },
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             };
-            var plot_set = [traceIFAM, traceIFPM, tracelineAM, tracelinePM, traceCurAM, traceCurPM, traceICAM, traceICPM];
+            var plot_set = [traceIFAM, traceIFPM, tracelineAM, tracelinePM, traceCurAM, traceCurPM,traceIHAM, traceIHPM, traceICAM, traceICPM];
             // var plot_set = [traceIF];
             Plotly.newPlot(chart, plot_set, layout)
           }
