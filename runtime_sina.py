@@ -124,8 +124,8 @@ def launch():
     with open(json_path, 'w', encoding='utf-8') as file:
         json.dump(option_dict, file, ensure_ascii=False)
 
-    # df = pd.DataFrame(option_dict,index=option_dict["now_list"])
-    # df = df.drop("now_list",axis=1)
+    df = pd.DataFrame(option_dict,index=option_dict["now_list"])
+    df = df.drop("now_list",axis=1)
     print(df)
     # with open(pickle_path, 'wb') as f:
     #     pickle.dump(df, f)
