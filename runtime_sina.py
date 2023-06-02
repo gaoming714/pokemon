@@ -92,7 +92,7 @@ def launch():
     # option_dict['op_down_50'].append(vol_down_50)
     option_dict['pct_50'].append(pct_50)
     pcr_50 = vol_down_50 / vol_up_50 * 100
-    mid_50 = vol_down_50 / vol_up_50 * 100 - 44
+    mid_50 = vol_down_50 / vol_up_50 * 100 - 42
     berry_50 = (pct_50 * 10) + mid_50
     option_dict['pcr_50'].append(pcr_50)
     option_dict['berry_50'].append(berry_50)
@@ -101,7 +101,7 @@ def launch():
     # option_dict['op_down_300'].append(vol_down_300)
     option_dict['pct_300'].append(pct_300)
     pcr_300 = vol_down_300 / vol_up_300 * 100
-    mid_300 = vol_down_300 / vol_up_300 * 100 - 44
+    mid_300 = vol_down_300 / vol_up_300 * 100 - 42
     berry_300 = (pct_300 * 10) + mid_300
     option_dict['pcr_300'].append(pcr_300)
     option_dict['berry_300'].append(berry_300)
@@ -110,7 +110,7 @@ def launch():
     # option_dict['op_down_500'].append(vol_down_500)
     option_dict['pct_500'].append(pct_500)
     pcr_500 = vol_down_500 / vol_up_500 * 100
-    mid_500 = vol_down_500 / vol_up_500 * 100 - 66
+    mid_500 = vol_down_500 / vol_up_500 * 100 - 64
     berry_500 = (pct_500 * 10) + mid_500
     option_dict['pcr_500'].append(pcr_500)
     option_dict['berry_500'].append(berry_500)
