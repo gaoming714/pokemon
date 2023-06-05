@@ -92,7 +92,7 @@ def launch():
     # option_dict['op_down_50'].append(vol_down_50)
     option_dict['pct_50'].append(pct_50)
     pcr_50 = vol_down_50 / vol_up_50 * 100
-    mid_50 = vol_down_50 / vol_up_50 * 100 - 42
+    mid_50 = vol_down_50 / vol_up_50 * 100 - 36
     berry_50 = (pct_50 * 10) + mid_50
     option_dict['pcr_50'].append(pcr_50)
     option_dict['berry_50'].append(berry_50)
