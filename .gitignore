@@ -1,6 +1,8 @@
 # Project
 data/
+node_modules/
 poetry.lock
+package-lock.json
 
 
 # Byte-compiled / optimized / DLL files
