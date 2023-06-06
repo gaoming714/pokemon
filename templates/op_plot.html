@@ -47,29 +47,42 @@
   <!-- End preloader -->
 
   <div class="container" id="app">
-    <nav class="navbar navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
           <img src="https://github.githubassets.com/images/modules/site/home/logos/platform-linux.svg" />
           Poke PCR Optimized
         </a>
-        <div class="d-flex">
-          <div class="ui labeled button" tabindex="0" onclick="window.open('/op/test')">
-            <div class="ui red button">
-              <i class="heart icon"></i> Like
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01"
+          aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+          <!-- <a class="navbar-brand" href="#">Hidden brand</a> -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+            </li>
+            <li class="nav-item">
+            </li>
+          </ul>
+          <div class="d-flex">
+            <div class="ui labeled button" tabindex="0" onclick="window.open('/op/test')">
+              <div class="ui red button">
+                <i class="heart icon"></i> Like
+              </div>
+              <button class="ui basic red left pointing label">
+                Blend
+              </button>
             </div>
-            <button class="ui basic red left pointing label">
-              Blend
-            </button>
-          </div>
-          <div class="ui labeled button" tabindex="0" onclick="window.open('http://github.com/gaoming714/pokemon')">
-            <div class="ui basic blue button">
-              <i class="fork icon"></i>Forks
+            <div class="ui labeled button" tabindex="0" onclick="window.open('http://github.com/gaoming714/pokemon')">
+              <div class="ui basic blue button">
+                <i class="fork icon"></i>Forks
+              </div>
+              <button class="ui basic left pointing blue label"
+                onclick="window.open('http://www.sse.com.cn/assortment/options/date/')">
+                期权统计
+              </button>
             </div>
-            <button class="ui basic left pointing blue label"
-              onclick="window.open('http://www.sse.com.cn/assortment/options/date/')">
-              期权统计
-            </button>
           </div>
         </div>
       </div>
