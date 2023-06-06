@@ -54,13 +54,22 @@
           Poke PCR Optimized
         </a>
         <div class="d-flex">
+          <div class="ui labeled button" tabindex="0" onclick="window.open('/op/test')">
+            <div class="ui red button">
+              <i class="heart icon"></i> Like
+            </div>
+            <button class="ui basic red left pointing label">
+              Blend
+            </button>
+          </div>
           <div class="ui labeled button" tabindex="0" onclick="window.open('http://github.com/gaoming714/pokemon')">
             <div class="ui basic blue button">
               <i class="fork icon"></i>Forks
             </div>
-            <button class="ui basic left pointing blue label" onclick="window.open('http://www.sse.com.cn/assortment/options/date/')">
+            <button class="ui basic left pointing blue label"
+              onclick="window.open('http://www.sse.com.cn/assortment/options/date/')">
               上海证券交易所-期权统计
-          </button>
+            </button>
           </div>
         </div>
       </div>
@@ -78,15 +87,14 @@
           </div>
         </div>
       </div>
-
     </div>
     <p></p>
     <div class="row">
       <div class="col">
-        <div class="ui icon message">
+        <div class="mini ui icon message" :class="{ blue: isActive }">
           <i class="notched circle loading icon"></i>
           <div class="content">
-            <div class="header">current: <span v-text="now"></span></div>
+            <div class="header">current: <span v-text="now"></span> <span v-if="isActive===false"> => Pause</span></div>
             <p>Auto refresh during market opening.</p>
           </div>
         </div>
@@ -188,6 +196,11 @@
           chartIFdatay: [],
           chartICdatay: [],
         };
+      },
+      computed: {
+        isActive() {
+          return this.timer <= 0;
+        }
       },
       created() { },
       mounted() {
