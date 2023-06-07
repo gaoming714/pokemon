@@ -116,7 +116,7 @@ def launch():
     option_dict['berry_500'].append(berry_500)
 
 
-    if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=50,seconds=0):
+    if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=47,seconds=47):
         fixture(option_dict['berry_50'])
         fixture(option_dict['berry_300'])
         fixture(option_dict['berry_500'])
