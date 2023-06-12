@@ -5,6 +5,7 @@ import time
 import json
 import pendulum
 import redis
+# import pandas as pd
 from flask import Flask
 from flask import redirect, url_for
 from flask import render_template
@@ -147,11 +148,18 @@ def api_op(name=None):
 
     pcr_50_list = option_dict['pcr_50']
     berry_50_list = option_dict['berry_50']
-    # bracket_50 = max(berry_50_list[-66:-6]), min(berry_50_list[-66:-6])
     pcr_300_list = option_dict['pcr_300']
     berry_300_list = option_dict['berry_300']
     pcr_500_list = option_dict['pcr_500']
     berry_500_list = option_dict['berry_500']
+
+    burger_list = option_dict['burger']
+
+    # df = pd.DataFrame(option_dict,index=option_dict["now_list"])
+    # df = df.drop("now_list",axis=1)
+    # df['burger_ma'] = MA(df['burger'],20)
+    # burger_list = (df["berry_50"]/2+ df["berry_500"]/2 - df["pct_t0"]*10).to_list()
+    # burger_list = df['burger_ma'].to_list()
 
     readme =  "30 -50- 70  ==   70 -90- 110"
     context = { 'now': now_str,
@@ -171,10 +179,19 @@ def api_op(name=None):
             'berry_500': round(berry_500_list[-1],2),
             'pcr_500_list': pcr_500_list,
             'berry_500_list': berry_500_list,
+
+            'burger': round(burger_list[-1],2),
+            'burger_list': burger_list,
+
             'readme': readme,
         }
     return json.dumps(context)
 
+
+# def MA(S,N):
+#     return pd.Series(S).rolling(N,min_periods=1).mean().values
+# def STD(S,N):
+#     return  pd.Series(S).rolling(N).std(ddof=0).values
 
 if __name__ == '__main__':
     app.run(debug=True,port=8009)

@@ -201,25 +201,22 @@
           pcr_500: 0,
           berry_500: 0,
           berry_500_list: [],
+          burger: 0,
+          burger_list: [],
           now: null,
           now_list: [],
-          readme: null,
-          chartdatax: [],
-          chartIHdatay: [],
-          chartIFdatay: [],
-          chartICdatay: [],
-        };
+          readme: null
+        }
       },
       computed: {
         isActive() {
-          return this.timer <= 0;
+          return this.timer <= 0
         }
       },
       created() { },
       mounted() {
         this.fetch();
         this.refresh();
-        // console.log(this.timer);
         setInterval(() => {
           if (this.timer <= -2) {
             this.fetch();
@@ -227,8 +224,6 @@
           }
           this.timer--;
         }, 1000);
-        // this.getEchart();
-        // this.getplotly();
       },
       methods: {
         fetch() {
@@ -236,8 +231,6 @@
           axios
             .get("/api/remain")
             .then(function (response) {
-              // console.log(this.timer);
-              // console.log(response);
               that.timer = response.data;
             })
             .catch(function (error) {
@@ -258,10 +251,12 @@
               that.berry_300 = response.data["berry_300"];
               that.pcr_500 = response.data["pcr_500"];
               that.berry_500 = response.data["berry_500"];
+              that.burger = response.data["burger"];
               that.now_list = response.data["now_list"]
               that.berry_50_list = response.data["berry_50_list"]
               that.berry_300_list = response.data["berry_300_list"]
               that.berry_500_list = response.data["berry_500_list"]
+              that.burger_list = response.data["burger_list"]
               that.pushdata();
             })
             .catch(function (error) {
@@ -270,44 +265,20 @@
             .then(function () { });
         },
         pushdata() {
-          this.chartdatax = that.now_list
-          this.chartIHdatay = that.berry_50_list
-          this.chartIFdatay = that.berry_300_list
-          this.chartICdatay = that.berry_500_list
+          this.now_list = that.now_list
+          this.berry_50_list = that.berry_50_list
+          this.berry_300_list = that.berry_300_list
+          this.berry_500_list = that.berry_500_list
+          this.buger_list = that.burger_list
           // this.getEchart();
-          this.getplotly();
-
+          this.getplotly()
         },
         getplotly() {
           chart = document.getElementById('chart');
           if (chart) {
-            var traceIHAM = {
-              x: this.chartdatax,
-              y: this.chartIHdatay,
-              xaxis: 'x1',
-              yaxis: 'y1',
-              mode: 'lines',
-              line: {
-                color: '#f25022',
-                width: 2
-              },
-              name: 'IF 510300',
-            };
-            var traceIHPM = {
-              x: this.chartdatax,
-              y: this.chartIHdatay,
-              xaxis: 'x2',
-              yaxis: 'y2',
-              mode: 'lines',
-              line: {
-                color: '#f25022',
-                width: 2
-              },
-              name: 'IC 510300',
-            };
             var traceIFAM = {
-              x: this.chartdatax,
-              y: this.chartIFdatay,
+              x: this.now_list,
+              y: this.berry_300_list,
               xaxis: 'x1',
               yaxis: 'y1',
               mode: 'lines',
@@ -318,8 +289,8 @@
               name: 'IF 510300',
             };
             var traceIFPM = {
-              x: this.chartdatax,
-              y: this.chartIFdatay,
+              x: this.now_list,
+              y: this.berry_300_list,
               xaxis: 'x2',
               yaxis: 'y2',
               mode: 'lines',
@@ -327,31 +298,31 @@
                 color: '#00a4ef',
                 width: 2
               },
-              name: 'IC 510300',
+              name: 'IF 510300',
             };
-            var traceICAM = {
-              x: this.chartdatax,
-              y: this.chartICdatay,
+            var traceburgerAM = {
+              x: this.now_list,
+              y: this.burger_list,
               xaxis: 'x1',
               yaxis: 'y1',
               mode: 'lines',
               line: {
-                color: '#7fba00',
+                color: '#b31b1b',
                 width: 2
               },
-              name: 'IC 510500',
+              name: 'Burger',
             };
-            var traceICPM = {
-              x: this.chartdatax,
-              y: this.chartICdatay,
+            var traceburgerPM = {
+              x: this.now_list,
+              y: this.burger_list,
               xaxis: 'x2',
               yaxis: 'y2',
               mode: 'lines',
               line: {
-                color: '#7fba00',
+                color: '#b31b1b',
                 width: 2
               },
-              name: 'IF 510500',
+              name: 'Burger',
             };
             var tracelineAM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "11:30:00"],
@@ -381,7 +352,7 @@
             };
             var traceCurAM = {
               x: [this.now, this.now, this.now],
-              y: [this.berry_50, this.berry_300, this.berry_500],
+              y: [this.berry_300, this.burger],
               xaxis: 'x1',
               yaxis: 'y1',
               mode: 'markers',
@@ -390,7 +361,7 @@
             };
             var traceCurPM = {
               x: [this.now, this.now, this.now],
-              y: [this.berry_50, this.berry_300, this.berry_500],
+              y: [this.berry_300, this.burger],
               xaxis: 'x2',
               yaxis: 'y2',
               mode: 'markers',
@@ -401,15 +372,13 @@
               showlegend: false,
               // title: 'Poke PCR Optimized',
               xaxis: {
-                // data: this.chartdatax,
+                // data: this.now_list,
                 title: 'AM',
                 type: 'date',
                 range: [this.now.slice(0, 11) + "09:29:00", this.now.slice(0, 11) + "11:31:00"],
               },
               yaxis: {
                 title: 'Optimized （%）',
-                // range: [50 - this.margin, 50 + this.margin],
-                // autorange: false
               },
               xaxis2: {
                 title: 'PM',
@@ -425,8 +394,7 @@
               },
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             };
-            var plot_set = [traceIFAM, traceIFPM, tracelineAM, tracelinePM, traceCurAM, traceCurPM, traceIHAM, traceIHPM, traceICAM, traceICPM];
-            // var plot_set = [traceIF];
+            var plot_set = [tracelineAM, tracelinePM, traceburgerAM, traceburgerPM, traceIFAM, traceIFPM, traceCurAM, traceCurPM];
             Plotly.newPlot(chart, plot_set, layout)
           }
         },
