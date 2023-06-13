@@ -105,9 +105,9 @@
     <div class="row">
       <div class="col">
         <div class="mini ui icon message" :class="{ blue: isActive }">
-          <i class="notched circle icon" :class="{ loading: isActive }"></i>
+          <i class="notched icon" :class="{ 'sync alternate loading': isActive , 'pause circle outline': !isActive}"></i>
           <div class="content">
-            <div class="header">current: <span v-text="now"></span> <span v-if="isActive===false"> => Pause</span></div>
+            <div class="header">current: <span v-text="now"></span></div>
             <p>Auto refresh during market opening.</p>
           </div>
         </div>
