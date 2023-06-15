@@ -313,48 +313,49 @@
     </script>
 
     <script type="text/javascript">
-        const App = {
+        const { createApp } = Vue
+
+        createApp({
             data() {
                 return {
                     timer: '',
                     msg: ''
-                };
+                }
             },
             created() { },
             mounted() {
-                this.fetch();
-                // console.log(this.timer);
+                this.fetch()
+                // console.log(this.timer)
                 setInterval(() => {
                     if (this.timer > 0) {
-                        this.timer--;
+                        this.timer--
                     }
                     else if (this.timer > -10) {
-                        this.timer--;
+                        this.timer--
                         this.msg = "--准备数据--"
                     }
                     else {
                         this.msg = "--未开盘--"
                     }
-                }, 1000);
+                }, 1000)
             },
             methods: {
                 fetch() {
-                    that = this;
+                    that = this
                     axios
                         .get("/api/remain")
                         .then(function (response) {
-                            // console.log(this.timer);
-                            // console.log(response);
-                            that.timer = response.data;
+                            // console.log(this.timer)
+                            // console.log(response)
+                            that.timer = response.data
                         })
                         .catch(function (error) {
-                            console.log(error);
+                            console.log(error)
                         })
-                        .then(function () { });
+                        .then(function () { })
                 }
             }
-        }
-        Vue.createApp(App).mount("#app");
+        }).mount("#app")
     </script>
 
     <!-- preloader need -->
@@ -362,16 +363,16 @@
 
     <!-- Start preloader -->
     <script type="text/javascript">
-        var preloader = document.querySelector('.preloader');
+        var preloader = document.querySelector('.preloader')
         if (preloader) {
 
-            const animations = ['oneByOne', 'delayed', 'sync', 'scenario'];
+            const animations = ['oneByOne', 'delayed', 'sync', 'scenario']
 
-            new Vivus('loader-logo', { duration: 50, type: 'oneByOne' }, function () { });
+            new Vivus('loader-logo', { duration: 50, type: 'oneByOne' }, function () { })
 
             setTimeout(function () {
-                preloader.classList.add('show');
-            }, 1500);
+                preloader.classList.add('show')
+            }, 1500)
         }
     </script>
     <!-- End preloader -->

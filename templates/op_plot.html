@@ -188,7 +188,9 @@
   <script src="https://cdn.bootcdn.net/ajax/libs/plotly.js/2.21.0/plotly.min.js"></script>
 
   <script type="text/javascript">
-    const App = {
+    const { createApp } = Vue
+
+    createApp({
       data() {
         return {
           timer: 0,
@@ -208,78 +210,72 @@
           chartIHdatay: [],
           chartIFdatay: [],
           chartICdatay: [],
-        };
+        }
       },
       computed: {
         isActive() {
-          return this.timer <= 0;
+          return this.timer <= 0
         }
       },
       created() { },
       mounted() {
-        this.fetch();
-        this.refresh();
-        // console.log(this.timer);
+        this.fetch()
+        this.refresh()
         setInterval(() => {
           if (this.timer <= -2) {
-            this.fetch();
-            this.refresh();
+            this.fetch()
+            this.refresh()
           }
-          this.timer--;
-        }, 1000);
-        // this.getEchart();
-        // this.getplotly();
+          this.timer--
+        }, 1000)
       },
       methods: {
         fetch() {
-          that = this;
+          that = this
           axios
             .get("/api/remain")
             .then(function (response) {
-              // console.log(this.timer);
-              // console.log(response);
-              that.timer = response.data;
+              that.timer = response.data
             })
             .catch(function (error) {
-              console.log(error);
+              console.log(error)
             })
-            .then(function () { });
+            .then(function () { })
         },
         refresh() {
-          that = this;
+          that = this
           axios
             .get("/api/op")
             .then(function (response) {
-              console.log(response);
-              that.now = response.data["now"];
-              that.pcr_50 = response.data["pcr_50"];
-              that.berry_50 = response.data["berry_50"];
-              that.pcr_300 = response.data["pcr_300"];
-              that.berry_300 = response.data["berry_300"];
-              that.pcr_500 = response.data["pcr_500"];
-              that.berry_500 = response.data["berry_500"];
+              console.log(response)
+              that.now = response.data["now"]
+              that.pcr_50 = response.data["pcr_50"]
+              that.berry_50 = response.data["berry_50"]
+              that.pcr_300 = response.data["pcr_300"]
+              that.berry_300 = response.data["berry_300"]
+              that.pcr_500 = response.data["pcr_500"]
+              that.berry_500 = response.data["berry_500"]
               that.now_list = response.data["now_list"]
               that.berry_50_list = response.data["berry_50_list"]
               that.berry_300_list = response.data["berry_300_list"]
               that.berry_500_list = response.data["berry_500_list"]
-              that.pushdata();
+              that.pushdata()
             })
             .catch(function (error) {
-              console.log(error);
+              console.log(error)
             })
-            .then(function () { });
+            .then(function () { })
         },
         pushdata() {
           this.chartdatax = that.now_list
           this.chartIHdatay = that.berry_50_list
           this.chartIFdatay = that.berry_300_list
           this.chartICdatay = that.berry_500_list
-          // this.getEchart();
-          this.getplotly();
+          this.getplotly()
 
         },
         getplotly() {
-          chart = document.getElementById('chart');
+          chart = document.getElementById('chart')
           if (chart) {
             var traceIFAM = {
               x: this.chartdatax,
@@ -292,7 +288,7 @@
                 width: 2
               },
               name: 'IF 510300',
-            };
+            }
             var traceIFPM = {
               x: this.chartdatax,
               y: this.chartIFdatay,
@@ -304,7 +300,7 @@
                 width: 2
               },
               name: 'IF 510300',
-            };
+            }
             var tracelineAM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "11:30:00"],
               y: [50, 50],
@@ -317,7 +313,7 @@
                 color: '#002c37',
                 width: 3
               }
-            };
+            }
             var tracelinePM = {
               x: [this.now.slice(0, 11) + "13:00:00", this.now.slice(0, 11) + "15:00:00"],
               y: [50, 50],
@@ -330,7 +326,7 @@
                 color: '#002c37',
                 width: 3
               }
-            };
+            }
             var traceCurAM = {
               x: [this.now],
               y: [this.berry_300],
@@ -339,7 +335,7 @@
               mode: 'markers',
               type: 'scatter',
               marker: { color: '#FF00FF', size: 7 }
-            };
+            }
             var traceCurPM = {
               x: [this.now],
               y: [this.berry_300],
@@ -348,7 +344,7 @@
               mode: 'markers',
               type: 'scatter',
               marker: { color: '#FF00FF', size: 7 }
-            };
+            }
             var layout = {
               showlegend: false,
               // title: 'Poke PCR Optimized',
@@ -359,7 +355,7 @@
                 range: [this.now.slice(0, 11) + "09:29:00", this.now.slice(0, 11) + "11:31:00"],
               },
               yaxis: {
-                title: 'Optimized （%）',
+                title: 'Optimized (%)',
                 // range: [50 - this.margin, 50 + this.margin],
                 // autorange: false
               },
@@ -376,29 +372,27 @@
                 t: 20,
               },
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
-            };
-            var plot_set = [traceIFAM, traceIFPM, tracelineAM, tracelinePM, traceCurAM, traceCurPM];
-            // var plot_set = [traceIF];
+            }
+            var plot_set = [traceIFAM, traceIFPM, tracelineAM, tracelinePM, traceCurAM, traceCurPM]
             Plotly.newPlot(chart, plot_set, layout)
           }
         },
       },
-    };
-    Vue.createApp(App).mount("#app");
+    }).mount("#app")
   </script>
 
   <!-- Start preloader -->
   <script type="text/javascript">
-    var preloader = document.querySelector('.preloader');
+    var preloader = document.querySelector('.preloader')
     if (preloader) {
 
-      const animations = ['oneByOne', 'delayed', 'sync', 'scenario'];
+      const animations = ['oneByOne', 'delayed', 'sync', 'scenario']
 
-      new Vivus('loader-logo', { duration: 50, type: 'oneByOne' }, function () { });
+      new Vivus('loader-logo', { duration: 50, type: 'oneByOne' }, function () { })
 
       setTimeout(function () {
-        preloader.classList.add('show');
-      }, 1000);
+        preloader.classList.add('show')
+      }, 1000)
     }
   </script>
   <!-- End preloader -->

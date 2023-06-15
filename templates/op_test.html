@@ -188,7 +188,9 @@
   <script src="https://cdn.bootcdn.net/ajax/libs/plotly.js/2.21.0/plotly.min.js"></script>
 
   <script type="text/javascript">
-    const App = {
+    const { createApp } = Vue
+
+    createApp({
       data() {
         return {
           timer: 0,
@@ -215,54 +217,54 @@
       },
       created() { },
       mounted() {
-        this.fetch();
-        this.refresh();
+        this.fetch()
+        this.refresh()
         setInterval(() => {
           if (this.timer <= -2) {
-            this.fetch();
-            this.refresh();
+            this.fetch()
+            this.refresh()
           }
-          this.timer--;
-        }, 1000);
+          this.timer--
+        }, 1000)
       },
       methods: {
         fetch() {
-          that = this;
+          that = this
           axios
             .get("/api/remain")
             .then(function (response) {
-              that.timer = response.data;
+              that.timer = response.data
             })
             .catch(function (error) {
-              console.log(error);
+              console.log(error)
             })
-            .then(function () { });
+            .then(function () { })
         },
         refresh() {
-          that = this;
+          that = this
           axios
             .get("/api/op")
             .then(function (response) {
-              console.log(response);
-              that.now = response.data["now"];
-              that.pcr_50 = response.data["pcr_50"];
-              that.berry_50 = response.data["berry_50"];
-              that.pcr_300 = response.data["pcr_300"];
-              that.berry_300 = response.data["berry_300"];
-              that.pcr_500 = response.data["pcr_500"];
-              that.berry_500 = response.data["berry_500"];
-              that.burger = response.data["burger"];
+              console.log(response)
+              that.now = response.data["now"]
+              that.pcr_50 = response.data["pcr_50"]
+              that.berry_50 = response.data["berry_50"]
+              that.pcr_300 = response.data["pcr_300"]
+              that.berry_300 = response.data["berry_300"]
+              that.pcr_500 = response.data["pcr_500"]
+              that.berry_500 = response.data["berry_500"]
+              that.burger = response.data["burger"]
               that.now_list = response.data["now_list"]
               that.berry_50_list = response.data["berry_50_list"]
               that.berry_300_list = response.data["berry_300_list"]
               that.berry_500_list = response.data["berry_500_list"]
               that.burger_list = response.data["burger_list"]
-              that.pushdata();
+              that.pushdata()
             })
             .catch(function (error) {
-              console.log(error);
+              console.log(error)
             })
-            .then(function () { });
+            .then(function () { })
         },
         pushdata() {
           this.now_list = that.now_list
@@ -270,11 +272,11 @@
           this.berry_300_list = that.berry_300_list
           this.berry_500_list = that.berry_500_list
           this.buger_list = that.burger_list
-          // this.getEchart();
+          // this.getEchart()
           this.getplotly()
         },
         getplotly() {
-          chart = document.getElementById('chart');
+          chart = document.getElementById('chart')
           if (chart) {
             var traceIFAM = {
               x: this.now_list,
@@ -287,7 +289,7 @@
                 width: 2
               },
               name: 'IF 510300',
-            };
+            }
             var traceIFPM = {
               x: this.now_list,
               y: this.berry_300_list,
@@ -299,7 +301,7 @@
                 width: 2
               },
               name: 'IF 510300',
-            };
+            }
             var traceburgerAM = {
               x: this.now_list,
               y: this.burger_list,
@@ -311,7 +313,7 @@
                 width: 2
               },
               name: 'Burger',
-            };
+            }
             var traceburgerPM = {
               x: this.now_list,
               y: this.burger_list,
@@ -323,7 +325,7 @@
                 width: 2
               },
               name: 'Burger',
-            };
+            }
             var tracelineAM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "11:30:00"],
               y: [50, 50],
@@ -336,7 +338,7 @@
                 color: '#002c37',
                 width: 3
               }
-            };
+            }
             var tracelinePM = {
               x: [this.now.slice(0, 11) + "13:00:00", this.now.slice(0, 11) + "15:00:00"],
               y: [50, 50],
@@ -349,7 +351,7 @@
                 color: '#002c37',
                 width: 3
               }
-            };
+            }
             var traceCurAM = {
               x: [this.now, this.now, this.now],
               y: [this.berry_300, this.burger],
@@ -358,7 +360,7 @@
               mode: 'markers',
               type: 'scatter',
               marker: { color: '#FF00FF', size: 7 }
-            };
+            }
             var traceCurPM = {
               x: [this.now, this.now, this.now],
               y: [this.berry_300, this.burger],
@@ -367,7 +369,7 @@
               mode: 'markers',
               type: 'scatter',
               marker: { color: '#FF00FF', size: 7 }
-            };
+            }
             var layout = {
               showlegend: false,
               // title: 'Poke PCR Optimized',
@@ -393,28 +395,27 @@
                 t: 20,
               },
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
-            };
-            var plot_set = [tracelineAM, tracelinePM, traceburgerAM, traceburgerPM, traceIFAM, traceIFPM, traceCurAM, traceCurPM];
+            }
+            var plot_set = [tracelineAM, tracelinePM, traceburgerAM, traceburgerPM, traceIFAM, traceIFPM, traceCurAM, traceCurPM]
             Plotly.newPlot(chart, plot_set, layout)
           }
         },
       },
-    };
-    Vue.createApp(App).mount("#app");
+    }).mount("#app")
   </script>
 
   <!-- Start preloader -->
   <script type="text/javascript">
-    var preloader = document.querySelector('.preloader');
+    var preloader = document.querySelector('.preloader')
     if (preloader) {
 
-      const animations = ['oneByOne', 'delayed', 'sync', 'scenario'];
+      const animations = ['oneByOne', 'delayed', 'sync', 'scenario']
 
-      new Vivus('loader-logo', { duration: 50, type: 'oneByOne' }, function () { });
+      new Vivus('loader-logo', { duration: 50, type: 'oneByOne' }, function () { })
 
       setTimeout(function () {
-        preloader.classList.add('show');
-      }, 1000);
+        preloader.classList.add('show')
+      }, 1000)
     }
   </script>
   <!-- End preloader -->
