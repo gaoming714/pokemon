@@ -135,7 +135,7 @@
       <div class="offcanvas-body small">
         <i class="notched circle loading icon"></i>
         <div class="content">
-          <div class="header"><span>此指标为调整后的PCR，50以上宜看多，50以下宜看空。</span></div>
+          <div class="header"><span>此指标为调整后的PCR,正值宜看多，负值宜看空。</span></div>
           <p>建立平台后，向上突破可做多，指标停滞可平仓，反向同理。</p>
         </div>
       </div>
@@ -215,6 +215,9 @@
       computed: {
         isActive() {
           return this.timer <= 0
+        },
+        berry_progress() {
+          return 50 - 2 * this.berry_300
         }
       },
       created() { },
@@ -303,7 +306,7 @@
             }
             var tracelineAM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "11:30:00"],
-              y: [50, 50],
+              y: [0, 0],
               xaxis: 'x1',
               yaxis: 'y1',
               mode: 'lines',
@@ -316,7 +319,7 @@
             }
             var tracelinePM = {
               x: [this.now.slice(0, 11) + "13:00:00", this.now.slice(0, 11) + "15:00:00"],
-              y: [50, 50],
+              y: [0, 0],
               xaxis: 'x2',
               yaxis: 'y2',
               mode: 'lines',

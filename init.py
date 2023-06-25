@@ -43,6 +43,8 @@ def fetch_op(name, op_list):
 def create_data():
     intraday_data_json = os.path.join("data", "sina_option_data.json")
     nightly_data_json = os.path.join("data", "nightly_data.json")
+    if not os.path.exists("data"):
+        lumos("mkdir data")
     if not os.path.exists(intraday_data_json):
         init_intraday = {
                     'pct_50':[],
@@ -60,11 +62,18 @@ def create_data():
                 }
         with open(intraday_data_json, 'w', encoding='utf-8') as file:
             json.dump(init_intraday, file, ensure_ascii=False)
+        print("create sina_option_data.json")
     if not os.path.exists(nightly_data_json):
-        init_nightly = {"time": ["1970-01-01"], "pct_300": [0], "pcr_300": [50], "berry_300": [50],"shuffle": [0]}
+        init_nightly = {"time": ["1970-01-01"], "pct_300": [0], "pcr_300": [100], "berry_300": [0],"shuffle": [0]}
         with open(nightly_data_json, 'w', encoding='utf-8') as file:
             json.dump(init_nightly, file, ensure_ascii=False)
+        print("create nightly_data.json")
 
+def lumos(cmd):
+    # res = 0
+    print("CMD ➜ " + cmd)
+    res = os.system(cmd)
+    return res
 
 # def save_redis():
 #     option_json = json.dumps(option_dict)

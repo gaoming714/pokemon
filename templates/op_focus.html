@@ -66,7 +66,8 @@
           </ul>
           <div class="d-flex">
             <div class="ui labeled button" tabindex="0">
-              <div class="ui red button"  onclick="window.open('https://widget2.sentryd.com/widget/#/15490A29-95E3-4296-999E-28D0B35E0D12/USD-CNH/4')">
+              <div class="ui red button"
+                onclick="window.open('https://widget2.sentryd.com/widget/#/15490A29-95E3-4296-999E-28D0B35E0D12/USD-CNH/4')">
                 <i class="yen sign icon"></i>离岸
               </div>
               <a class="ui basic btn red left pointing label" onclick="window.open('/op/plot')">
@@ -87,23 +88,25 @@
       </div>
     </nav>
     <div class="row">
+      <div class="col-2">
+        <div class="text-center">
+          <h4 v-text="berry_300" title="PCR Optimized"></h4>
+        </div>
+      </div>
+      <div class="col-1">
+        <div class="text-center" title="沪深300 PCR">
+          <h4 v-text="pcr_300"></h4>
+        </div>
+      </div>
       <div class="col">
-        <div class="card">
-          <div class="card-header">IF ( 510300 ) - 上交所 沪深300 </div>
-          <div class="card-body">
-            <h5 v-text="berry_300+ ' - ( ' + pcr_300 + ' ) '"></h5>
-            <div class="progress" style="height: 27px">
-              <div class="progress-bar" role="progressbar" v-bind:aria-valuenow="berry_300" aria-valuemin="0"
-                aria-valuemax="100" v-text="berry_300+'%'" :style="{width: berry_300+'%'}"></div>
-            </div>
-          </div>
+        <div class="ui indicating progress active" style="height: 24px" :data-percent="berry_progress">
+          <div class="bar" :style="{width: berry_progress+'%'}"></div>
         </div>
       </div>
     </div>
-    <p></p>
     <div class="row">
       <div class="col">
-        <div class="mini ui icon message" :class="{ blue: isActive }" @click="fetch">
+        <div class="mini ui floating icon message" :class="{ blue: isActive }" @click="fetch">
           <i class="notched icon" :class="{'sync alternate loading': isActive , 'pause circle outline': !isActive}"></i>
           <div class="content">
             <div class="header">current: <span v-text="now"></span></div>
@@ -144,7 +147,7 @@
       <div class="offcanvas-body small">
         <i class="notched circle loading icon"></i>
         <div class="content">
-          <div class="header"><span>此指标为调整后的PCR，50以上宜看多，50以下宜看空。</span></div>
+          <div class="header"><span>此指标为调整后的PCR,正值宜看多，负值宜看空。</span></div>
           <p>建立平台后，向上突破可做多，指标停滞可平仓，反向同理。</p>
         </div>
       </div>
@@ -224,6 +227,9 @@
       computed: {
         isActive() {
           return this.timer <= 0
+        },
+        berry_progress() {
+          return 50 - 2 * this.berry_300
         }
       },
       created() { },
@@ -343,7 +349,7 @@
             }
             var tracelineAM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "11:30:00"],
-              y: [50, 50],
+              y: [0, 0],
               xaxis: 'x1',
               yaxis: 'y1',
               mode: 'lines',
@@ -356,7 +362,7 @@
             }
             var tracelinePM = {
               x: [this.now.slice(0, 11) + "13:00:00", this.now.slice(0, 11) + "15:00:00"],
-              y: [50, 50],
+              y: [0, 0],
               xaxis: 'x2',
               yaxis: 'y2',
               mode: 'lines',
@@ -395,7 +401,7 @@
                 range: [this.now.slice(0, 11) + "09:29:00", this.now.slice(0, 11) + "11:31:00"],
               },
               yaxis: {
-                title: 'Optimized （%）',
+                title: 'Optimized',
               },
               xaxis2: {
                 title: 'PM',

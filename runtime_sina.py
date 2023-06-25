@@ -64,21 +64,21 @@ def launch():
 
     option_dict['pct_50'].append(pct_50)
     pcr_50 = vol_down_50 / vol_up_50 * 100
-    mid_50 = vol_down_50 / vol_up_50 * 100 - 36
+    mid_50 = vol_down_50 / vol_up_50 * 100 - 86
     berry_50 = (pct_50 * 10) + mid_50
     option_dict['pcr_50'].append(pcr_50)
     option_dict['berry_50'].append(berry_50)
 
     option_dict['pct_300'].append(pct_300)
     pcr_300 = vol_down_300 / vol_up_300 * 100
-    mid_300 = vol_down_300 / vol_up_300 * 100 - 42
+    mid_300 = vol_down_300 / vol_up_300 * 100 - 92
     berry_300 = (pct_300 * 10) + mid_300
     option_dict['pcr_300'].append(pcr_300)
     option_dict['berry_300'].append(berry_300)
 
     option_dict['pct_500'].append(pct_500)
     pcr_500 = vol_down_500 / vol_up_500 * 100
-    mid_500 = vol_down_500 / vol_up_500 * 100 - 64
+    mid_500 = vol_down_500 / vol_up_500 * 100 - 114
     berry_500 = (pct_500 * 10) + mid_500
     option_dict['pcr_500'].append(pcr_500)
     option_dict['berry_500'].append(berry_500)
@@ -170,10 +170,10 @@ def fetch_future(code):
 
 
 def fixture(input_list):
-    if input_list[-1] > 65:
-        input_list[-1] = 65
-    elif input_list[-1] < 35:
-        input_list[-1] = 35
+    if input_list[-1] > 15:
+        input_list[-1] = 15
+    elif input_list[-1] < -15:
+        input_list[-1] = -15
     else:
         pass
 
