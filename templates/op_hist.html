@@ -50,7 +50,7 @@
     <nav class="navbar navbar-expand-md bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
-          <img src="{{ url_for('static', filename='platform-linux.svg') }}" />
+          <img src="https://github.githubassets.com/images/modules/site/home/logos/platform-linux.svg" />
           Poke PCR Optimized
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01"
@@ -58,6 +58,7 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+          <!-- <a class="navbar-brand" href="#">Hidden brand</a> -->
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
             </li>
@@ -65,16 +66,16 @@
             </li>
           </ul>
           <div class="d-flex">
-            <div class="ui labeled button" tabindex="0">
-              <div class="ui red button"  onclick="window.open('https://widget2.sentryd.com/widget/#/15490A29-95E3-4296-999E-28D0B35E0D12/USD-CNH/4')">
-                <i class="yen sign icon"></i>离岸
+            <div class="ui labeled button" tabindex="0" onclick="window.open('/op/plot')">
+              <div class="ui red button">
+                <i class="heart icon"></i> Like
               </div>
-              <a class="ui basic btn red left pointing label" onclick="window.open('/op/focus')">
-                Focus
+              <a class="ui basic btn red left pointing label">
+                Solo
               </a>
             </div>
-            <div class="ui labeled button" tabindex="0">
-              <div class="ui basic blue button" onclick="window.open('http://github.com/gaoming714/pokemon')">
+            <div class="ui labeled button" tabindex="0" onclick="window.open('http://github.com/gaoming714/pokemon')">
+              <div class="ui basic blue button">
                 <i class="fork icon"></i>Forks
               </div>
               <a class="ui basic btn left pointing blue label"
@@ -203,13 +204,11 @@
           pcr_500: 0,
           berry_500: 0,
           berry_500_list: [],
+          burger: 0,
+          burger_list: [],
           now: null,
           now_list: [],
-          readme: null,
-          chartdatax: [],
-          chartIHdatay: [],
-          chartIFdatay: [],
-          chartICdatay: [],
+          readme: null
         }
       },
       computed: {
@@ -255,10 +254,12 @@
               that.berry_300 = response.data["berry_300"]
               that.pcr_500 = response.data["pcr_500"]
               that.berry_500 = response.data["berry_500"]
+              that.burger = response.data["burger"]
               that.now_list = response.data["now_list"]
               that.berry_50_list = response.data["berry_50_list"]
               that.berry_300_list = response.data["berry_300_list"]
               that.berry_500_list = response.data["berry_500_list"]
+              that.burger_list = response.data["burger_list"]
               that.pushdata()
             })
             .catch(function (error) {
@@ -267,39 +268,64 @@
             .then(function () { })
         },
         pushdata() {
-          this.chartdatax = that.now_list
-          this.chartIHdatay = that.berry_50_list
-          this.chartIFdatay = that.berry_300_list
-          this.chartICdatay = that.berry_500_list
+          this.now_list = that.now_list
+          this.berry_50_list = that.berry_50_list
+          this.berry_300_list = that.berry_300_list
+          this.berry_500_list = that.berry_500_list
+          this.buger_list = that.burger_list
+          // this.getEchart()
           this.getplotly()
-
         },
         getplotly() {
           chart = document.getElementById('chart')
           if (chart) {
             var traceIFAM = {
-              x: this.chartdatax,
-              y: this.chartIFdatay,
+              x: this.now_list,
+              y: this.berry_300_list,
               xaxis: 'x1',
               yaxis: 'y1',
               mode: 'lines',
               line: {
-                color: '#0d6efd',
+                color: '#00a4ef',
                 width: 2
               },
               name: 'IF 510300',
             }
             var traceIFPM = {
-              x: this.chartdatax,
-              y: this.chartIFdatay,
+              x: this.now_list,
+              y: this.berry_300_list,
               xaxis: 'x2',
               yaxis: 'y2',
               mode: 'lines',
               line: {
-                color: '#0d6efd',
+                color: '#00a4ef',
                 width: 2
               },
               name: 'IF 510300',
+            }
+            var traceburgerAM = {
+              x: this.now_list,
+              y: this.burger_list,
+              xaxis: 'x1',
+              yaxis: 'y1',
+              mode: 'lines',
+              line: {
+                color: '#b31b1b',
+                width: 2
+              },
+              name: 'Burger',
+            }
+            var traceburgerPM = {
+              x: this.now_list,
+              y: this.burger_list,
+              xaxis: 'x2',
+              yaxis: 'y2',
+              mode: 'lines',
+              line: {
+                color: '#b31b1b',
+                width: 2
+              },
+              name: 'Burger',
             }
             var tracelineAM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "11:30:00"],
@@ -328,8 +354,8 @@
               }
             }
             var traceCurAM = {
-              x: [this.now],
-              y: [this.berry_300],
+              x: [this.now, this.now, this.now],
+              y: [this.berry_300, this.burger],
               xaxis: 'x1',
               yaxis: 'y1',
               mode: 'markers',
@@ -337,8 +363,8 @@
               marker: { color: '#FF00FF', size: 7 }
             }
             var traceCurPM = {
-              x: [this.now],
-              y: [this.berry_300],
+              x: [this.now, this.now, this.now],
+              y: [this.berry_300, this.burger],
               xaxis: 'x2',
               yaxis: 'y2',
               mode: 'markers',
@@ -349,15 +375,13 @@
               showlegend: false,
               // title: 'Poke PCR Optimized',
               xaxis: {
-                // data: this.chartdatax,
+                // data: this.now_list,
                 title: 'AM',
                 type: 'date',
                 range: [this.now.slice(0, 11) + "09:29:00", this.now.slice(0, 11) + "11:31:00"],
               },
               yaxis: {
-                title: 'Optimized (%)',
-                // range: [50 - this.margin, 50 + this.margin],
-                // autorange: false
+                title: 'Optimized （%）',
               },
               xaxis2: {
                 title: 'PM',
@@ -373,7 +397,7 @@
               },
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             }
-            var plot_set = [traceIFAM, traceIFPM, tracelineAM, tracelinePM, traceCurAM, traceCurPM]
+            var plot_set = [tracelineAM, tracelinePM, traceburgerAM, traceburgerPM, traceIFAM, traceIFPM, traceCurAM, traceCurPM]
             Plotly.newPlot(chart, plot_set, layout)
           }
         },

@@ -13,24 +13,32 @@ from flask import render_template
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
 json_path = os.path.join("data", "sina_option_data.json")
+nightly_path = os.path.join("data", "nightly_data.json")
 
 app = Flask(__name__)
 
 
 @app.route("/")
 def index(name=None):
-    return redirect("/op/plot")
+    return redirect("/op/focus")
 
 @app.route("/op/<code>")
 def oppage(code = "IF", name=None):
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
-    if not os.path.exists(json_path):
+    with open(json_path, 'r', encoding='utf-8') as file:
+        option_dict = json.load(file)
+    if 'now' not in option_dict:
         mk_margin = pendulum.today("Asia/Shanghai").add(hours=9,minutes=30,seconds=10)
         remain = (mk_margin - now).total_seconds()
         return render_template('pedding.html',name=name, remain = str(remain))
     return render_template('op_'+code+'.html', name=name)
 
+@app.route("/hist")
+def histpage(name=None):
+    now = pendulum.now("Asia/Shanghai")
+    now_str = now.to_datetime_string()
+    return render_template('op_hist.html', name=name)
 
 
 @app.route("/api/remain")
@@ -42,7 +50,7 @@ def api_remain(name=None):
     mk_alpha = dawn.add(hours=9,minutes=30)
     mk_beta = dawn.add(hours=11,minutes=30)
     mk_gamma = dawn.add(hours=13,minutes=0)
-    mk_delta = dawn.add(hours=15,minutes=0)
+    mk_delta = dawn.add(hours=15,minutes=1)
     mk_zeta = pendulum.tomorrow("Asia/Shanghai")
     remain = 0
 
@@ -143,6 +151,73 @@ def api_op(name=None):
     # get sum of vol from sina_option_data
     with open(json_path, 'r', encoding='utf-8') as file:
         option_dict = json.load(file)
+    if 'now' not in option_dict:
+        return json.dumps({})
+    last_time = option_dict['now']
+    now_list = option_dict['now_list']
+    with open(nightly_path, 'r', encoding='utf-8') as file:
+        nightly_dict = json.load(file)
+
+    pcr_50_list = option_dict['pcr_50']
+    berry_50_list = option_dict['berry_50']
+    pcr_300_list = option_dict['pcr_300']
+    berry_300_list = option_dict['berry_300']
+    pcr_500_list = option_dict['pcr_500']
+    berry_500_list = option_dict['berry_500']
+    burger_list = option_dict['burger']
+
+    yest_shuffle = nightly_dict['shuffle'][-1]
+    yest_berry = nightly_dict['berry_300'][-1]
+    diff_berry = berry_300_list[-1] - yest_berry
+    if diff_berry > 0 and berry_300_list[-1] > 50:
+        today_shuffle = 1
+    elif diff_berry < 0 and berry_300_list[-1] < 50:
+        today_shuffle = -1
+    else:
+        today_shuffle = 0
+
+
+    readme =  "30 -50- 70  ==   70 -90- 110"
+    context = {
+            'now': now_str,
+            'last_time': last_time,
+            'now_list': now_list,
+            'pcr_50': round(pcr_50_list[-1],2),
+            'berry_50': round(berry_50_list[-1],2),
+            'pcr_50_list': pcr_50_list,
+            'berry_50_list': berry_50_list,
+
+            'pcr_300': round(pcr_300_list[-1],2),
+            'berry_300': round(berry_300_list[-1],2),
+            'pcr_300_list': pcr_300_list,
+            'berry_300_list': berry_300_list,
+
+            'pcr_500': round(pcr_500_list[-1],2),
+            'berry_500': round(berry_500_list[-1],2),
+            'pcr_500_list': pcr_500_list,
+            'berry_500_list': berry_500_list,
+
+            'burger': round(burger_list[-1],2),
+            'burger_list': burger_list,
+
+            'yest_shuffle': yest_shuffle,
+            'today_shuffle': today_shuffle,
+
+            'readme': readme,
+        }
+    return json.dumps(context)
+
+@app.route("/api/hist/<date>")
+def api_hist(name = None, date = None):
+    now = pendulum.now("Asia/Shanghai")
+    now_str = now.to_datetime_string()
+    # get sum of vol from sina_option_data
+    hist_path = os.path.join("data", date + ".json")
+    if not os.path.exists(hist_path):
+        return json.dumps({"status": '404'})
+
+    with open(hist_path, 'r', encoding='utf-8') as file:
+        option_dict = json.load(file)
     last_time = option_dict['now']
     now_list = option_dict['now_list']
 
@@ -162,7 +237,9 @@ def api_op(name=None):
     # burger_list = df['burger_ma'].to_list()
 
     readme =  "30 -50- 70  ==   70 -90- 110"
-    context = { 'now': now_str,
+    context = {
+            'status': '200',
+            'now': now_str,
             'last_time': last_time,
             'now_list': now_list,
             'pcr_50': round(pcr_50_list[-1],2),
@@ -186,8 +263,6 @@ def api_op(name=None):
             'readme': readme,
         }
     return json.dumps(context)
-
-
 # def MA(S,N):
 #     return pd.Series(S).rolling(N,min_periods=1).mean().values
 # def STD(S,N):

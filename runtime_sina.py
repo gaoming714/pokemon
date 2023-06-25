@@ -28,6 +28,7 @@ def launch():
 
     # now_online, pct_300 = fetch_stock("sh000300")
     now_online = fetch_time()
+    date_online = now_online.split()[0]
     print(now_online)
     # pct_50 = fetch_future("nf_IH0")
     # pct_300 = fetch_future("nf_IF0")
@@ -48,45 +49,14 @@ def launch():
     if vol_up_300 == 0:
         return
 
-    # try:
-    #     with open(json_path, 'r', encoding='utf-8') as file:
-    #         option_dict = json.load(file)
-    # except:
-    #         option_dict = {
-    #                         'pct_50':[],
-    #                         'pcr_50':[],
-    #                         'berry_50':[],
-    #                         'pct_300':[],
-    #                         'pcr_300':[],
-    #                         'berry_300':[],
-    #                         'pct_500':[],
-    #                         'pcr_500':[],
-    #                         'berry_500':[],
-    #                         'now_list':[]
-    #                     }
     if pendulum.today("Asia/Shanghai") == pendulum.parse(now_online,tz="Asia/Shanghai").at(0,0,0):
-        try:
-            with open(json_path, 'r', encoding='utf-8') as file:
-                option_dict = json.load(file)
-        except:
-            option_dict = {
-                            'pct_50':[],
-                            'pcr_50':[],
-                            'berry_50':[],
-                            'pct_300':[],
-                            'pcr_300':[],
-                            'berry_300':[],
-                            'pct_500':[],
-                            'pcr_500':[],
-                            'berry_500':[],
-                            'inc_t0':[],
-                            'burger':[],
-                            'now_list':[]
-                        }
+        with open(json_path, 'r', encoding='utf-8') as file:
+            option_dict = json.load(file)
     else:
-        backup_path = "data/" + now_online.split()[0] + ".json"
-        if os.path.exists(json_path) and not os.path.exists(backup_path):
-            backup_json(json_path, backup_path)
+        if not os.path.exists("data/" + date_online + ".json"):
+            update_nightly(date_online)
+            backup_intraday(date_online)
+        print('after backup_intraday return')
         return
 
     option_dict['now'] = now_str
@@ -215,13 +185,13 @@ mk_nu = dawn.add(hours=9,minutes=25)
 mk_alpha = dawn.add(hours=9,minutes=30)
 mk_beta = dawn.add(hours=11,minutes=30)
 mk_gamma = dawn.add(hours=13,minutes=0)
-mk_delta = dawn.add(hours=15,minutes=0)
+mk_delta = dawn.add(hours=15,minutes=0,seconds=20)
 mk_zeta = pendulum.tomorrow("Asia/Shanghai")
 
 
 def hold_period():
     """
-        mu nu  9:30  alpha beta  12  gamma  delta  15 zeta
+        mu nu  9:30  alpha beta  12  gamma  delta  15:00:20 zeta
     """
     while True:
         now = pendulum.now("Asia/Shanghai")
@@ -243,12 +213,60 @@ def hold_period():
             # sleep @ 1:00
             exit(0)
 
+def update_nightly(date_online):
+    nightly_path = os.path.join("data", "nightly_data.json")
+    json_path = os.path.join("data", "sina_option_data.json")
+    with open(nightly_path, 'r', encoding='utf-8') as file:
+        nightly_dict = json.load(file)
+    with open(json_path, 'r', encoding='utf-8') as file:
+        option_dict = json.load(file)
 
+    yest_shuffle = nightly_dict['shuffle'][-1]
+    yest_berry = nightly_dict['berry_300'][-1]
+    berry_300 = option_dict['berry_300'][-1]
+    diff_berry = berry_300 - yest_berry
+    if diff_berry > 0 and berry_300 > 50:
+        today_shuffle = 1
+    elif diff_berry < 0 and berry_300 < 50:
+        today_shuffle = -1
+    else:
+        today_shuffle = 0
+    nightly_dict['time'].append(date_online)
+    nightly_dict['pct_300'].append(option_dict['pct_300'][-1])
+    nightly_dict['pcr_300'].append(option_dict['pcr_300'][-1])
+    nightly_dict['berry_300'].append(option_dict['berry_300'][-1])
+    nightly_dict['shuffle'].append(today_shuffle)
 
-def backup_json(source,target):
-    cmd = "mv " + source + " " + target
-    lumos(cmd)
+    with open(nightly_path, 'w', encoding='utf-8') as file:
+        json.dump(nightly_dict, file, ensure_ascii=False)
+    print("update nightly complete!")
 
+def backup_intraday(date_online):
+    source = os.path.join("data", "sina_option_data.json")
+    target = "data/" + date_online + ".json"
+    mv_cmd = "mv " + source + " " + target
+    if not os.path.exists(target):
+        lumos(mv_cmd)
+    else:
+        print("backup_intraday twice!! ERR")
+        raise
+    # create new sina_option_data.json
+    init_dict = {
+                'pct_50':[],
+                'pcr_50':[],
+                'berry_50':[],
+                'pct_300':[],
+                'pcr_300':[],
+                'berry_300':[],
+                'pct_500':[],
+                'pcr_500':[],
+                'berry_500':[],
+                'inc_t0':[],
+                'burger':[],
+                'now_list':[]
+            }
+    with open(source, 'w', encoding='utf-8') as file:
+        json.dump(init_dict, file, ensure_ascii=False)
 
 def lumos(cmd):
     # res = 0

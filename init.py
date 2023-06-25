@@ -1,4 +1,5 @@
 import re
+import os
 import requests
 import time
 import json
@@ -39,6 +40,32 @@ def fetch_op(name, op_list):
     option_dict[name] = hq_str_op_list
     # print(hq_str_op_list)
 
+def create_data():
+    intraday_data_json = os.path.join("data", "sina_option_data.json")
+    nightly_data_json = os.path.join("data", "nightly_data.json")
+    if not os.path.exists(intraday_data_json):
+        init_intraday = {
+                    'pct_50':[],
+                    'pcr_50':[],
+                    'berry_50':[],
+                    'pct_300':[],
+                    'pcr_300':[],
+                    'berry_300':[],
+                    'pct_500':[],
+                    'pcr_500':[],
+                    'berry_500':[],
+                    'inc_t0':[],
+                    'burger':[],
+                    'now_list':[]
+                }
+        with open(intraday_data_json, 'w', encoding='utf-8') as file:
+            json.dump(init_intraday, file, ensure_ascii=False)
+    if not os.path.exists(nightly_data_json):
+        init_nightly = {"time": ["1970-01-01"], "pct_300": [0], "pcr_300": [50], "berry_300": [50],"shuffle": [0]}
+        with open(nightly_data_json, 'w', encoding='utf-8') as file:
+            json.dump(init_nightly, file, ensure_ascii=False)
+
+
 # def save_redis():
 #     option_json = json.dumps(option_dict)
 #     db.set("data/sina_op_config.json",option_json)
@@ -67,5 +94,6 @@ if __name__ == '__main__':
     fetch_op("op_down_300",op_down_300_list)
     fetch_op("op_up_500",op_up_500_list)
     fetch_op("op_down_500",op_down_500_list)
+    create_data()
     # save_redis()
     save_json()

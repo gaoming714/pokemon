@@ -50,7 +50,7 @@
     <nav class="navbar navbar-expand-md bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
-          <img src="https://github.githubassets.com/images/modules/site/home/logos/platform-linux.svg" />
+          <img src="{{ url_for('static', filename='platform-linux.svg') }}" />
           Poke PCR Optimized
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01"
@@ -58,7 +58,6 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-          <!-- <a class="navbar-brand" href="#">Hidden brand</a> -->
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
             </li>
@@ -66,16 +65,16 @@
             </li>
           </ul>
           <div class="d-flex">
-            <div class="ui labeled button" tabindex="0" onclick="window.open('/op/plot')">
-              <div class="ui red button">
-                <i class="heart icon"></i> Like
+            <div class="ui labeled button" tabindex="0">
+              <div class="ui red button"  onclick="window.open('https://widget2.sentryd.com/widget/#/15490A29-95E3-4296-999E-28D0B35E0D12/USD-CNH/4')">
+                <i class="yen sign icon"></i>离岸
               </div>
-              <a class="ui basic btn red left pointing label">
+              <a class="ui basic btn red left pointing label" onclick="window.open('/op/plot')">
                 Solo
               </a>
             </div>
-            <div class="ui labeled button" tabindex="0" onclick="window.open('http://github.com/gaoming714/pokemon')">
-              <div class="ui basic blue button">
+            <div class="ui labeled button" tabindex="0">
+              <div class="ui basic blue button" onclick="window.open('http://github.com/gaoming714/pokemon')">
                 <i class="fork icon"></i>Forks
               </div>
               <a class="ui basic btn left pointing blue label"
@@ -105,11 +104,17 @@
     <div class="row">
       <div class="col">
         <div class="mini ui icon message" :class="{ blue: isActive }" @click="fetch">
-          <i class="notched icon"
-            :class="{'sync alternate loading': isActive , 'pause circle outline': !isActive}"></i>
+          <i class="notched icon" :class="{'sync alternate loading': isActive , 'pause circle outline': !isActive}"></i>
           <div class="content">
             <div class="header">current: <span v-text="now"></span></div>
             <p>Auto refresh during market opening.</p>
+          </div>
+          <div class="ui buttons">
+            <button class="ui button" :class="{negative: yest_shuffle==1, positive: yest_shuffle==-1}"><img
+                src="{{ url_for('static', filename='xbox.svg') }}" /></button>
+            <div class="or"></div>
+            <button class="ui button" :class="{negative: today_shuffle==1, positive: today_shuffle==-1}"><img
+                src="{{ url_for('static', filename='apple.svg') }}" /></button>
           </div>
         </div>
       </div>
@@ -120,7 +125,10 @@
         <div id="chart" style="width: 100%; height: 800px"></div>
       </div>
     </div>
-
+    <h4 class="ui horizontal divider header">
+      <i class="tag icon"></i>
+      Winner Winner Chicken Dinner
+    </h4>
     <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom"
       aria-controls="offcanvasBottom">
       Readme 使用说明
@@ -195,17 +203,19 @@
       data() {
         return {
           timer: 0,
-          pcr_50: 0,
-          berry_50: 0,
-          berry_50_list: [],
+          // pcr_50: 0,
+          // berry_50: 0,
+          // berry_50_list: [],
           pcr_300: 0,
           berry_300: 0,
           berry_300_list: [],
-          pcr_500: 0,
-          berry_500: 0,
-          berry_500_list: [],
+          // pcr_500: 0,
+          // berry_500: 0,
+          // berry_500_list: [],
           burger: 0,
           burger_list: [],
+          yest_shuffle: 0,
+          today_shuffle: 0,
           now: null,
           now_list: [],
           readme: null
@@ -248,34 +258,38 @@
             .then(function (response) {
               console.log(response)
               that.now = response.data["now"]
-              that.pcr_50 = response.data["pcr_50"]
-              that.berry_50 = response.data["berry_50"]
+              // that.pcr_50 = response.data["pcr_50"]
+              // that.berry_50 = response.data["berry_50"]
               that.pcr_300 = response.data["pcr_300"]
               that.berry_300 = response.data["berry_300"]
-              that.pcr_500 = response.data["pcr_500"]
-              that.berry_500 = response.data["berry_500"]
+              // that.pcr_500 = response.data["pcr_500"]
+              // that.berry_500 = response.data["berry_500"]
               that.burger = response.data["burger"]
               that.now_list = response.data["now_list"]
-              that.berry_50_list = response.data["berry_50_list"]
+              // that.berry_50_list = response.data["berry_50_list"]
               that.berry_300_list = response.data["berry_300_list"]
-              that.berry_500_list = response.data["berry_500_list"]
+              // that.berry_500_list = response.data["berry_500_list"]
               that.burger_list = response.data["burger_list"]
-              that.pushdata()
+              that.yest_shuffle = response.data["yest_shuffle"]
+              that.today_shuffle = response.data["today_shuffle"]
+              // that.pushdata()
             })
             .catch(function (error) {
               console.log(error)
             })
-            .then(function () { })
+            .then(function () {
+              that.getplotly()
+            })
         },
-        pushdata() {
-          this.now_list = that.now_list
-          this.berry_50_list = that.berry_50_list
-          this.berry_300_list = that.berry_300_list
-          this.berry_500_list = that.berry_500_list
-          this.buger_list = that.burger_list
-          // this.getEchart()
-          this.getplotly()
-        },
+        // pushdata() {
+        //   this.now_list = that.now_list
+        //   this.berry_50_list = that.berry_50_list
+        //   this.berry_300_list = that.berry_300_list
+        //   this.berry_500_list = that.berry_500_list
+        //   this.buger_list = that.burger_list
+        //   // this.getEchart()
+        //   this.getplotly()
+        // },
         getplotly() {
           chart = document.getElementById('chart')
           if (chart) {
