@@ -88,18 +88,17 @@
       </div>
     </nav>
     <div class="row">
-      <div class="col-2">
+      <div class="col-3">
         <div class="text-center">
-          <h4 v-text="berry_300" title="PCR Optimized"></h4>
-        </div>
-      </div>
-      <div class="col-1">
-        <div class="text-center" title="沪深300 PCR">
-          <h4 v-text="pcr_300"></h4>
+          <div class="fluid ui animated compact large primary active basic button" tabindex="0">
+            <div class="visible content" v-text="berry_300"></div>
+            <div class="hidden content" v-text="pcr_300">
+            </div>
+          </div>
         </div>
       </div>
       <div class="col">
-        <div class="ui indicating progress active" style="height: 24px" :data-percent="berry_progress">
+        <div class="ui indicating large progress active" style="height: 34px" :data-percent="berry_progress">
           <div class="bar" :style="{width: berry_progress+'%'}"></div>
         </div>
       </div>
