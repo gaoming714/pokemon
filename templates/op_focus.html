@@ -228,7 +228,9 @@
           return this.timer <= 0
         },
         berry_progress() {
-          return 50 - 2 * this.berry_300
+          var pct = 50 - 3 * this.berry_300
+          if (pct < 10) {pct = 10}
+          return pct
         }
       },
       created() { },
