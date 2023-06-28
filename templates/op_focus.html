@@ -87,7 +87,7 @@
         </div>
       </div>
     </nav>
-    <div class="row">
+    <div class="row ui segment">
       <div class="col-3">
         <div class="text-center">
           <div class="fluid ui animated compact large primary active basic button" tabindex="0">
@@ -98,7 +98,7 @@
         </div>
       </div>
       <div class="col">
-        <div class="ui indicating large progress" style="height: 34px" :data-percent="berry_progress">
+        <div class="ui indicating large progress" style="height: 34px; margin-bottom: 0px;" :data-percent="berry_progress">
           <div class="bar" :style="{width: berry_progress+'%'}"></div>
         </div>
       </div>
@@ -106,7 +106,7 @@
     <div class="row">
       <div class="col">
         <div class="mini ui floating icon message" :class="{ blue: isActive }" @click="fetch">
-          <i class="notched icon" :class="{'sync alternate loading': isActive , 'pause circle outline': !isActive}"></i>
+          <i class="notched icon" :class="{'superpowers loading': isActive , 'nintendo switch': !isActive}"></i>
           <div class="content">
             <div class="header">current: <span v-text="now"></span></div>
             <p>Auto refresh during market opening.</p>
