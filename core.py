@@ -169,9 +169,9 @@ def api_op(name=None):
     yest_shuffle = nightly_dict['shuffle'][-1]
     yest_berry = nightly_dict['berry_300'][-1]
     diff_berry = berry_300_list[-1] - yest_berry
-    if diff_berry > 0 and berry_300_list[-1] > 0:
+    if diff_berry > -4 and berry_300_list[-1] > 0:
         today_shuffle = 1
-    elif diff_berry < 0 and berry_300_list[-1] < 0:
+    elif diff_berry < 4 and berry_300_list[-1] < 0:
         today_shuffle = -1
     else:
         today_shuffle = 0
