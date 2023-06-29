@@ -230,6 +230,7 @@
         berry_progress() {
           var pct = 50 - 3 * this.berry_300
           if (pct < 10) {pct = 10}
+          if (pct > 100) {pct = 100}
           return pct
         }
       },
