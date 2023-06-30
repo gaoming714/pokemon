@@ -228,7 +228,9 @@
           return this.timer <= 0
         },
         berry_progress() {
-          var pct = 50 - 3 * this.berry_300
+          var value = Math.sqrt(Math.abs(this.berry_300))
+          var sign = Math.sign(this.berry_300)
+          var pct = 50 - sign * value * 12
           if (pct < 10) {pct = 10}
           if (pct > 100) {pct = 100}
           return pct
