@@ -29,7 +29,7 @@ def launch():
     # now_online, pct_300 = fetch_stock("sh000300")
     now_online = fetch_time()
     date_online = now_online.split()[0]
-    print(now_online)
+    print("Online => " + now_online)
     # pct_50 = fetch_future("nf_IH0")
     # pct_300 = fetch_future("nf_IF0")
     # pct_500 = fetch_future("nf_IF0")
@@ -56,6 +56,9 @@ def launch():
         if not os.path.exists("data/" + date_online + ".json"):
             update_nightly(date_online)
             backup_intraday(date_online)
+        elif now.hour == 9 and now.minute == 30:
+            print("Market is not opened today. Sleep 6 hours.")
+            time.sleep(60*60*6)
         print('after backup_intraday return')
         return
 
