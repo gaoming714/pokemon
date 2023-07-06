@@ -92,6 +92,14 @@ def launch():
     option_dict['burger'].append(burger)
 
     if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=47,seconds=47):
+        option_dict['std_300'].append(0)
+    else:
+        std_300 = pd.Series(option_dict['berry_300'][-240:]).std()
+        if std_300 > 3:
+            std_300 = 3
+        option_dict['std_300'].append(std_300)
+
+    if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=47,seconds=47):
         fixture(option_dict['berry_50'])
         fixture(option_dict['berry_300'])
         fixture(option_dict['berry_500'])
@@ -266,6 +274,7 @@ def backup_intraday(date_online):
                 'berry_500':[],
                 'inc_t0':[],
                 'burger':[],
+                'std_300':[],
                 'now_list':[]
             }
     with open(source, 'w', encoding='utf-8') as file:

@@ -165,6 +165,7 @@ def api_op(name=None):
     pcr_500_list = option_dict['pcr_500']
     berry_500_list = option_dict['berry_500']
     burger_list = option_dict['burger']
+    std_list = option_dict['std_300']
 
     yest_shuffle = nightly_dict['shuffle'][-1]
     yest_berry = nightly_dict['berry_300'][-1]
@@ -191,6 +192,7 @@ def api_op(name=None):
             'berry_300': round(berry_300_list[-1],2),
             'pcr_300_list': pcr_300_list,
             'berry_300_list': berry_300_list,
+            'std_list': std_list,
 
             'pcr_500': round(pcr_500_list[-1],2),
             'berry_500': round(berry_500_list[-1],2),

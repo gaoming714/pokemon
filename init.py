@@ -58,6 +58,7 @@ def create_data():
                     'berry_500':[],
                     'inc_t0':[],
                     'burger':[],
+                    'std_300':[],
                     'now_list':[]
                 }
         with open(intraday_data_json, 'w', encoding='utf-8') as file:
