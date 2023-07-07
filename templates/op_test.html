@@ -127,6 +127,11 @@
         <div id="chart" style="width: 100%; height: 800px"></div>
       </div>
     </div>
+    <div class="row">
+      <div class="col">
+        <div id="chart_std" style="width: 100%; height: 200px"></div>
+      </div>
+    </div>
     <h4 class="ui horizontal divider header">
       <i class="tag icon"></i>
       Winner Winner Chicken Dinner
@@ -229,12 +234,15 @@
           return this.timer <= 0
         },
         berry_progress() {
-          var value = Math.sqrt(Math.abs(this.berry_300))
-          var sign = Math.sign(this.berry_300)
-          var pct = 50 - sign * value * 12
-          if (pct < 10) {pct = 10}
-          if (pct > 100) {pct = 100}
-          return pct
+          var std_arr = this.std_list.slice().reverse()
+          if (std_arr[0] == 0) {return 0}
+          var count = 0
+          for (item of std_arr) {
+            if (item<0.74) { count = count + 1 }
+            else {break}
+          }
+          if (count > 120) { count = 120}
+          return count / 120 * 100
         }
       },
       created() { },
@@ -328,30 +336,6 @@
                 width: 2
               },
               name: 'IF 510300',
-            }
-            var traceSTDAM = {
-              x: this.now_list,
-              y: this.std_list.map(function(element) {return element * 5}),
-              xaxis: 'x1',
-              yaxis: 'y1',
-              mode: 'lines',
-              line: {
-                color: '#5F9EA0',
-                width: 2
-              },
-              name: 'IF 510300 STD',
-            }
-            var traceSTDPM = {
-              x: this.now_list,
-              y: this.std_list.map(function(element) {return element * 5}),
-              xaxis: 'x2',
-              yaxis: 'y2',
-              mode: 'lines',
-              line: {
-                color: '#5F9EA0',
-                width: 2
-              },
-              name: 'IF 510300 STD',
             }
             var traceburgerAM = {
               x: this.now_list,
@@ -447,8 +431,89 @@
               },
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             }
-            var plot_set = [tracelineAM, tracelinePM, traceSTDAM, traceSTDPM, traceburgerAM, traceburgerPM, traceIFAM, traceIFPM, traceCurAM, traceCurPM]
+            var plot_set = [tracelineAM, tracelinePM, traceburgerAM, traceburgerPM, traceIFAM, traceIFPM, traceCurAM, traceCurPM]
             Plotly.newPlot(chart, plot_set, layout)
+          }
+          chart_std = document.getElementById('chart_std')
+          if (chart_std) {
+            var traceSTDAM = {
+              x: this.now_list,
+              y: this.std_list,
+              xaxis: 'x1',
+              yaxis: 'y1',
+              mode: 'lines',
+              line: {
+                color: '#5F9EA0',
+                width: 2
+              },
+              name: 'IF 510300 STD',
+            }
+            var traceSTDPM = {
+              x: this.now_list,
+              y: this.std_list,
+              xaxis: 'x2',
+              yaxis: 'y2',
+              mode: 'lines',
+              line: {
+                color: '#5F9EA0',
+                width: 2
+              },
+              name: 'IF 510300 STD',
+            }
+            var tracelineAM = {
+              x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "11:30:00"],
+              y: [0, 0],
+              xaxis: 'x1',
+              yaxis: 'y1',
+              mode: 'lines',
+              name: 'dashdot',
+              line: {
+                dash: 'dashdot',
+                color: '#002c37',
+                width: 3
+              }
+            }
+            var tracelinePM = {
+              x: [this.now.slice(0, 11) + "13:00:00", this.now.slice(0, 11) + "15:00:00"],
+              y: [0, 0],
+              xaxis: 'x2',
+              yaxis: 'y2',
+              mode: 'lines',
+              name: 'Solid',
+              line: {
+                dash: 'dashdot',
+                color: '#002c37',
+                width: 3
+              }
+            }
+            var layout = {
+              showlegend: false,
+              // title: 'Poke PCR Optimized',
+              xaxis: {
+                // data: this.now_list,
+                title: 'AM',
+                type: 'date',
+                range: [this.now.slice(0, 11) + "09:29:00", this.now.slice(0, 11) + "11:31:00"],
+              },
+              yaxis: {
+                title: 'Optimized',
+              },
+              xaxis2: {
+                title: 'PM',
+                type: 'date',
+                range: [this.now.slice(0, 11) + "12:59:00", this.now.slice(0, 11) + "15:01:00"],
+              },
+              yaxis2: {
+              },
+              margin: {
+                l: 40,
+                r: 40,
+                t: 20,
+              },
+              grid: { rows: 1, columns: 2, pattern: 'coupled' }
+            }
+            var plot_set = [tracelineAM, tracelinePM, traceSTDAM, traceSTDPM,]
+            Plotly.newPlot(chart_std, plot_set, layout)
           }
         },
       },

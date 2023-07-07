@@ -95,8 +95,8 @@ def launch():
         option_dict['std_300'].append(0)
     else:
         std_300 = pd.Series(option_dict['berry_300'][-240:]).std()
-        if std_300 > 3:
-            std_300 = 3
+        if std_300 > 5:
+            std_300 = 5
         option_dict['std_300'].append(std_300)
 
     if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=47,seconds=47):
