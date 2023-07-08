@@ -105,13 +105,24 @@
     </div>
     <div class="row">
       <div class="col">
-        <div class="mini ui floating icon message" :class="{ blue: isActive }" @click="fetch">
+        <div class="small ui floating icon message" :class="{ blue: isActive }" @click="fetch">
           <i class="notched icon" :class="{'superpowers loading': isActive , 'nintendo switch': !isActive}"></i>
           <div class="content">
             <div class="header">current: <span v-text="now"></span></div>
             <p>Auto refresh during market opening.</p>
           </div>
-          <div class="ui buttons">
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="small ui floating icon message">
+          <i class="notched icon utensils" :class="{ blue: isActive }" v-show="sign_flag==0"></i>
+          <i class="notched icon red arrow circle up"  v-show="sign_flag==1"></i>
+          <i class="notched icon green arrow circle down" v-show="sign_flag==-1"></i>
+          <div class="content">
+            <div class="header"></div>
+            <p></p>
+          </div>
+          <div class="ui right buttons">
             <button class="ui button" :class="{negative: yest_shuffle==1, positive: yest_shuffle==-1}"><img
                 src="{{ url_for('static', filename='xbox.svg') }}" /></button>
             <div class="or"></div>
@@ -217,6 +228,7 @@
           berry_300: 0,
           berry_300_list: [],
           std_list: [],
+          sign_flag: 0,
           // pcr_500: 0,
           // berry_500: 0,
           // berry_500_list: [],
@@ -234,15 +246,36 @@
           return this.timer <= 0
         },
         berry_progress() {
-          var std_arr = this.std_list.slice().reverse()
+          var std_arr = this.std_list.slice().reverse().slice(0,180)
           if (std_arr[0] == 0) {return 0}
           var count = 0
+          var fail_count = 0
           for (item of std_arr) {
             if (item<0.74) { count = count + 1 }
+            else if(fail_count < 4 && count < 8) {
+              fail_count = fail_count + 1
+            }
             else {break}
           }
-          if (count > 120) { count = 120}
-          return count / 120 * 100
+          if (count > 120) {
+            if (fail_count != 0) {
+              var berry_arr = this.berry_300_list.slice().reverse().slice(0,180)
+              var berry_mean = berry_arr.reduce((acc, curr) => acc + curr) / berry_arr.length;
+              if (berry_arr[0] >= berry_mean){
+                this.sign_flag = 1
+                return 100
+              }
+              else if(berry_arr[0] < berry_mean){
+                this.sign_flag = -1
+                return 100
+              }
+            }
+            count = 120
+          }
+          else{
+            this.sign_flag = 0
+          }
+          return count / 140 * 100
         }
       },
       created() { },
