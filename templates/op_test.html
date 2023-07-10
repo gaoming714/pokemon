@@ -292,7 +292,7 @@
       },
       methods: {
         fetch() {
-          that = this
+          var that = this
           axios
             .get("/api/remain")
             .then(function (response) {
@@ -304,7 +304,7 @@
             .then(function () { })
         },
         refresh() {
-          that = this
+          var that = this
           axios
             .get("/api/op")
             .then(function (response) {
@@ -325,7 +325,6 @@
               that.std_list = response.data["std_list"]
               that.yest_shuffle = response.data["yest_shuffle"]
               that.today_shuffle = response.data["today_shuffle"]
-              // that.pushdata()
             })
             .catch(function (error) {
               console.log(error)
@@ -334,17 +333,8 @@
               that.getplotly()
             })
         },
-        // pushdata() {
-        //   this.now_list = that.now_list
-        //   this.berry_50_list = that.berry_50_list
-        //   this.berry_300_list = that.berry_300_list
-        //   this.berry_500_list = that.berry_500_list
-        //   this.buger_list = that.burger_list
-        //   // this.getEchart()
-        //   this.getplotly()
-        // },
         getplotly() {
-          chart = document.getElementById('chart')
+          var chart = document.getElementById('chart')
           if (chart) {
             var traceIFAM = {
               x: this.now_list,
@@ -467,7 +457,7 @@
             var plot_set = [tracelineAM, tracelinePM, traceburgerAM, traceburgerPM, traceIFAM, traceIFPM, traceCurAM, traceCurPM]
             Plotly.newPlot(chart, plot_set, layout)
           }
-          chart_std = document.getElementById('chart_std')
+          var chart_std = document.getElementById('chart_std')
           if (chart_std) {
             var traceSTDAM = {
               x: this.now_list,
