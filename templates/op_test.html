@@ -87,20 +87,22 @@
         </div>
       </div>
     </nav>
-    <div class="row ui segment">
-      <div class="col-3">
-        <div class="text-center">
-          <div class="fluid ui animated compact large primary active basic button" tabindex="0">
-            <div class="visible content" v-text="berry_300"></div>
-            <div class="hidden content" v-text="pcr_300">
+    <div class="ui segment">
+      <div class="row">
+        <div class="col-3">
+          <div class="text-center">
+            <div class="fluid ui animated compact large primary active basic button" tabindex="0">
+              <div class="visible content" v-text="berry_300"></div>
+              <div class="hidden content" v-text="pcr_300">
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="col">
-        <div class="ui indicating large progress" style="height: 34px; margin-bottom: 0px;"
-          :data-percent="berry_progress">
-          <div class="bar" :style="{width: berry_progress+'%'}"></div>
+        <div class="col">
+          <div class="ui indicating large progress" style="height: 34px; margin-bottom: 0px;"
+            :data-percent="berry_progress">
+            <div class="bar" :style="{width: berry_progress+'%'}"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -114,9 +116,10 @@
           </div>
         </div>
       </div>
-      <div class="col-3">
+      <div class="col-xl-3">
         <div class="small ui floating icon message">
-          <i class="notched icon utensils" v-show="sign_flag==0" :class="{ teal: gear_timer>0 }" style="width: 39px;"></i>
+          <i class="notched icon utensils" v-show="sign_flag==0" :class="{ teal: gear_timer>0 }"
+            style="width: 39px;"></i>
           <i class="notched icon red arrow circle up" v-show="sign_flag==1"></i>
           <i class="notched icon green arrow circle down" v-show="sign_flag==-1"></i>
           <div class="content">
