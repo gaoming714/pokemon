@@ -117,9 +117,8 @@
         </div>
       </div>
       <div class="col-xl-3">
-        <div class="small ui floating icon message">
-          <i class="notched icon utensils" v-show="sign_flag==0" :class="{ teal: gear_timer>0 }"
-            style="width: 39px;"></i>
+        <div class="small ui floating icon message" :class="{ teal: gear_timer>0, '':gear}">
+          <i class="notched icon utensils" v-show="sign_flag==0" style="width: 39px;"></i>
           <i class="notched icon red arrow circle up" v-show="sign_flag==1"></i>
           <i class="notched icon green arrow circle down" v-show="sign_flag==-1"></i>
           <div class="content">
