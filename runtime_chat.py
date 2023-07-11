@@ -10,91 +10,86 @@ import pendulum
 import pickle
 import pandas as pd
 
+from envelopes import Envelope, GMailSMTP
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
 
-SIGN_list = []
-# (time, signal, value)
+SECRET = ""
+ADDR = []
+BOX = []
 
 
 def launch():
+    global BOX
+    global ADDR
     '''
     now_str is local
     now_online is the online time
     '''
     json_path = os.path.join("data", "sina_option_data.json")
-
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
+    with open(json_path, 'r', encoding='utf-8') as file:
+        option_dict = json.load(file)
 
-    try:
-        with open(json_path, 'r', encoding='utf-8') as file:
-            option_dict = json.load(file)
-    except:
+    if 'now' not in option_dict:
         return
-
-    analyse(option_dict)
-    # emit()
-
-def analyse(option_dict):
-
-    df = pd.DataFrame(option_dict,index=option_dict["now_list"])
-    df = df.drop("now_list",axis=1)
-
-    if len(df.index) < 240:
+    if option_dict["std_300"] == 0:
         return
-    stamp = df["now"][-1]
-    ave = df["berry_300"][-240:].mean()
-    last = df["berry_300"][-1]
-    print([ave, last - ave])
-    if last > ave + 1 and last > 50:
-        add_sign(df["now"][-1], "open_buy", last)
-
-    if last < ave - 1 and last < 50:
-        add_sign(df["now"][-1], "open_sell", last)
-
-
-def add_sign(stamp, sign, value):
-    if SIGN_list == []:
-        SIGN_list.append((stamp, sign, value))
-        emit()
-    else:
-        last_stamp = SIGN_list[-1][0]
-        if pendulum.parse(last_stamp).add(minutes=5) < pendulum.parse(stamp):
-            SIGN_list.append((stamp, sign, value))
-            emit()
-
-
-def emit():
-
-    msg = SIGN_list[-1][0] + " " + SIGN_list[-1][1] + " " + str(SIGN_list[-1][2])
-    print(msg)
-    r = requests.get('http://127.0.0.1:8008/msg/'+ msg)
-
+    if BOX != []:
+        btime = BOX[-1]
+        dtime = BOX[-1].add(minutes = 30)
+        if dtime > btime.at(0,0,0).add(hours = 11,minutes = 30) and dtime < btime.at(0,0,0).add(hours = 13):
+            dtime = dtime.add(hours = 1, minutes = 30)
+        if dtime > now:
+            return
+    std_arr = option_dict["std_300"][-1:-181:-1]
+    if std_arr[0] == 0 or std_arr[10] == 0:
+        return
+    count = 0
+    fail_count = 0
+    for item in std_arr:
+        if item < 0.5:
+            count = count + 1
+        elif fail_count < 4 and count < 8:
+            fail_count = fail_count + 1
+        else:
+            break
+    print([count,std_arr[-1]])
+    direct = None
+    if count > 120:
+        if fail_count != 0:
+            BOX.append(now)
+            berry_arr = option_dict["berry_300"][-1:-181:-1]
+            berry_mean = sum(berry_arr) / len(berry_arr)
+            if berry_arr[0] >= berry_mean:
+                direct = "up"
+            else:
+                direct = "down"
+    if direct != None:
+        msg = now_str + "\t" + direct
+        for user in ADDR:
+            email(user,msg)
 
 
 now = pendulum.now("Asia/Shanghai")
 dawn = pendulum.today("Asia/Shanghai")
 mk_mu = dawn.add(hours=9,minutes=20)
 mk_nu = dawn.add(hours=9,minutes=25)
-mk_alpha = dawn.add(hours=9,minutes=31)
+mk_alpha = dawn.add(hours=9,minutes=35)
 mk_beta = dawn.add(hours=11,minutes=30)
 mk_gamma = dawn.add(hours=13,minutes=0)
-mk_delta = dawn.add(hours=15,minutes=0)
+mk_delta = dawn.add(hours=15,minutes=0,seconds=20)
 mk_zeta = pendulum.tomorrow("Asia/Shanghai")
 
 
 def hold_period():
     """
-        mu nu  9:30  alpha beta  12  gamma  delta  15 zeta
+        mu nu  9:35  alpha beta  12  gamma  delta  15:00:20 zeta
     """
     while True:
         now = pendulum.now("Asia/Shanghai")
-        # refresh remain per half-hour
-        # heart beat
-        # if now.minute % 30 == 0:
-        #     print(("JQData Remains => ",personal.jq_remains()))
 
         if now < mk_alpha:
             print(["remain (s) ",(mk_alpha - now).total_seconds()])
@@ -115,6 +110,33 @@ def hold_period():
 
 
 
+def get_mixin():
+    global SECRET
+    global ADDR
+    info_path = os.path.join("data", "chat_config.json")
+    try:
+        with open(info_path, 'r', encoding='utf-8') as file:
+            info_dict = json.load(file)
+        SECRET = info_dict['secret']
+        ADDR = info_dict['addr_list']
+    except:
+        print("chat_config.json is not ready")
+        raise
+
+
+
+def email(addr,msg):
+    global SECRET
+    envelope = Envelope(
+        from_addr = ('369687664@qq.com', 'PokeScript'),
+        to_addr = (addr, 'Hi Jack'),
+        subject = 'PokeScript',
+        text_body = msg
+    )
+
+    # Send the envelope using an ad-hoc connection...
+    envelope.send('smtp.qq.com', login='369687664',
+                password=SECRET, tls=True)
 
 
 def lumos(cmd):
@@ -124,13 +146,10 @@ def lumos(cmd):
     return res
 
 if __name__ == '__main__':
+    get_mixin()
     while True:
         launch()
-        if sys.argv[-1] == 'test':
-            pass
-        else:
-            hold_period()
+        hold_period()
         print(pendulum.now("Asia/Shanghai"))
-        now = pendulum.now("Asia/Shanghai")
+        now = pendulum.now("Asia/Shanghai").add(seconds = -2)
         time.sleep(4 - now.second % 5)
-        time.sleep(1)
