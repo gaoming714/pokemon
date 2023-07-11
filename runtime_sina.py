@@ -288,6 +288,8 @@ def lumos(cmd):
 
 if __name__ == '__main__':
     while True:
+        print(pendulum.now("Asia/Shanghai"))
+        print("Lanuch")
         launch()
         if sys.argv[-1] == 'test':
             pass
@@ -296,3 +298,4 @@ if __name__ == '__main__':
         print(pendulum.now("Asia/Shanghai"))
         now = pendulum.now("Asia/Shanghai")
         time.sleep(4 - now.second % 5)
+        print("END")
