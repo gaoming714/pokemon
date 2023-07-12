@@ -58,7 +58,7 @@ def launch():
             break
     print([count,std_arr[-1]])
     direct = None
-    if count > 120:
+    if count >= 120:
         if fail_count != 0:
             BOX.append(now)
             berry_arr = option_dict["berry_300"][-1:-181:-1]
