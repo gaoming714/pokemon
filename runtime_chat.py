@@ -151,5 +151,5 @@ if __name__ == '__main__':
         launch()
         hold_period()
         print(pendulum.now("Asia/Shanghai"))
-        now = pendulum.now("Asia/Shanghai").add(seconds = -2)
-        time.sleep(4 - now.second % 5)
+        now = pendulum.now("Asia/Shanghai").add(seconds = -3)
+        time.sleep(5 - now.second % 5)
