@@ -43,6 +43,7 @@ def fetch_op(name, op_list):
 def create_data():
     intraday_data_json = os.path.join("data", "sina_option_data.json")
     nightly_data_json = os.path.join("data", "nightly_data.json")
+    chat_config_json = os.path.join("data", "chat_config.json")
     if not os.path.exists("data"):
         lumos("mkdir data")
     if not os.path.exists(intraday_data_json):
@@ -69,6 +70,11 @@ def create_data():
         with open(nightly_data_json, 'w', encoding='utf-8') as file:
             json.dump(init_nightly, file, ensure_ascii=False)
         print("create nightly_data.json")
+    if not os.path.exists(chat_config_json):
+        init_chat = {{"secret":"", "addr_list":[""]}
+        with open(chat_config_json, 'w', encoding='utf-8') as file:
+            json.dump(init_chat, file, ensure_ascii=False)
+        print("create chat_config.json")
 
 def lumos(cmd):
     # res = 0
