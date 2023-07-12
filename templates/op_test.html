@@ -271,7 +271,16 @@
             }
             else { break }
           }
-          if (count > 120) {
+          if (count == 0) {
+            if (this.sign_flag != 0) {
+              this.sign_flag = 0
+            }
+            return 0
+          }
+          else if (count < 120) {
+            return (count + std_arr[0] * 20) / 140 * 100
+          }
+          else {
             if (fail_count != 0) {
               var berry_arr = this.berry_300_list.slice().reverse().slice(0, 180)
               var berry_mean = berry_arr.reduce((acc, curr) => acc + curr) / berry_arr.length;
@@ -284,12 +293,8 @@
                 return 100
               }
             }
-            count = 120
+            return (120 + std_arr[0] * 20) / 140 * 100
           }
-          else {
-            this.sign_flag = 0
-          }
-          return count / 130 * 100
         }
       },
       created() { },
