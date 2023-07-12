@@ -14,3 +14,11 @@ apps:
     interpreter : "bash"
     out_file    : "log/pm2_sina.log"
     error_file  : "log/pm2_sina.log"
+
+  - name        : "run chat"
+    script      : "./daemon.runtime_chat.sh"
+    args        : ""
+    cwd         : ""
+    interpreter : "bash"
+    out_file    : "log/pm2_chat.log"
+    error_file  : "log/pm2_chat.log"
