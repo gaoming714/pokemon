@@ -278,7 +278,7 @@
             return 0
           }
           else if (count < 120) {
-            return (count + std_arr[0] * 20) / 140 * 100
+            return (count + std_arr[0] * count / 2) / 180 * 100
           }
           else {
             if (fail_count != 0) {
@@ -293,7 +293,7 @@
                 return 100
               }
             }
-            return (120 + std_arr[0] * 20) / 140 * 100
+            return (120 + std_arr[0] * 120 / 2) / 180 * 100
           }
         }
       },
