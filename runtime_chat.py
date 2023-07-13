@@ -138,7 +138,7 @@ def email(addr,msg):
     )
 
     # Send the envelope using an ad-hoc connection...
-    envelope.send(EMAIL['smtp'], login=EMAIL['login'],
+    envelope.send(EMAIL['smtp'], port=EMAIL['port'], login=EMAIL['login'],
                 password=EMAIL['password'], tls=True)
 
 
