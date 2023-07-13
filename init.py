@@ -71,7 +71,7 @@ def create_data():
             json.dump(init_nightly, file, ensure_ascii=False)
         print("create nightly_data.json")
     if not os.path.exists(chat_config_json):
-        init_chat = {"secret":"", "addr_list":[""]}
+        init_chat = {"email":{"smtp":"","login":"","password":"","from":""},"handle":1,"addr_list":[""]}
         with open(chat_config_json, 'w', encoding='utf-8') as file:
             json.dump(init_chat, file, ensure_ascii=False)
         print("create chat_config.json")

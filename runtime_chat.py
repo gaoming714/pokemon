@@ -15,7 +15,7 @@ from envelopes import Envelope, GMailSMTP
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
 
-SECRET = ""
+EMAIL = {}
 ADDR = []
 BOX = []
 
@@ -111,14 +111,17 @@ def hold_period():
 
 
 def get_mixin():
-    global SECRET
+    global EMAIL
     global ADDR
     info_path = os.path.join("data", "chat_config.json")
     try:
         with open(info_path, 'r', encoding='utf-8') as file:
             info_dict = json.load(file)
-        SECRET = info_dict['secret']
+        EMAIL = info_dict['email']
         ADDR = info_dict['addr_list']
+        handle = info_dict['handle']
+        if handle == 0:
+            ADDR = []
     except:
         print("chat_config.json is not ready")
         raise
@@ -126,17 +129,17 @@ def get_mixin():
 
 
 def email(addr,msg):
-    global SECRET
+    global EMAIL
     envelope = Envelope(
-        from_addr = ('369687664@qq.com', 'PokeScript'),
+        from_addr = (EMAIL['from'], 'PokeScript'),
         to_addr = (addr, 'Hi Jack'),
         subject = 'PokeScript',
         text_body = msg
     )
 
     # Send the envelope using an ad-hoc connection...
-    envelope.send('smtp.qq.com', login='369687664',
-                password=SECRET, tls=True)
+    envelope.send(EMAIL['smtp'], login=EMAIL['login'],
+                password=EMAIL['password'], tls=True)
 
 
 def lumos(cmd):
