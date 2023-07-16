@@ -284,11 +284,11 @@
             if (fail_count != 0) {
               var berry_arr = this.berry_300_list.slice().reverse().slice(0, 180)
               var berry_mean = berry_arr.reduce((acc, curr) => acc + curr) / berry_arr.length;
-              if (berry_arr[0] >= berry_mean) {
+              if (berry_arr[0] >= berry_mean && berry_mean > -10) {
                 this.sign_flag = 1
                 return 100
               }
-              else if (berry_arr[0] < berry_mean) {
+              else if (berry_arr[0] < berry_mean && berry_mean < 10) {
                 this.sign_flag = -1
                 return 100
               }
