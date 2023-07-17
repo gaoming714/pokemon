@@ -65,31 +65,31 @@ def launch():
     option_dict['now'] = now_str
     option_dict['now_list'].append(now_online)
 
-    option_dict['pct_50'].append(pct_50)
+    option_dict['pct_50'].append(round(pct_50,4))
     pcr_50 = vol_down_50 / vol_up_50 * 100
     mid_50 = vol_down_50 / vol_up_50 * 100 - 86
     berry_50 = (pct_50 * 10) + mid_50
-    option_dict['pcr_50'].append(pcr_50)
-    option_dict['berry_50'].append(berry_50)
+    option_dict['pcr_50'].append(round(pcr_50,4))
+    option_dict['berry_50'].append(round(berry_50,4))
 
-    option_dict['pct_300'].append(pct_300)
+    option_dict['pct_300'].append(round(pct_300,4))
     pcr_300 = vol_down_300 / vol_up_300 * 100
     mid_300 = vol_down_300 / vol_up_300 * 100 - 92
     berry_300 = (pct_300 * 10) + mid_300
-    option_dict['pcr_300'].append(pcr_300)
-    option_dict['berry_300'].append(berry_300)
+    option_dict['pcr_300'].append(round(pcr_300,4))
+    option_dict['berry_300'].append(round(berry_300,4))
 
-    option_dict['pct_500'].append(pct_500)
+    option_dict['pct_500'].append(round(pct_500,4))
     pcr_500 = vol_down_500 / vol_up_500 * 100
     mid_500 = vol_down_500 / vol_up_500 * 100 - 114
     berry_500 = (pct_500 * 10) + mid_500
-    option_dict['pcr_500'].append(pcr_500)
-    option_dict['berry_500'].append(berry_500)
+    option_dict['pcr_500'].append(round(pcr_500,4))
+    option_dict['berry_500'].append(round(berry_500,4))
 
-    option_dict['inc_t0'].append(inc_t0)
+    option_dict['inc_t0'].append(round(inc_t0,4))
     burger = (berry_50 + berry_500 + berry_300) / 3 - inc_t0 * 30
     # burger = (berry_50 + berry_500 + berry_300) / 3
-    option_dict['burger'].append(burger)
+    option_dict['burger'].append(round(burger,4))
 
     if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=47,seconds=47):
         option_dict['std_300'].append(0)
@@ -97,7 +97,7 @@ def launch():
         std_300 = pd.Series(option_dict['berry_300'][-240:]).std()
         if std_300 > 5:
             std_300 = 5
-        option_dict['std_300'].append(std_300)
+        option_dict['std_300'].append(round(std_300,4))
 
     if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=47,seconds=47):
         fixture(option_dict['berry_50'])

@@ -29,7 +29,7 @@ def oppage(code = "IF", name=None):
     with open(json_path, 'r', encoding='utf-8') as file:
         option_dict = json.load(file)
     if 'now' not in option_dict:
-        mk_margin = pendulum.today("Asia/Shanghai").add(hours=9,minutes=30,seconds=10)
+        mk_margin = pendulum.today("Asia/Shanghai").add(hours=9,minutes=30,seconds=15)
         remain = (mk_margin - now).total_seconds()
         return render_template('pedding.html',name=name, remain = str(remain))
     return render_template('op_'+code+'.html', name=name)
@@ -146,23 +146,26 @@ def api_touch(name=None):
 
 @app.route("/api/op")
 def api_op(name=None):
-    now = pendulum.now("Asia/Shanghai")
-    now_str = now.to_datetime_string()
+    # now = pendulum.now("Asia/Shanghai")
+    # now_str = now.to_datetime_string()
     # get sum of vol from sina_option_data
     with open(json_path, 'r', encoding='utf-8') as file:
         option_dict = json.load(file)
     if 'now' not in option_dict:
         return json.dumps({})
-    last_time = option_dict['now']
+    now = option_dict['now']
     now_list = option_dict['now_list']
     with open(nightly_path, 'r', encoding='utf-8') as file:
         nightly_dict = json.load(file)
 
     pcr_50_list = option_dict['pcr_50']
+    pct_50_list = option_dict['pct_50']
     berry_50_list = option_dict['berry_50']
     pcr_300_list = option_dict['pcr_300']
+    pct_300_list = option_dict['pct_300']
     berry_300_list = option_dict['berry_300']
     pcr_500_list = option_dict['pcr_500']
+    pct_500_list = option_dict['pct_500']
     berry_500_list = option_dict['berry_500']
     burger_list = option_dict['burger']
     std_list = option_dict['std_300']
@@ -178,15 +181,17 @@ def api_op(name=None):
         today_shuffle = 0
 
 
-    readme =  "30 -50- 70  ==   70 -90- 110"
+    readme =  "Watch the fork and progress"
     context = {
-            'now': now_str,
-            'last_time': last_time,
+            'now': now,
             'now_list': now_list,
             # 'pcr_50': round(pcr_50_list[-1],2),
             # 'berry_50': round(berry_50_list[-1],2),
             # 'pcr_50_list': pcr_50_list,
             # 'berry_50_list': berry_50_list,
+            'pct_50': round(pct_50_list[-1],4),
+            'pct_300': round(pct_300_list[-1],4),
+            'pct_500': round(pct_500_list[-1],4),
 
             'pcr_300': round(pcr_300_list[-1],2),
             'berry_300': round(berry_300_list[-1],2),
