@@ -104,9 +104,9 @@
             <div class="bar" :style="{width: onProgress+'%'}"></div>
           </div>
           <div class="ui indicating large progress" style="height: 34px; margin-bottom: 0px;" v-show="gear!=0"
-          :data-percent="onEdge">
-          <div class="bar" :style="{width: onEdge+'%'}"></div>
-        </div>
+            :data-percent="onEdge">
+            <div class="bar" :style="{width: onEdge+'%'}"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -118,6 +118,13 @@
             <div class="header">current: <span v-text="now"></span></div>
             <p>Auto refresh during market opening.</p>
           </div>
+          <div class="ui right buttons">
+            <button class="ui button" :class="{negative: yest_shuffle==1, positive: yest_shuffle==-1}"><img
+                src="{{ url_for('static', filename='xbox.svg') }}" /></button>
+            <div class="or"></div>
+            <button class="ui button" :class="{negative: today_shuffle==1, positive: today_shuffle==-1}"><img
+                src="{{ url_for('static', filename='apple.svg') }}" /></button>
+          </div>
         </div>
       </div>
       <div class="col-xl-3">
@@ -125,16 +132,21 @@
           <i class="notched icon utensils" v-show="gear==0" style="width: 39px;"></i>
           <i class="notched icon red arrow circle up" v-show="gear==1"></i>
           <i class="notched icon green arrow circle down" v-show="gear==-1"></i>
-          <div class="content">
+          <div class="content" v-show="gear==0">
             <div class="header"><span v-text="std"></span></div>
-            <p>STD detail</p>
+            <p v-show="gear==0">STD detail</p>
+          </div>
+          <div class="content" v-show="gear!=0">
+            <div class="header" v-show="gear==1"><span v-text="(price-Math.max(...cache))*100+6"></span></div>
+            <div class="header" v-show="gear==-1"><span v-text="-(price-Math.min(...cache))*100+6"></span></div>
+            <p v-show="gear!=0">Edge %%</p>
           </div>
           <div class="ui right buttons">
-            <button class="ui button" :class="{negative: yest_shuffle==1, positive: yest_shuffle==-1}"><img
-                src="{{ url_for('static', filename='xbox.svg') }}" /></button>
-            <div class="or"></div>
-            <button class="ui button" :class="{negative: today_shuffle==1, positive: today_shuffle==-1}"><img
-                src="{{ url_for('static', filename='apple.svg') }}" /></button>
+            <button class="ui button twitter" @click="gear=-1"><img
+                src="{{ url_for('static', filename='hand-thumbs-down-fill.svg') }}" /></button>
+            <div class="or" @click="gear=0"></div>
+            <button class="ui button twitter" @click="gear=1"><img class="rotated"
+                src="{{ url_for('static', filename='hand-thumbs-up-fill.svg') }}" /></button>
           </div>
         </div>
       </div>
@@ -171,7 +183,8 @@
         <div class="content">
           <div class="header"><span>此指标为调整后的PCR, STD稳定在1以下一段时间后拉升，PCR突破平台判断方向。</span></div>
           <p>建立平台后，向上突破可做多，指标停滞可平仓，反向同理。建议限制在30分钟内完成交易。</p>
-          <p>本页持续在线可以保留15分钟交易信号。</p>
+          <p>本页持续在线可以保留15分钟交易信号。回撤控制在万分之6，动态止损线，标的sh000905。</p>
+          <p>右上角手势箭头可以进行手动生成交易信号，用于分析动态止损。</p>
         </div>
       </div>
     </div>
@@ -259,24 +272,25 @@
             }, 1000 * 60 * 30)
           }
         },
-        onEdge(){
+        onEdge() {
           if (this.gear == 0) {
             return 0
           }
-          if (this.price != null){
+          if (this.price != null) {
             this.cache.push(this.price)
           }
-          var edgeMargin = -3 * 0.01
-          if (this.gear > 0){
-            var edge  = Math.max(...this.cache) + edgeMargin
-            if (this.price>=edge){
-              return Math.round((this.price - edge) * 500)
+          var pct = this.price * 100
+          var edgeMargin = -6
+          if (this.gear > 0) {
+            var edge = Math.max(...this.cache) * 100 + edgeMargin
+            if (pct >= edge) {
+              return Math.round((pct - edge) * 5)
             }
           }
           else {
-            var edge  = Math.min(...this.cache) - edgeMargin
-            if (this.price<=edge){
-              return Math.round(-(this.price - edge) * 500)
+            var edge = Math.min(...this.cache) * 100 - edgeMargin
+            if (pct <= edge) {
+              return Math.round(-(pct - edge) * 5)
             }
           }
           this.gear = 0
