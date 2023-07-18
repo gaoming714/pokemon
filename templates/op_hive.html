@@ -137,8 +137,8 @@
             <p v-show="gear==0">STD detail</p>
           </div>
           <div class="content" v-show="gear!=0">
-            <div class="header" v-show="gear==1"><span v-text="((price-Math.max(...cache))*100+6).toFixed(2)"></span></div>
-            <div class="header" v-show="gear==-1"><span v-text="(-(price-Math.min(...cache))*100+6).toFixed(2)"></span></div>
+            <div class="header" v-show="gear==1"><span v-text="((price-Math.max(...cache))*100+8).toFixed(2)"></span></div>
+            <div class="header" v-show="gear==-1"><span v-text="(-(price-Math.min(...cache))*100+8).toFixed(2)"></span></div>
             <p v-show="gear!=0">Edge %%</p>
           </div>
           <div class="ui right buttons">
@@ -280,7 +280,7 @@
             this.cache.push(this.price)
           }
           var pct = this.price * 100
-          var edgeMargin = -6
+          var edgeMargin = -8
           if (this.gear > 0) {
             var edge = Math.max(...this.cache) * 100 + edgeMargin
             if (pct >= edge) {
@@ -319,11 +319,11 @@
             if (fail_count != 0) {
               var berry_arr = this.berry_300_list.slice().reverse().slice(0, 180)
               var berry_mean = berry_arr.reduce((acc, curr) => acc + curr) / berry_arr.length;
-              if (berry_arr[0] >= berry_mean && berry_mean > -12) {
+              if (berry_arr[0] >= berry_mean && berry_mean >= -10) {
                 this.gear = 1
                 return 100
               }
-              else if (berry_arr[0] < berry_mean && berry_mean < 12) {
+              else if (berry_arr[0] < berry_mean && berry_mean <= 10) {
                 this.gear = -1
                 return 100
               }
