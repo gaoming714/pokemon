@@ -144,7 +144,7 @@
           <div class="ui right buttons">
             <button class="ui button twitter" @click="gear=-1"><img
                 src="{{ url_for('static', filename='hand-thumbs-down-fill.svg') }}" /></button>
-            <div class="or" @click="gear=0"></div>
+            <div class="or" @click="gear=0;cache=[]"></div>
             <button class="ui button twitter" @click="gear=1"><img class="rotated"
                 src="{{ url_for('static', filename='hand-thumbs-up-fill.svg') }}" /></button>
           </div>
