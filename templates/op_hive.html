@@ -92,8 +92,8 @@
         <div class="col-3">
           <div class="text-center">
             <div class="fluid ui animated compact large primary active basic button" tabindex="0">
-              <div class="visible content" v-text="berry_300"></div>
-              <div class="hidden content" v-text="pcr_300">
+              <div class="visible content" v-text="berry_300.toFixed(2)"></div>
+              <div class="hidden content" v-text="pcr_300.toFixed(2)">
               </div>
             </div>
           </div>
@@ -133,12 +133,12 @@
           <i class="notched icon red arrow circle up" v-show="gear==1"></i>
           <i class="notched icon green arrow circle down" v-show="gear==-1"></i>
           <div class="content" v-show="gear==0">
-            <div class="header"><span v-text="std"></span></div>
+            <div class="header"><span v-text="std.toFixed(4)"></span></div>
             <p v-show="gear==0">STD detail</p>
           </div>
           <div class="content" v-show="gear!=0">
-            <div class="header" v-show="gear==1"><span v-text="(price-Math.max(...cache))*100+6"></span></div>
-            <div class="header" v-show="gear==-1"><span v-text="-(price-Math.min(...cache))*100+6"></span></div>
+            <div class="header" v-show="gear==1"><span v-text="((price-Math.max(...cache))*100+6).toFixed(2)"></span></div>
+            <div class="header" v-show="gear==-1"><span v-text="(-(price-Math.min(...cache))*100+6).toFixed(2)"></span></div>
             <p v-show="gear!=0">Edge %%</p>
           </div>
           <div class="ui right buttons">
