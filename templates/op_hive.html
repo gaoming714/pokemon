@@ -284,13 +284,13 @@
           if (this.gear > 0) {
             var edge = Math.max(...this.cache) * 100 + edgeMargin
             if (pct >= edge) {
-              return Math.round((pct - edge) * 5)
+              return Math.round((pct - edge) * 12.5)
             }
           }
           else {
             var edge = Math.min(...this.cache) * 100 - edgeMargin
             if (pct <= edge) {
-              return Math.round(-(pct - edge) * 5)
+              return Math.round(-(pct - edge) * 12.5)
             }
           }
           this.gear = 0
