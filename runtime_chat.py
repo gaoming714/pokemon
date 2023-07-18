@@ -57,20 +57,20 @@ def launch():
         else:
             break
     print([count,std_arr[-1]])
-    direct = None
+
     if count >= 120:
         if fail_count != 0:
             BOX.append(now)
             berry_arr = option_dict["berry_300"][-1:-181:-1]
             berry_mean = sum(berry_arr) / len(berry_arr)
-            if berry_arr[0] >= berry_mean:
-                direct = "up"
-            else:
-                direct = "down"
-    if direct != None:
-        msg = now_str + "\t" + direct
-        for user in ADDR:
-            email(user,msg)
+            if berry_arr[0] >= berry_mean and berry_mean >= -10:
+                msg = now_str + "\tup\t" + "🍓"
+                for user in ADDR:
+                    email(user,msg)
+            elif berry_arr[0] < berry_mean and berry_mean < 10:
+                msg = now_str + "\tdown\t" + "🍏"
+                for user in ADDR:
+                    email(user,msg)
 
 
 now = pendulum.now("Asia/Shanghai")
