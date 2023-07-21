@@ -63,13 +63,13 @@ def launch():
             BOX.append(now)
             berry_arr = option_dict["berry_300"][-1:-181:-1]
             berry_mean = sum(berry_arr) / len(berry_arr)
-            edge = round(1.6 * pd.Series(option_dict["pct_500"][-360:-1]).std(),2)
+            margin = round(-1.6 * pd.Series(option_dict["pct_500"][-360:-1]).std(), 2)
             if berry_arr[0] >= berry_mean and berry_mean >= -10:
-                msg = now_str + "\tup\t" + "🍓" + "\nStop-loss\t" + str(edge)
+                msg = now_str + "\tup\t" + "🍓" + "\nStop-loss\t" + str(margin*100)
                 for user in ADDR:
                     email(user,msg)
             elif berry_arr[0] < berry_mean and berry_mean < 10:
-                msg = now_str + "\tdown\t" + "🍏" + "\nStop-loss\t" + str(edge)
+                msg = now_str + "\tdown\t" + "🍏" + "\nStop-loss\t" + str(margin*100)
                 for user in ADDR:
                     email(user,msg)
 

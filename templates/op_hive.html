@@ -137,8 +137,10 @@
             <p v-show="gear==0">STD detail</p>
           </div>
           <div class="content" v-show="gear!=0">
-            <div class="header" v-show="gear==1"><span v-text="((price-Math.max(...cache))*100+8).toFixed(2)"></span></div>
-            <div class="header" v-show="gear==-1"><span v-text="(-(price-Math.min(...cache))*100+8).toFixed(2)"></span></div>
+            <div class="header" v-show="gear==1"><span
+                v-text="(chg-Math.max(...cache)-marginCache[0]).toFixed(4)*100"></span></div>
+            <div class="header" v-show="gear==-1"><span
+                v-text="(-(chg-Math.min(...cache)+marginCache[0])).toFixed(4)*100"></span></div>
             <p v-show="gear!=0">Edge %%</p>
           </div>
           <div class="ui right buttons">
@@ -243,12 +245,14 @@
         return {
           timer: 0,
           last: 0,
-          price: null,
+          chg: null,
           pcr_300: 0,
           berry_300: 0,
           berry_300_list: [],
           std_list: [],
           std: 0,
+          margin: 0,
+          marginCache: [],
           gear: 0,
           burger: 0,
           burger_list: [],
@@ -276,27 +280,28 @@
           if (this.gear == 0) {
             return 0
           }
-          if (this.price != null) {
-            this.cache.push(this.price)
+          if (this.chg != null) {
+            this.cache.push(this.chg)
+            this.marginCache.push(this.margin)
           }
-          var pct = this.price * 100
-          var edgeMargin = -8
+          var edgeMargin = this.marginCache[0]
           if (this.gear > 0) {
-            var edge = Math.max(...this.cache) * 100 + edgeMargin
-            var gain = pct - this.cache[0] * 100
-            if (pct >= edge) {
-              return Math.round((pct - edge) * 3 + gain * 2 + 16)
+            var edge = Math.max(...this.cache) + edgeMargin
+            var gain = this.chg - this.cache[0] - edgeMargin
+            if (this.chg >= edge) {
+              return Math.round(100 * (this.chg - edge + gain)) * 2
             }
           }
           else {
-            var edge = Math.min(...this.cache) * 100 - edgeMargin
-            var gain = pct - this.cache[0] * 100
-            if (pct <= edge) {
-              return Math.round(-(pct - edge) * 3 - gain * 2 + 16)
+            var edge = Math.min(...this.cache) - edgeMargin
+            var gain = this.chg - this.cache[0] + edgeMargin
+            if (this.chg <= edge) {
+              return Math.round(-100 * (this.chg - edge + gain)) * 2
             }
           }
           this.gear = 0
           this.cache = []
+          this.marginCache = []
           return 0
         },
         onProgress() {
@@ -371,10 +376,11 @@
               console.log(response)
               that.now = response.data["now"]
               that.last = response.data["now_list"].length - 1
-              that.price = response.data["pct_500"]
+              that.chg = response.data["pct_500"]
               that.pcr_300 = response.data["pcr_300"]
               that.berry_300 = response.data["berry_300"]
               that.std = response.data["std"]
+              that.margin = response.data["margin"]
               that.burger = response.data["burger"]
               that.now_list = response.data["now_list"]
               that.berry_300_list = response.data["berry_300_list"]

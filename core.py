@@ -5,7 +5,7 @@ import time
 import json
 import pendulum
 import redis
-# import pandas as pd
+import pandas as pd
 from flask import Flask
 from flask import redirect, url_for
 from flask import render_template
@@ -170,6 +170,8 @@ def api_op(name=None):
     burger_list = option_dict['burger']
     std_list = option_dict['std_300']
 
+    margin = -1.6 * pd.Series(option_dict["pct_500"][-360:-1]).std()
+
     yest_shuffle = nightly_dict['shuffle'][-1]
     yest_berry = nightly_dict['berry_300'][-1]
     diff_berry = berry_300_list[-1] - yest_berry
@@ -197,6 +199,7 @@ def api_op(name=None):
             'berry_300': round(berry_300_list[-1],2),
             'pcr_300_list': pcr_300_list,
             'berry_300_list': berry_300_list,
+            'margin': round(margin,4),
             'std': round(std_list[-1],4),
             'std_list': std_list,
 
