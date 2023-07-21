@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+
+  <!-- <semantic CSS> -->
+  <link href="https://cdn.bootcdn.net/ajax/libs/semantic-ui/2.5.0/semantic.min.css" rel="stylesheet" />
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Main CSS -->
+  <link href="{{ url_for('static', filename='preloader.css') }}" rel="stylesheet" />
+
+  <!-- vue -->
+  <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.2.47/vue.global.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.3.6/axios.min.js"></script>
+
+  <!-- Analytics_baidu -->
+  <script src="{{ url_for('static', filename='Analytics_baidu.js') }}"></script>
+
+  <title>Poke PCR Optimized</title>
+</head>
+
+<body>
+  <!-- Start preloader -->
+  <div class="preloader bg-dark flex-column justify-content-center align-items-center">
+    <svg id="loader-logo" xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 64 78.4">
+      <path fill="#fff" d="M10,0h1.2V11.2H0V10A10,10,0,0,1,10,0Z" />
+      <rect fill="none" stroke="#fff" stroke-width="11.2" x="40" y="17.6" width="0" height="25.6" />
+      <rect fill="none" stroke="#fff" stroke-opacity="0.4" stroke-width="11.2" x="23" y="35.2" width="0"
+        height="25.6" />
+      <path fill="#fff" d="M52.8,35.2H64V53.8a7,7,0,0,1-7,7H52.8V35.2Z" />
+      <rect fill="none" stroke="#fff" stroke-width="11.2" x="6" y="52.8" width="0" height="25.6" />
+      <path fill="#fff" d="M52.8,0H57a7,7,0,0,1,7,7h0v4.2H52.8V0Z" />
+      <rect fill="none" stroke="#fff" stroke-opacity="0.4" stroke-width="11.2" x="57.8" y="17.6" width="0"
+        height="11.2" />
+      <rect fill="none" stroke="#0d6efd" stroke-width="11.2" x="6" y="35.2" width="0" height="11.2" />
+      <rect fill="none" stroke="#fff" stroke-width="11.2" x="40.2" y="49.6" width="0" height="11.2" />
+      <path fill="#fff" d="M17.6,67.2H28.8v1.2a10,10,0,0,1-10,10H17.6V67.2Z" />
+      <rect fill="none" stroke="#0d6efd" stroke-opacity="0.4" stroke-width="28.8" x="31.6" width="0" height="11.2" />
+      <rect fill="none" stroke="#fff" x="14" stroke-width="28.8" y="17.6" width="0" height="11.2" />
+    </svg>
+  </div>
+  <!-- End preloader -->
+
+  <div class="container" id="app">
+    <div class="ui segment">
+      <div class="row">
+        <div class="col">
+          <div class="text-center">
+            <div class="fluid ui animated compact large primary active basic button" tabindex="0">
+              <div class="visible content" v-text="onProgress.toFixed(2)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="ui indicating large progress" style="height: 34px; margin-bottom: 0px;" v-show="gear==0"
+            :data-percent="onProgress">
+            <div class="bar" :style="{width: onProgress+'%'}"></div>
+          </div>
+          <div class="ui indicating large progress" style="height: 34px; margin-bottom: 0px;" v-show="gear!=0"
+            :data-percent="onEdge">
+            <div class="bar" :style="{width: onEdge+'%'}"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="small ui floating icon message" :class="{ teal: gear!=0, '':onGear}">
+          <i class="notched icon shield alternate" v-show="gear==0" style="width: 39px;"></i>
+          <i class="notched icon red home" v-show="gear==1"></i>
+          <i class="notched icon green leaf" v-show="gear==-1"></i>
+          <div class="content" v-show="gear==0">
+            <div class="header"><span v-text="std.toFixed(4)"></span></div>
+            <p v-show="gear==0">STD detail</p>
+          </div>
+          <div class="content" v-show="gear!=0">
+            <div class="header" v-show="gear==1"><span
+                v-text="((chg-Math.max(...cache)-marginCache[0])*100).toFixed(2)"></span></div>
+            <div class="header" v-show="gear==-1"><span
+                v-text="(-(chg-Math.min(...cache)+marginCache[0])*100).toFixed(2)"></span></div>
+            <p v-show="gear!=0">Edge %%</p>
+          </div>
+          <div class="ui right buttons">
+            <button class="ui button twitter" @click="gear=-1"><img
+                src="{{ url_for('static', filename='hand-thumbs-down-fill.svg') }}" /></button>
+            <div class="or" @click="gear=0;cache=[];marginCache=[]"></div>
+            <button class="ui button twitter" @click="gear=1"><img
+                src="{{ url_for('static', filename='hand-thumbs-up-fill.svg') }}" /></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <h2 class="ui horizontal divider header">
+      <i class="tag icon"></i>
+      正在完成小番茄🍅数量：
+    </h2>
+    <div class="row">
+      <div class="col text-center">
+        <h1 v-text="last"></h1>
+      </div>
+    </div>
+    <p></p>
+    <div class="row">
+      <div class="col text-center">
+        <img class="img-fluid"
+        src="{{ url_for('static', filename='tomato.jpeg') }}" />
+      </div>
+    </div>
+
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+      <div class="col-md-4 d-flex align-items-center">
+        <a href="/" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
+        </a>
+        <span class="text-muted"><i class="closed captioning icon"></i>Email:
+          gaoming714@126.com</span>
+      </div>
+
+      <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+        <li class="ms-3">
+          <a class="text-muted" href="#"><svg class="bi" width="24" height="24">
+              <use xlink:href="#twitter"></use>
+            </svg></a>
+        </li>
+        <li class="ms-3">
+          <a class="text-muted" href="#"><svg class="bi" width="24" height="24">
+              <use xlink:href="#instagram"></use>
+            </svg></a>
+        </li>
+        <li class="ms-3">
+          <a class="text-muted" href="#"><svg class="bi" width="24" height="24">
+              <use xlink:href="#facebook"></use>
+            </svg></a>
+        </li>
+      </ul>
+    </footer>
+  </div>
+
+  <!-- Option 1: Bootstrap Bundle with Popper -->
+  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Option 2: Separate Popper and Bootstrap JS -->
+  <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    -->
+  <!-- <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script> -->
+  <!-- <script src="https://cdn.bootcdn.net/ajax/libs/semantic-ui/2.5.0/semantic.min.js"></script> -->
+  <!-- <script src="{{ url_for('static', filename='semantic/semantic.min.js') }}"></script> -->
+
+  <!-- preloader need -->
+  <script src="https://cdn.bootcdn.net/ajax/libs/vivus/0.4.6/vivus.min.js"></script>
+
+  <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.min.js"></script> -->
+
+  <script src="https://cdn.bootcdn.net/ajax/libs/plotly.js/2.21.0/plotly.min.js"></script>
+
+  <script type="text/javascript">
+    const { createApp } = Vue
+
+    createApp({
+      data() {
+        return {
+          timer: 0,
+          last: 0,
+          chg: null,
+          pcr_300: 0,
+          berry_300: 0,
+          berry_300_list: [],
+          std_list: [],
+          std: 0,
+          margin: 0,
+          marginCache: [],
+          gear: 0,
+          burger: 0,
+          burger_list: [],
+          cache: [],
+          yest_shuffle: 0,
+          today_shuffle: 0,
+          now: null,
+          now_list: [],
+          readme: null
+        }
+      },
+      computed: {
+        isActive() {
+          return this.timer <= 0
+        },
+        onGear() {
+          if (this.gear != 0) {
+            setTimeout(() => {
+              this.gear = 0
+              this.cache = []
+              this.marginCache = []
+            }, 1000 * 60 * 30)
+          }
+        },
+        onEdge() {
+          if (this.gear == 0) {
+            return 0
+          }
+          if (this.chg != null) {
+            this.cache.push(this.chg)
+            this.marginCache.push(this.margin)
+          }
+          var edgeMargin = this.marginCache[0]
+          if (this.gear > 0) {
+            var edge = Math.max(...this.cache) + edgeMargin
+            var gain = this.chg - this.cache[0] - edgeMargin
+            if (this.chg >= edge) {
+              return Math.round(100 * (this.chg - edge + gain) * (-0.2)/edgeMargin)
+            }
+          }
+          else {
+            var edge = Math.min(...this.cache) - edgeMargin
+            var gain = this.chg - this.cache[0] + edgeMargin
+            if (this.chg <= edge) {
+              return Math.round(-100 * (this.chg - edge + gain) * (-0.2)/edgeMargin)
+            }
+          }
+          this.gear = 0
+          this.cache = []
+          this.marginCache = []
+          return 0
+        },
+        onProgress() {
+          var std_arr = this.std_list.slice().reverse().slice(0, 180)
+          if (std_arr[0] == 0 || std_arr[120] == 0) { return 0 }
+          var count = 0
+          var fail_count = 0
+          for (item of std_arr) {
+            if (item < 1) { count = count + 1 }
+            else if (fail_count < 6 && count < 8) {
+              fail_count = fail_count + 1
+            }
+            else { break }
+          }
+          if (count == 0) {
+            return 0
+          }
+          else if (count < 120) {
+            return (count + std_arr[0] * count / 2) / 180 * 100
+          }
+          else {
+            if (fail_count != 0) {
+              var berry_arr = this.berry_300_list.slice().reverse().slice(0, 180)
+              var berry_mean = berry_arr.reduce((acc, curr) => acc + curr) / berry_arr.length;
+              if (berry_arr[0] >= berry_mean && berry_mean >= -10) {
+                this.gear = 1
+                return 100
+              }
+              else if (berry_arr[0] < berry_mean && berry_mean <= 10) {
+                this.gear = -1
+                return 100
+              }
+              else {
+                this.gear = 0
+                return 0
+              }
+            }
+            return Math.round((120 + std_arr[0] * 120 / 2) / 180 * 100)
+          }
+        }
+      },
+      created() { },
+      mounted() {
+        this.fetch()
+        this.refresh()
+        setInterval(() => {
+          if (this.timer <= -2) {
+            this.fetch()
+            this.refresh()
+          }
+          this.timer--
+        }, 1000)
+      },
+      methods: {
+        fetch() {
+          var that = this
+          axios
+            .get("/api/remain")
+            .then(function (response) {
+              that.timer = response.data
+            })
+            .catch(function (error) {
+              console.log(error)
+            })
+            .then(function () { })
+        },
+        refresh() {
+          var that = this
+          axios
+            .get("/api/op")
+            .then(function (response) {
+              console.log(response)
+              that.now = response.data["now"]
+              that.last = response.data["now_list"].length - 1
+              that.chg = response.data["chg_300"]
+              that.pcr_300 = response.data["pcr_300"]
+              that.berry_300 = response.data["berry_300"]
+              that.std = response.data["std"]
+              that.margin = response.data["margin"]
+              that.burger = response.data["burger"]
+              that.now_list = response.data["now_list"]
+              that.berry_300_list = response.data["berry_300_list"]
+              that.burger_list = response.data["burger_list"]
+              that.std_list = response.data["std_list"]
+              that.yest_shuffle = response.data["yest_shuffle"]
+              that.today_shuffle = response.data["today_shuffle"]
+            })
+            .catch(function (error) {
+              console.log(error)
+            })
+            .then(function () {
+              that.getplotly()
+            })
+        },
+        getplotly() {
+          var chart = document.getElementById('chart')
+          if (chart) {
+            var traceIFAM = {
+              x: this.now_list,
+              y: this.berry_300_list,
+              xaxis: 'x1',
+              yaxis: 'y1',
+              mode: 'lines',
+              line: {
+                color: '#0d6efd',
+                width: 2
+              },
+              name: 'IF 510300',
+            }
+            var traceIFPM = {
+              x: this.now_list,
+              y: this.berry_300_list,
+              xaxis: 'x2',
+              yaxis: 'y2',
+              mode: 'lines',
+              line: {
+                color: '#0d6efd',
+                width: 2
+              },
+              name: 'IF 510300',
+            }
+            var traceburgerAM = {
+              x: this.now_list,
+              y: this.burger_list,
+              xaxis: 'x1',
+              yaxis: 'y1',
+              mode: 'lines',
+              line: {
+                color: '#b31b1b',
+                width: 2
+              },
+              name: 'Burger',
+            }
+            var traceburgerPM = {
+              x: this.now_list,
+              y: this.burger_list,
+              xaxis: 'x2',
+              yaxis: 'y2',
+              mode: 'lines',
+              line: {
+                color: '#b31b1b',
+                width: 2
+              },
+              name: 'Burger',
+            }
+            var tracelineAM = {
+              x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "11:30:00"],
+              y: [0, 0],
+              xaxis: 'x1',
+              yaxis: 'y1',
+              mode: 'lines',
+              name: 'dashdot',
+              line: {
+                dash: 'dashdot',
+                color: '#002c37',
+                width: 3
+              }
+            }
+            var tracelinePM = {
+              x: [this.now.slice(0, 11) + "13:00:00", this.now.slice(0, 11) + "15:00:00"],
+              y: [0, 0],
+              xaxis: 'x2',
+              yaxis: 'y2',
+              mode: 'lines',
+              name: 'Solid',
+              line: {
+                dash: 'dashdot',
+                color: '#002c37',
+                width: 3
+              }
+            }
+            var traceCurAM = {
+              x: [this.now, this.now, this.now],
+              y: [this.berry_300, this.burger],
+              xaxis: 'x1',
+              yaxis: 'y1',
+              mode: 'markers',
+              type: 'scatter',
+              marker: { color: '#FF00FF', size: 7 }
+            }
+            var traceCurPM = {
+              x: [this.now, this.now, this.now],
+              y: [this.berry_300, this.burger],
+              xaxis: 'x2',
+              yaxis: 'y2',
+              mode: 'markers',
+              type: 'scatter',
+              marker: { color: '#FF00FF', size: 7 }
+            }
+            var layout = {
+              showlegend: false,
+              xaxis: {
+                title: 'AM',
+                type: 'date',
+                range: [this.now.slice(0, 11) + "09:29:00", this.now.slice(0, 11) + "11:31:00"],
+              },
+              yaxis: {
+                title: 'Optimized',
+              },
+              xaxis2: {
+                title: 'PM',
+                type: 'date',
+                range: [this.now.slice(0, 11) + "12:59:00", this.now.slice(0, 11) + "15:01:00"],
+              },
+              yaxis2: {
+              },
+              margin: {
+                l: 40,
+                r: 40,
+                t: 20,
+              },
+              grid: { rows: 1, columns: 2, pattern: 'coupled' }
+            }
+            var plot_set = [tracelineAM, tracelinePM, traceburgerAM, traceburgerPM, traceIFAM, traceIFPM, traceCurAM, traceCurPM]
+            Plotly.newPlot(chart, plot_set, layout)
+          }
+          var chart_std = document.getElementById('chart_std')
+          if (chart_std) {
+            var traceSTDAM = {
+              x: this.now_list,
+              y: this.std_list,
+              xaxis: 'x1',
+              yaxis: 'y1',
+              mode: 'lines',
+              line: {
+                color: '#5F9EA0',
+                width: 2
+              },
+              name: 'IF 510300 STD',
+            }
+            var traceSTDPM = {
+              x: this.now_list,
+              y: this.std_list,
+              xaxis: 'x2',
+              yaxis: 'y2',
+              mode: 'lines',
+              line: {
+                color: '#5F9EA0',
+                width: 2
+              },
+              name: 'IF 510300 STD',
+            }
+            var tracelineAM = {
+              x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "11:30:00"],
+              y: [0, 0],
+              xaxis: 'x1',
+              yaxis: 'y1',
+              mode: 'lines',
+              name: 'dashdot',
+              line: {
+                dash: 'dashdot',
+                color: '#002c37',
+                width: 3
+              }
+            }
+            var tracelinePM = {
+              x: [this.now.slice(0, 11) + "13:00:00", this.now.slice(0, 11) + "15:00:00"],
+              y: [0, 0],
+              xaxis: 'x2',
+              yaxis: 'y2',
+              mode: 'lines',
+              name: 'Solid',
+              line: {
+                dash: 'dashdot',
+                color: '#002c37',
+                width: 3
+              }
+            }
+            var layout = {
+              showlegend: false,
+              xaxis: {
+                title: 'AM',
+                type: 'date',
+                range: [this.now.slice(0, 11) + "09:29:00", this.now.slice(0, 11) + "11:31:00"],
+              },
+              yaxis: {
+                title: 'Optimized',
+                range: [-0.1, 3.1],
+              },
+              xaxis2: {
+                title: 'PM',
+                type: 'date',
+                range: [this.now.slice(0, 11) + "12:59:00", this.now.slice(0, 11) + "15:01:00"],
+              },
+              yaxis2: {
+                range: [-0.1, 3.1],
+              },
+              margin: {
+                l: 40,
+                r: 40,
+                t: 20,
+              },
+              grid: { rows: 1, columns: 2, pattern: 'coupled' }
+            }
+            var plot_set = [tracelineAM, tracelinePM, traceSTDAM, traceSTDPM,]
+            Plotly.newPlot(chart_std, plot_set, layout)
+          }
+        },
+      },
+    }).mount("#app")
+  </script>
+
+  <!-- Start preloader -->
+  <script type="text/javascript">
+    var preloader = document.querySelector('.preloader')
+    if (preloader) {
+
+      const animations = ['oneByOne', 'delayed', 'sync', 'scenario']
+
+      new Vivus('loader-logo', { duration: 50, type: 'oneByOne' }, function () { })
+
+      setTimeout(function () {
+        preloader.classList.add('show')
+      }, 1000)
+    }
+  </script>
+  <!-- End preloader -->
+
+</body>
+
+</html>
