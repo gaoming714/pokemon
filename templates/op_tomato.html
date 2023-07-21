@@ -51,8 +51,9 @@
       <div class="row">
         <div class="col">
           <div class="text-center">
-            <div class="fluid ui animated compact large primary active basic button" tabindex="0">
-              <div class="visible content" v-text="onProgress.toFixed(2)"></div>
+            <div class="fluid ui compact large primary active basic button" tabindex="0">
+              <div class="visible content" v-show="gear==0" v-text="onProgress.toFixed(2)"></div>
+              <div class="visible content" v-show="gear!=0" v-text="onEdge.toFixed(2)"></div>
             </div>
           </div>
         </div>
