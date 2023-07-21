@@ -170,7 +170,7 @@ def api_op(name=None):
     burger_list = option_dict['burger']
     std_list = option_dict['std_300']
 
-    margin = -1.6 * pd.Series(option_dict["pct_500"][-360:-1]).std()
+    margin = -1.5 * pd.Series(option_dict["pct_300"][-481:-1]).std()
 
     yest_shuffle = nightly_dict['shuffle'][-1]
     yest_berry = nightly_dict['berry_300'][-1]
