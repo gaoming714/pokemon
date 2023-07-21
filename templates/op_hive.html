@@ -138,16 +138,16 @@
           </div>
           <div class="content" v-show="gear!=0">
             <div class="header" v-show="gear==1"><span
-                v-text="(chg-Math.max(...cache)-marginCache[0]).toFixed(4)*100"></span></div>
+                v-text="((chg-Math.max(...cache)-marginCache[0])*100).toFixed(2)"></span></div>
             <div class="header" v-show="gear==-1"><span
-                v-text="(-(chg-Math.min(...cache)+marginCache[0])).toFixed(4)*100"></span></div>
+                v-text="(-(chg-Math.min(...cache)+marginCache[0])*100).toFixed(2)"></span></div>
             <p v-show="gear!=0">Edge %%</p>
           </div>
           <div class="ui right buttons">
             <button class="ui button twitter" @click="gear=-1"><img
                 src="{{ url_for('static', filename='hand-thumbs-down-fill.svg') }}" /></button>
-            <div class="or" @click="gear=0;cache=[]"></div>
-            <button class="ui button twitter" @click="gear=1"><img class="rotated"
+            <div class="or" @click="gear=0;cache=[];marginCache=[]"></div>
+            <button class="ui button twitter" @click="gear=1"><img
                 src="{{ url_for('static', filename='hand-thumbs-up-fill.svg') }}" /></button>
           </div>
         </div>
@@ -273,6 +273,7 @@
             setTimeout(() => {
               this.gear = 0
               this.cache = []
+              this.marginCache = []
             }, 1000 * 60 * 30)
           }
         },
@@ -289,14 +290,14 @@
             var edge = Math.max(...this.cache) + edgeMargin
             var gain = this.chg - this.cache[0] - edgeMargin
             if (this.chg >= edge) {
-              return Math.round(100 * (this.chg - edge + gain)) * 2
+              return Math.round(100 * (this.chg - edge + gain) * (-0.2)/edgeMargin)
             }
           }
           else {
             var edge = Math.min(...this.cache) - edgeMargin
             var gain = this.chg - this.cache[0] + edgeMargin
             if (this.chg <= edge) {
-              return Math.round(-100 * (this.chg - edge + gain)) * 2
+              return Math.round(-100 * (this.chg - edge + gain) * (-0.2)/edgeMargin)
             }
           }
           this.gear = 0
@@ -376,7 +377,7 @@
               console.log(response)
               that.now = response.data["now"]
               that.last = response.data["now_list"].length - 1
-              that.chg = response.data["pct_300"]
+              that.chg = response.data["chg_300"]
               that.pcr_300 = response.data["pcr_300"]
               that.berry_300 = response.data["berry_300"]
               that.std = response.data["std"]

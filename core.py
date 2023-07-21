@@ -159,18 +159,18 @@ def api_op(name=None):
         nightly_dict = json.load(file)
 
     pcr_50_list = option_dict['pcr_50']
-    pct_50_list = option_dict['pct_50']
+    chg_50_list = option_dict['chg_50']
     berry_50_list = option_dict['berry_50']
     pcr_300_list = option_dict['pcr_300']
-    pct_300_list = option_dict['pct_300']
+    chg_300_list = option_dict['chg_300']
     berry_300_list = option_dict['berry_300']
     pcr_500_list = option_dict['pcr_500']
-    pct_500_list = option_dict['pct_500']
+    chg_500_list = option_dict['chg_500']
     berry_500_list = option_dict['berry_500']
     burger_list = option_dict['burger']
     std_list = option_dict['std_300']
 
-    margin = -1.5 * pd.Series(option_dict["pct_300"][-481:-1]).std()
+    margin = -1.5 * pd.Series(option_dict["chg_300"][-481:-1]).std()
 
     yest_shuffle = nightly_dict['shuffle'][-1]
     yest_berry = nightly_dict['berry_300'][-1]
@@ -191,9 +191,9 @@ def api_op(name=None):
             # 'berry_50': round(berry_50_list[-1],2),
             # 'pcr_50_list': pcr_50_list,
             # 'berry_50_list': berry_50_list,
-            'pct_50': round(pct_50_list[-1],4),
-            'pct_300': round(pct_300_list[-1],4),
-            'pct_500': round(pct_500_list[-1],4),
+            'chg_50': round(chg_50_list[-1],4),
+            'chg_300': round(chg_300_list[-1],4),
+            'chg_500': round(chg_500_list[-1],4),
 
             'pcr_300': round(pcr_300_list[-1],2),
             'berry_300': round(berry_300_list[-1],2),
@@ -244,7 +244,7 @@ def api_hist(name = None, date = None):
     # df = pd.DataFrame(option_dict,index=option_dict["now_list"])
     # df = df.drop("now_list",axis=1)
     # df['burger_ma'] = MA(df['burger'],20)
-    # burger_list = (df["berry_50"]/2+ df["berry_500"]/2 - df["pct_t0"]*10).to_list()
+    # burger_list = (df["berry_50"]/2+ df["berry_500"]/2 - df["chg_t0"]*10).to_list()
     # burger_list = df['burger_ma'].to_list()
 
     readme =  "30 -50- 70  ==   70 -90- 110"

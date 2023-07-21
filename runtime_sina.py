@@ -26,18 +26,18 @@ def launch():
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
 
-    # now_online, pct_300 = fetch_stock("sh000300")
+    # now_online, chg_300 = fetch_stock("sh000300")
     now_online = fetch_time()
     date_online = now_online.split()[0]
     print("Online => " + now_online)
-    # pct_50 = fetch_future("nf_IH0")
-    # pct_300 = fetch_future("nf_IF0")
-    # pct_500 = fetch_future("nf_IF0")
+    # chg_50 = fetch_future("nf_IH0")
+    # chg_300 = fetch_future("nf_IF0")
+    # chg_500 = fetch_future("nf_IF0")
     # https://hq.sinajs.cn/list=nf_IC0,nf_IF0
-    pct_50,  inc_50  = fetch_stock("sh000016")
-    pct_300, inc_300 = fetch_stock("sh000300")
-    pct_500, inc_500 = fetch_stock("sh000905")
-    pct_t0,  inc_t0  = fetch_future("nf_T0")
+    chg_50,  inc_50  = fetch_stock("sh000016")
+    chg_300, inc_300 = fetch_stock("sh000300")
+    chg_500, inc_500 = fetch_stock("sh000905")
+    chg_t0,  inc_t0  = fetch_future("nf_T0")
 
     vol_up_50 = fetch_op_sum('op_up_50')
     vol_down_50 = fetch_op_sum('op_down_50')
@@ -65,24 +65,24 @@ def launch():
     option_dict['now'] = now_str
     option_dict['now_list'].append(now_online)
 
-    option_dict['pct_50'].append(round(pct_50,4))
+    option_dict['chg_50'].append(round(chg_50,4))
     pcr_50 = vol_down_50 / vol_up_50 * 100
     mid_50 = vol_down_50 / vol_up_50 * 100 - 86
-    berry_50 = (pct_50 * 10) + mid_50
+    berry_50 = (chg_50 * 10) + mid_50
     option_dict['pcr_50'].append(round(pcr_50,4))
     option_dict['berry_50'].append(round(berry_50,4))
 
-    option_dict['pct_300'].append(round(pct_300,4))
+    option_dict['chg_300'].append(round(chg_300,4))
     pcr_300 = vol_down_300 / vol_up_300 * 100
     mid_300 = vol_down_300 / vol_up_300 * 100 - 92
-    berry_300 = (pct_300 * 10) + mid_300
+    berry_300 = (chg_300 * 10) + mid_300
     option_dict['pcr_300'].append(round(pcr_300,4))
     option_dict['berry_300'].append(round(berry_300,4))
 
-    option_dict['pct_500'].append(round(pct_500,4))
+    option_dict['chg_500'].append(round(chg_500,4))
     pcr_500 = vol_down_500 / vol_up_500 * 100
     mid_500 = vol_down_500 / vol_up_500 * 100 - 114
-    berry_500 = (pct_500 * 10) + mid_500
+    berry_500 = (chg_500 * 10) + mid_500
     option_dict['pcr_500'].append(round(pcr_500,4))
     option_dict['berry_500'].append(round(berry_500,4))
 
@@ -144,10 +144,10 @@ def fetch_stock(code):
     res_open = float(res_list[1])
     res_yest = float(res_list[2])
     res_price = float(res_list[3])
-    res_pct = (res_price - res_yest) / res_yest * 100
+    res_chg = (res_price - res_yest) / res_yest * 100
     res_inc = res_price - res_yest
     res_now = res_list[30] + " " + res_list[31]
-    return res_pct, res_inc
+    return res_chg, res_inc
 
 def fetch_time():
     detail_url = "http://hq.sinajs.cn/list=" + "sh000300"
@@ -168,10 +168,10 @@ def fetch_future(code):
     res_open = float(res_list[0])
     res_yest = float(res_list[14])
     res_price = float(res_list[3])
-    res_pct = (res_price - res_open) / res_open * 100
+    res_chg = (res_price - res_open) / res_open * 100
     res_inc = res_price - res_open
     res_now = res_list[36] + " " + res_list[37]
-    return res_pct, res_inc
+    return res_chg, res_inc
 
 
 #var hq_str_sh510300="沪深300ETF,4.103,4.103,4.030,4.106,4.024,4.031,4.032,683648627,2776624903.000,136700,4.031,35200,4.030,306800,4.029,1011700,4.028,161900,4.027,461200,4.032,221400,4.033,103900,4.034,117800,4.035,111800,4.036,2023-04-21,15:00:01,00,";
@@ -243,7 +243,7 @@ def update_nightly(date_online):
     else:
         today_shuffle = 0
     nightly_dict['time'].append(date_online)
-    nightly_dict['pct_300'].append(option_dict['pct_300'][-1])
+    nightly_dict['chg_300'].append(option_dict['chg_300'][-1])
     nightly_dict['pcr_300'].append(option_dict['pcr_300'][-1])
     nightly_dict['berry_300'].append(option_dict['berry_300'][-1])
     nightly_dict['shuffle'].append(today_shuffle)
@@ -263,13 +263,13 @@ def backup_intraday(date_online):
         raise
     # create new sina_option_data.json
     init_dict = {
-                'pct_50':[],
+                'chg_50':[],
                 'pcr_50':[],
                 'berry_50':[],
-                'pct_300':[],
+                'chg_300':[],
                 'pcr_300':[],
                 'berry_300':[],
-                'pct_500':[],
+                'chg_500':[],
                 'pcr_500':[],
                 'berry_500':[],
                 'inc_t0':[],

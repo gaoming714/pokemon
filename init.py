@@ -48,13 +48,13 @@ def create_data():
         lumos("mkdir data")
     if not os.path.exists(intraday_data_json):
         init_intraday = {
-                    'pct_50':[],
+                    'chg_50':[],
                     'pcr_50':[],
                     'berry_50':[],
-                    'pct_300':[],
+                    'chg_300':[],
                     'pcr_300':[],
                     'berry_300':[],
-                    'pct_500':[],
+                    'chg_500':[],
                     'pcr_500':[],
                     'berry_500':[],
                     'inc_t0':[],
@@ -66,7 +66,7 @@ def create_data():
             json.dump(init_intraday, file, ensure_ascii=False)
         print("create sina_option_data.json")
     if not os.path.exists(nightly_data_json):
-        init_nightly = {"time": ["1970-01-01"], "pct_300": [0], "pcr_300": [100], "berry_300": [0],"shuffle": [0]}
+        init_nightly = {"time": ["1970-01-01"], "chg_300": [0], "pcr_300": [100], "berry_300": [0],"shuffle": [0]}
         with open(nightly_data_json, 'w', encoding='utf-8') as file:
             json.dump(init_nightly, file, ensure_ascii=False)
         print("create nightly_data.json")
