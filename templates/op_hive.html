@@ -306,8 +306,9 @@
           return 0
         },
         onProgress() {
-          var std_arr = this.std_list.slice().reverse().slice(0, 180)
-          if (std_arr[0] == 0 || std_arr[120] == 0) { return 0 }
+          var rolling = 15 * 12 // 15 minutes
+          var std_arr = this.std_list.slice().reverse().slice(0, 240)
+          if (std_arr[0] == 0 || std_arr[180] == 0) { return 0 }
           var count = 0
           var fail_count = 0
           for (item of std_arr) {
@@ -320,8 +321,8 @@
           if (count == 0) {
             return 0
           }
-          else if (count < 120) {
-            return (count + std_arr[0] * count / 2) / 180 * 100
+          else if (count < rolling) {
+            return Math.round((count + std_arr[0] * count / 2) / rolling / 1.5 * 100)
           }
           else {
             if (fail_count != 0) {
@@ -340,7 +341,7 @@
                 return 0
               }
             }
-            return Math.round((120 + std_arr[0] * 120 / 2) / 180 * 100)
+            return Math.round((rolling + std_arr[0] * rolling / 2) / rolling / 1.5 * 100)
           }
         }
       },

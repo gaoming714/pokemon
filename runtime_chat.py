@@ -44,8 +44,8 @@ def launch():
             dtime = dtime.add(hours = 1, minutes = 30)
         if dtime > now:
             return
-    std_arr = option_dict["std_300"][-1:-181:-1]
-    if std_arr[0] == 0 or std_arr[120] == 0:
+    std_arr = option_dict["std_300"][-1:-241:-1]
+    if std_arr[0] == 0 or std_arr[180] == 0:
         return
     count = 0
     fail_count = 0
@@ -58,7 +58,7 @@ def launch():
             break
     print([count,std_arr[-1]])
 
-    if count >= 120:
+    if count >= 180:
         if fail_count != 0:
             BOX.append(now)
             berry_arr = option_dict["berry_300"][-1:-181:-1]
