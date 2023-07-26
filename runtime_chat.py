@@ -45,7 +45,7 @@ def launch():
         if dtime > now:
             return
     std_arr = option_dict["std_300"][-1:-181:-1]
-    if std_arr[0] == 0 or std_arr[180] == 0:
+    if std_arr[0] == 0 or std_arr[120] == 0:
         return
     count = 0
     fail_count = 0
