@@ -34,7 +34,7 @@ def login_wechat_auto():
 
 # @app.route('/login',methods=['GET','POST'])
 def login_wechat():
-    itchat.auto_login()
+    itchat.auto_login(enableCmdQR=2)
     payload = ""
     str_list = ["🍒 => 买  Buy ", "\n",
                 "🍏 => 卖  Sell", "\n",
