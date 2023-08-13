@@ -6,7 +6,9 @@ import json
 import pendulum
 import redis
 import pandas as pd
+from pathlib import Path
 from flask import Flask
+from flask import Response
 from flask import redirect, url_for
 from flask import render_template
 
@@ -274,6 +276,17 @@ def api_hist(name = None, date = None):
             'readme': readme,
         }
     return json.dumps(context)
+
+@app.route('/welogin',methods=['GET','POST'])
+def test_wechat():
+    qr_path = Path("QR.png")
+    if not qr_path.exists():
+        print("here")
+        return "<p>No QR.png.</p>"
+    with open(qr_path, 'rb') as f:
+        image = f.read()
+    return Response(image, mimetype='image/jpeg')
+
 # def MA(S,N):
 #     return pd.Series(S).rolling(N,min_periods=1).mean().values
 # def STD(S,N):

@@ -68,10 +68,12 @@ def launch():
                 msg = now_str + "\tup\t" + "🍓" + "\nStop-loss\t" + str(margin)
                 for user in ADDR:
                     email(user,msg)
+                r = requests.get('http://127.0.0.1:8010/msg/' + msg)
             elif berry_arr[0] <= berry_mean - 1:
                 msg = now_str + "\tdown\t" + "🍏" + "\nStop-loss\t" + str(margin)
                 for user in ADDR:
                     email(user,msg)
+                r = requests.get('http://127.0.0.1:8010/msg/' + msg)
 
 
 now = pendulum.now("Asia/Shanghai")

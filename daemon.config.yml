@@ -22,3 +22,11 @@ apps:
     interpreter : "bash"
     out_file    : "log/pm2_chat.log"
     error_file  : "log/pm2_chat.log"
+
+  - name        : "run wechat"
+    script      : "./daemon.runtime_wechat.sh"
+    args        : ""
+    cwd         : ""
+    interpreter : "bash"
+    out_file    : "log/pm2_wechat.log"
+    error_file  : "log/pm2_wechat.log"
