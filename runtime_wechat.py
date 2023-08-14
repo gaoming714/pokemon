@@ -1,14 +1,13 @@
 import os
 import sys
-from pathlib import Path
 import json
 import pendulum
 from flask import Flask, request, jsonify, Response
 import itchat
 
 ## wechat profile
-WECHAT_LIST = Path("data").joinpath("chat_config.json")
-with open(WECHAT_LIST, 'r', encoding='utf-8') as f:
+chat_path = os.path.join("data", "chat_config.json")
+with open(chat_path, 'r', encoding='utf-8') as f:
     chat_list = json.load(f)
 
 user_list = chat_list["user_list"]
