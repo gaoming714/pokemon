@@ -177,6 +177,7 @@
           std: 0,
           margin: 0,
           marginCache: [],
+          horizon: 0,
           gear: 0,
           burger: 0,
           burger_list: [],
@@ -214,14 +215,14 @@
             var edge = Math.max(...this.cache) + edgeMargin
             var gain = this.chg - this.cache[0] - edgeMargin
             if (this.chg >= edge) {
-              return Math.round(100 * (this.chg - edge + gain) * (-0.2) / edgeMargin)
+              return Math.round(100 * (this.chg - edge + gain) * (-0.2)/edgeMargin)
             }
           }
           else {
             var edge = Math.min(...this.cache) - edgeMargin
             var gain = this.chg - this.cache[0] + edgeMargin
             if (this.chg <= edge) {
-              return Math.round(-100 * (this.chg - edge + gain) * (-0.2) / edgeMargin)
+              return Math.round(-100 * (this.chg - edge + gain) * (-0.2)/edgeMargin)
             }
           }
           this.gear = 0
@@ -231,11 +232,12 @@
         },
         onProgress() {
           var std_arr = this.std_list.slice().reverse().slice(0, 180)
-          if (std_arr[0] == 0 || std_arr[120] == 0) { return 0 }
+          if (this.horizon == 0) { return 0 }
           var count = 0
           var fail_count = 0
+          var std_part = std_arr[0] / this.horizon
           for (item of std_arr) {
-            if (item < 1) { count = count + 1 }
+            if (item < this.horizon) { count = count + 1 }
             else if (fail_count < 6 && count < 8) {
               fail_count = fail_count + 1
             }
@@ -245,7 +247,7 @@
             return 0
           }
           else if (count < 120) {
-            return Math.round((count + std_arr[0] * count / 2) / 180 * 100)
+            return Math.round((count + std_part * count / 2) / 180 * 100)
           }
           else {
             if (fail_count != 0) {
@@ -264,7 +266,7 @@
                 return 0
               }
             }
-            return Math.round((120 + std_arr[0] * 120 / 2) / 180 * 100)
+            return Math.round((120 + std_part * 120 / 2) / 180 * 100)
           }
         }
       },
@@ -306,6 +308,7 @@
               that.berry_300 = response.data["berry_300"]
               that.std = response.data["std"]
               that.margin = response.data["margin"]
+              that.horizon = response.data["horizon"]
               that.burger = response.data["burger"]
               that.now_list = response.data["now_list"]
               that.berry_300_list = response.data["berry_300_list"]
