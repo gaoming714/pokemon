@@ -48,7 +48,10 @@ def launch():
     horizon = round(9 * pd.Series(option_dict["chg_300"][12:280]).std(), 2)
     if ONCE:
         msg = now_str + "\nHorizon🍌\t" + str(horizon)
-        r = requests.get('http://127.0.0.1:8010/msg/' + msg)
+        try:
+            r = requests.get('http://127.0.0.1:8010/msg/' + msg)
+        except:
+            pass
         ONCE = False
     std_arr = option_dict["std_300"][-1:-181:-1]
     if std_arr[0] == 0 or std_arr[120] == 0:
