@@ -18,11 +18,12 @@ SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
 EMAIL = {}
 ADDR = []
 BOX = []
-
+ONCE = True
 
 def launch():
     global BOX
     global ADDR
+    global ONCE
     '''
     now_str is local
     now_online is the online time
@@ -44,13 +45,18 @@ def launch():
             dtime = dtime.add(hours = 1, minutes = 30)
         if dtime > now:
             return
+    horizon = round(9 * pd.Series(option_dict["chg_300"][12:280]).std(), 2)
+    if ONCE:
+        msg = now_str + "\nHorizon🍌\t" + str(horizon)
+        r = requests.get('http://127.0.0.1:8010/msg/' + msg)
+        ONCE = False
     std_arr = option_dict["std_300"][-1:-181:-1]
     if std_arr[0] == 0 or std_arr[120] == 0:
         return
     count = 0
     fail_count = 0
     for item in std_arr:
-        if item < 1:
+        if item < horizon:
             count = count + 1
         elif fail_count < 4 and count < 8:
             fail_count = fail_count + 1
@@ -80,7 +86,7 @@ now = pendulum.now("Asia/Shanghai")
 dawn = pendulum.today("Asia/Shanghai")
 mk_mu = dawn.add(hours=9,minutes=20)
 mk_nu = dawn.add(hours=9,minutes=25)
-mk_alpha = dawn.add(hours=9,minutes=35)
+mk_alpha = dawn.add(hours=9,minutes=55)
 mk_beta = dawn.add(hours=11,minutes=30)
 mk_gamma = dawn.add(hours=13,minutes=0)
 mk_delta = dawn.add(hours=15,minutes=0,seconds=20)

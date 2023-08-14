@@ -36,12 +36,8 @@ def login_wechat_auto():
 def login_wechat():
     itchat.auto_login(enableCmdQR=2)
     payload = ""
-    str_list = ["🍒 => 买  Buy ", "\n",
-                "🍏 => 卖  Sell", "\n",
-                "🍌 => 量  amount", "\n",
-                "🔵 => 开  open", "\n",
-                "🔷 => 平  close", "\n",
-                "🍍 => 阈  area", "\n",
+    str_list = ["🍓 🍏 🍌 ", "\n",
+                "Login in Successful.", "\n",
                 (pendulum.now("Asia/Shanghai")).strftime("%Y-%m-%d %H:%M:%S")
                 ]
     payload = payload.join(str_list)

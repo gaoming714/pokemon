@@ -173,6 +173,10 @@ def api_op(name=None):
     std_list = option_dict['std_300']
 
     margin = -1.5 * pd.Series(option_dict["chg_300"][-481:-1]).std()
+    if len(now_list) >= 300:
+        horizon = 9 * pd.Series(option_dict["chg_300"][12:280]).std()
+    else:
+        horizon = 0
 
     yest_shuffle = nightly_dict['shuffle'][-1]
     yest_berry = nightly_dict['berry_300'][-1]
@@ -202,6 +206,7 @@ def api_op(name=None):
             'pcr_300_list': pcr_300_list,
             'berry_300_list': berry_300_list,
             'margin': round(margin,4),
+            'horizon': round(horizon,4),
             'std': round(std_list[-1],4),
             'std_list': std_list,
 
