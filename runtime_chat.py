@@ -46,7 +46,7 @@ def launch():
         if dtime > now:
             return
     horizon = round(9 * pd.Series(option_dict["chg_300"][12:280]).std(), 2)
-    if ONCE:
+    if ONCE and now.hour == 9:
         msg = now_str + "\nHorizon🍌\t" + str(horizon)
         try:
             r = requests.get('http://127.0.0.1:8010/msg/' + msg)
