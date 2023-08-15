@@ -236,6 +236,7 @@
           var count = 0
           var fail_count = 0
           var std_part = std_arr[0] / this.horizon
+          var std_total = (2 + this.horizon) * 120
           for (item of std_arr) {
             if (item < this.horizon) { count = count + 1 }
             else if (fail_count < 6 && count < 8) {
@@ -247,17 +248,17 @@
             return 0
           }
           else if (count < 120) {
-            return Math.round((count + std_part * count / 2) / 180 * 100)
+            return Math.round(count * (2 + std_part) / std_total * 100)
           }
           else {
             if (fail_count != 0) {
               var berry_arr = this.berry_300_list.slice().reverse().slice(0, 180)
               var berry_mean = berry_arr.reduce((acc, curr) => acc + curr) / berry_arr.length;
-              if (berry_arr[0] >= berry_mean + 1) {
+              if (berry_arr[0] >= berry_mean + 0.4) {
                 this.gear = 1
                 return 100
               }
-              else if (berry_arr[0] <= berry_mean - 1) {
+              else if (berry_arr[0] <= berry_mean - 0.4) {
                 this.gear = -1
                 return 100
               }
@@ -266,7 +267,7 @@
                 return 0
               }
             }
-            return Math.round((120 + std_part * 120 / 2) / 180 * 100)
+            return Math.round(120 * (2 + std_part) / std_total * 100)
           }
         }
       },

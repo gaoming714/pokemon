@@ -65,7 +65,7 @@ def launch():
             fail_count = fail_count + 1
         else:
             break
-    print([count,std_arr[-1]])
+    print([count,std_arr[0]])
 
     if count >= 120:
         if fail_count != 0:
@@ -73,13 +73,13 @@ def launch():
             berry_arr = option_dict["berry_300"][-1:-181:-1]
             berry_mean = sum(berry_arr) / len(berry_arr)
             margin = round(-1.8 * pd.Series(option_dict["chg_300"][-481:-1]).std() * 100, 2)
-            if berry_arr[0] >= berry_mean + 1:
-                msg = now_str + "\tup\t" + "🍓" + "\nStop-loss\t" + str(margin)
+            if berry_arr[0] >= berry_mean + 0.4:
+                msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
                 for user in ADDR:
                     email(user,msg)
                 r = requests.get('http://127.0.0.1:8010/msg/' + msg)
-            elif berry_arr[0] <= berry_mean - 1:
-                msg = now_str + "\tdown\t" + "🍏" + "\nStop-loss\t" + str(margin)
+            elif berry_arr[0] <= berry_mean - 0.4:
+                msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
                 for user in ADDR:
                     email(user,msg)
                 r = requests.get('http://127.0.0.1:8010/msg/' + msg)
@@ -116,8 +116,8 @@ def hold_period():
         else:
             print("Market Closed")
             print(["remain to end (s) ",(mk_zeta - now).total_seconds()])
-            time.sleep((mk_zeta - now).total_seconds() + 3600)
-            # sleep @ 1:00
+            time.sleep((mk_zeta - now).total_seconds() + 3900)
+            # sleep @ 1:05
             exit(0)
 
 
