@@ -91,19 +91,18 @@ def launch():
     # burger = (berry_50 + berry_500 + berry_300) / 3
     option_dict['burger'].append(round(burger,4))
 
-    if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=47,seconds=47):
+    if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=45,seconds=0):
         option_dict['std_300'].append(0)
     else:
         std_300 = pd.Series(option_dict['berry_300'][-240:]).std()
-        if std_300 > 5:
-            std_300 = 5
         option_dict['std_300'].append(round(std_300,4))
 
-    if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=47,seconds=47):
-        fixture(option_dict['berry_50'])
-        fixture(option_dict['berry_300'])
-        fixture(option_dict['berry_500'])
-        fixture(option_dict['burger'])
+    if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=45,seconds=0):
+        scale = len(option_dict['now_list'])
+        option_dict['berry_50'][-1] = round(option_dict['berry_50'][-1] * scale/180,4)
+        option_dict['berry_300'][-1] = round(option_dict['berry_300'][-1] * scale/180,4)
+        option_dict['berry_500'][-1] = round(option_dict['berry_500'][-1] * scale/180,4)
+        option_dict['burger'][-1] = round(option_dict['burger'][-1] * scale/180,4)
 
     with open(json_path, 'w', encoding='utf-8') as file:
         json.dump(option_dict, file, ensure_ascii=False)
