@@ -61,7 +61,7 @@ def launch():
     for item in std_arr:
         if item < horizon:
             count = count + 1
-        elif fail_count < 4 and count < 8:
+        elif fail_count < 40 and count < 48:
             fail_count = fail_count + 1
         else:
             break
@@ -69,16 +69,19 @@ def launch():
 
     if count >= 120:
         if fail_count != 0:
-            BOX.append(now)
             berry_arr = option_dict["berry_300"][-1:-181:-1]
-            berry_mean = sum(berry_arr) / len(berry_arr)
+            berry_it = berry[0]
+            berry_long = sum(berry_arr) / len(berry_arr)
+            berry_short = sum(berry_arr[0:20]) / len(berry_arr[0:20])
             margin = round(-1.8 * pd.Series(option_dict["chg_300"][-481:-1]).std() * 100, 2)
-            if berry_arr[0] >= berry_mean + 0.4:
+            if berry_it >= berry_long and berry_it >= berry_short:
+                BOX.append(now)
                 msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
                 for user in ADDR:
                     email(user,msg)
                 r = requests.get('http://127.0.0.1:8010/msg/' + msg)
-            elif berry_arr[0] <= berry_mean - 0.4:
+            elif berry_it <= berry_long and berry_it <= berry_short:
+                BOX.append(now)
                 msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
                 for user in ADDR:
                     email(user,msg)
