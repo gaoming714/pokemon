@@ -21,6 +21,15 @@
   <!-- Analytics_baidu -->
   <script src="{{ url_for('static', filename='Analytics_baidu.js') }}"></script>
 
+  <!-- Analytics Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7JMM2D2DVM"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-7JMM2D2DVM');
+  </script>
+
   <title>Poke PCR Optimized</title>
 </head>
 
