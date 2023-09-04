@@ -1,5 +1,6 @@
 # Project
 data/
+log/
 node_modules/
 poetry.lock
 package-lock.json
