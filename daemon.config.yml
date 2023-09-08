@@ -1,11 +1,11 @@
 apps:
   - name        : "PCR flask"
-    script      : "./daemon.shadow.sh"
+    script      : "./daemon.atom.sh"
     args        : ""
     cwd         : ""
     interpreter : "bash"
-    out_file    : "log/pm2_shadow.log"
-    error_file  : "log/pm2_shadow.log"
+    out_file    : "log/pm2_atom.log"
+    error_file  : "log/pm2_atom.log"
 
   - name        : "run sina"
     script      : "./daemon.runtime_sina.sh"
