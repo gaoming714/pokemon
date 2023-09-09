@@ -1,6 +1,16 @@
 {
+  "name": "pokemon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "atom.js",
+  "scripts": {
+    "start": "pm2 start daemon.config.yml",
+    "qr": "cat log/pm2_wechat.log  | tail -n 42",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
-    "socket.io": "^4.6.2"
+    "gulp": "^4.0.2"
   }
 }
