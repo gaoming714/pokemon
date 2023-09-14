@@ -15,7 +15,9 @@ pandas = "^2.0.1"
 plotly = "^5.14.1"
 Envelopes = "^0.4"
 scikit-opt = "^0.6.6"
-itchat-uos = "1.5.0.dev0"
+rich = "^13.5.2"
+pytest = "^7.4.2"
+itchat-uos = {path = "static/itchat_uos-1.5.0.dev0-py3-none-any.whl"}
 
 
 [build-system]
