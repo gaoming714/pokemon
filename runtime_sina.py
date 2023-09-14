@@ -121,7 +121,7 @@ def fetch_op_sum(op_name):
     # sina_option_dict = json.loads(db.get("data/sina_op_config.json"))
     hq_str_op_list = sina_option_dict[op_name]
     detail_url = "http://hq.sinajs.cn/list=" + ",".join(hq_str_op_list)
-    res = requests.get(detail_url, headers=SINA)
+    res = requests.get(detail_url, headers=SINA, timeout=5)
     res_str = res.text
     hq_str_con_op_list = re.findall('="[\w,. -:购沽月]*',res_str)
     vol_sum = 0
@@ -135,7 +135,7 @@ def fetch_op_sum(op_name):
 
 def fetch_stock(code):
     detail_url = "http://hq.sinajs.cn/list=" + code
-    res = requests.get(detail_url, headers=SINA)
+    res = requests.get(detail_url, headers=SINA, timeout=5)
     res_str = res.text
     res_tmp_list = res_str.split("=\"")[-1]
     res_list = res_tmp_list.split(",")
@@ -150,7 +150,7 @@ def fetch_stock(code):
 
 def fetch_time():
     detail_url = "http://hq.sinajs.cn/list=" + "sh000300"
-    res = requests.get(detail_url, headers=SINA)
+    res = requests.get(detail_url, headers=SINA, timeout=5)
     res_str = res.text
     res_tmp_list = res_str.split("=\"")[-1]
     res_list = res_tmp_list.split(",")
@@ -159,7 +159,7 @@ def fetch_time():
 
 def fetch_future(code):
     detail_url = "http://hq.sinajs.cn/list=" + code
-    res = requests.get(detail_url, headers=SINA)
+    res = requests.get(detail_url, headers=SINA, timeout=5)
     res_str = res.text
     res_tmp_list = res_str.split("=\"")[-1]
     res_list = res_tmp_list.split(",")

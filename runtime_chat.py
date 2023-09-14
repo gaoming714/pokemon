@@ -49,7 +49,7 @@ def launch():
     if ONCE and now.hour == 9:
         msg = now_str + "\nHorizon🍌\t" + str(horizon)
         try:
-            r = requests.get('http://127.0.0.1:8010/msg/' + msg)
+            r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=5)
         except:
             pass
         ONCE = False
@@ -79,13 +79,13 @@ def launch():
                 msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
                 for user in ADDR:
                     email(user,msg)
-                r = requests.get('http://127.0.0.1:8010/msg/' + msg)
+                r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=5)
             elif berry_it <= berry_long and berry_it <= berry_short:
                 BOX.append(now)
                 msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
                 for user in ADDR:
                     email(user,msg)
-                r = requests.get('http://127.0.0.1:8010/msg/' + msg)
+                r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=5)
 
 
 now = pendulum.now("Asia/Shanghai")

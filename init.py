@@ -14,7 +14,7 @@ op_data_list = []
 def fetch_date():
     base_name = "300ETF"
     url = "http://stock.finance.sina.com.cn/futures/api/openapi.php/StockOptionService.getStockName?exchange=null&cate=" + base_name
-    res = requests.get(url, headers = SINA)
+    res = requests.get(url, headers = SINA, timeout=5)
     res_dict = json.loads(res.text)
     month_list = list(set(res_dict["result"]["data"]["contractMonth"]))
     for month in month_list:
@@ -33,7 +33,7 @@ def create_op_list(pre_name):
 
 def fetch_op(name, op_list):
     names_url = "http://hq.sinajs.cn/list=" + ",".join(op_list)
-    res = requests.get(names_url, headers = SINA)
+    res = requests.get(names_url, headers = SINA, timeout=5)
     res_str = res.text
     #hq_str_op_list = re.findall('="[A-Z_0-9,]*";',res_str)
     hq_str_op_list = re.findall('CON_OP_\d*',res_str)
