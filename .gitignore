@@ -4,6 +4,7 @@ log/
 node_modules/
 poetry.lock
 package-lock.json
+QR.png
 
 
 # Byte-compiled / optimized / DLL files
