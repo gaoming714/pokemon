@@ -4,8 +4,13 @@
   "description": "",
   "main": "atom.js",
   "scripts": {
-    "start": "pm2 start daemon.config.yml",
-    "qr": "cat log/pm2_wechat.log  | tail -n 42",
+    "atom": "pm2 start daemon.atom.sh --name atom --log log/pm2_atom.log",
+    "chat": "pm2 start daemon.runtime_chat.sh --name chat --log log/pm2_chat.log",
+    "sina": "pm2 start daemon.runtime_sina.sh --name sina --log log/pm2_sina.log",
+    "wechat": "pm2 start daemon.runtime_wechat.sh --name wechat --log log/pm2_wechat.log",
+    "qr": "cat log/pm2_wechat.log",
+    "start": "npm run atom && npm run chat && npm run sina && npm run wechat",
+    "stop": "pm2 delete atom sina chat wechat",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
