@@ -4,11 +4,11 @@
   "description": "",
   "main": "atom.js",
   "scripts": {
-    "atom": "pm2 start daemon.atom.sh --name atom --silent --log log/pm2_atom.log",
-    "chat": "pm2 start daemon.runtime_chat.sh --name chat --silent --log log/pm2_chat.log",
-    "sina": "pm2 start daemon.runtime_sina.sh --name sina --silent --log log/pm2_sina.log",
-    "wechat": "pm2 start daemon.runtime_wechat.sh --name wechat --silent --log log/pm2_wechat.log",
-    "qr": "cat log/pm2_wechat.log",
+    "atom": "pm2 start daemon.atom.sh --name atom --silent --log",
+    "chat": "pm2 start daemon.runtime_chat.sh --name chat --silent --log",
+    "sina": "pm2 start daemon.runtime_sina.sh --name sina --silent --log",
+    "wechat": "pm2 start daemon.runtime_wechat.sh --name wechat --silent --log",
+    "qr": "cat ~/.pm2/logs/wechat-out.log | tail -n 50",
     "start": "npm run atom && npm run chat && npm run sina && npm run wechat && pm2 status",
     "stop": "pm2 delete atom sina chat wechat",
     "test": "echo \"Error: no test specified\" && exit 1"
