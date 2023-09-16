@@ -12,6 +12,9 @@ from flask import Response
 from flask import redirect, url_for
 from flask import render_template
 
+from loguru import logger
+logger.add("log/atom.log")
+
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
 json_path = os.path.join("data", "sina_option_data.json")
@@ -63,10 +66,10 @@ def api_remain(name=None):
     # refresh remain per half-hour
     # if now.minute % 30 == 0:
     #     print(("JQData Remains => ",personal.jq_remains()))
-    json_path = os.path.join("data", "sina_option_data.json")
-    if not os.path.exists(json_path) and now > mk_alpha:
-        print("Market Closed. Holiday")
-        return ""
+    # json_path = os.path.join("data", "sina_option_data.json")
+    # if not os.path.exists(json_path) and now > mk_alpha:
+    #     print("Market Closed. Holiday")
+    #     return ""
 
 
     #check market is closed
@@ -74,20 +77,20 @@ def api_remain(name=None):
     # remain = mk_zeta - now
     # need to do
     if now < mk_alpha:
-        print(["remain (s) ",(mk_alpha - now).total_seconds()])
+        # print(["remain (s) ",(mk_alpha - now).total_seconds()])
         remain = (mk_alpha - now).total_seconds()
     elif now < mk_beta:
         pass
     elif now < mk_gamma:
-        print(["remain (s) ",(mk_gamma - now).total_seconds()])
+        # print(["remain (s) ",(mk_gamma - now).total_seconds()])
         remain = (mk_gamma - now).total_seconds()
     elif now < mk_delta:
         pass
     else:
-        print("Market Closed")
-        print(["remain to end (s) ",(mk_zeta - now).total_seconds()])
+        # print("Market Closed")
+        # print(["remain to end (s) ",(mk_zeta - now).total_seconds()])
         remain = (mk_zeta - now).total_seconds()
-        print("update to tomorrow")
+        # print("update to tomorrow")
     return str(int(remain))
 
 @app.route("/api/touch")
@@ -123,23 +126,23 @@ def api_touch(name=None):
         return json.dumps(context)
 
     if now < mk_alpha:
-        print(["remain (s) ",(mk_alpha - now).total_seconds()])
+        # print(["remain (s) ",(mk_alpha - now).total_seconds()])
         status = '301'
         remain = (mk_alpha - now).total_seconds()
     elif now < mk_beta:
         status = '200'
     elif now < mk_gamma:
-        print(["remain (s) ",(mk_gamma - now).total_seconds()])
+        # print(["remain (s) ",(mk_gamma - now).total_seconds()])
         status = '302'
         remain = (mk_gamma - now).total_seconds()
     elif now < mk_delta:
         status = '200'
     else:
-        print("Market Closed")
-        print(["remain to end (s) ",(mk_zeta - now).total_seconds()])
+        # print("Market Closed")
+        # print(["remain to end (s) ",(mk_zeta - now).total_seconds()])
         status = '303'
         remain = (mk_zeta - now).total_seconds()
-        print("update to tomorrow")
+        # print("update to tomorrow")
     context = { 'status': status,
                 'now': now.to_datetime_string(),
                 'remain': remain,
@@ -286,7 +289,6 @@ def api_hist(name = None, date = None):
 def test_wechat():
     qr_path = Path("QR.png")
     if not qr_path.exists():
-        print("here")
         return "<p>No QR.png.</p>"
     with open(qr_path, 'rb') as f:
         image = f.read()

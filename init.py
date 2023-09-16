@@ -44,8 +44,6 @@ def create_data():
     intraday_data_json = os.path.join("data", "sina_option_data.json")
     nightly_data_json = os.path.join("data", "nightly_data.json")
     chat_config_json = os.path.join("data", "chat_config.json")
-    if not os.path.exists("data"):
-        lumos("mkdir data")
     if not os.path.exists(intraday_data_json):
         init_intraday = {
                     'chg_50':[],

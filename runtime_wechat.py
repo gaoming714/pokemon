@@ -5,6 +5,9 @@ import pendulum
 from flask import Flask, request, jsonify, Response
 import itchat
 
+from loguru import logger
+logger.add("log/wechat.log")
+
 ## wechat profile
 chat_path = os.path.join("data", "chat_config.json")
 with open(chat_path, 'r', encoding='utf-8') as f:

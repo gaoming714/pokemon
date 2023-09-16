@@ -10,6 +10,9 @@ import pendulum
 import pickle
 import pandas as pd
 
+from loguru import logger
+logger.add("log/sina.log")
+
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
 
@@ -29,7 +32,7 @@ def launch():
     # now_online, chg_300 = fetch_stock("sh000300")
     now_online = fetch_time()
     date_online = now_online.split()[0]
-    print("Online => " + now_online)
+    logger.debug("Online => " + now_online)
     # chg_50 = fetch_future("nf_IH0")
     # chg_300 = fetch_future("nf_IF0")
     # chg_500 = fetch_future("nf_IF0")
@@ -57,9 +60,9 @@ def launch():
             update_nightly(date_online)
             backup_intraday(date_online)
         elif now.hour == 9 and now.minute == 30:
-            print("Market is not opened today. Sleep 6 hours.")
+            logger.debug("Market is not opened today. Sleep 6 hours.")
             time.sleep(60*60*6)
-        print('after backup_intraday return')
+        logger.debug('after backup_intraday return')
         return
 
     option_dict['now'] = now_str
@@ -109,7 +112,7 @@ def launch():
 
     # df = pd.DataFrame(option_dict,index=option_dict["now_list"])
     # df = df.drop("now_list",axis=1)
-    # print(df)
+    # logger.debug(df)
     # with open(pickle_path, 'wb') as f:
     #     pickle.dump(df, f)
 
@@ -207,18 +210,18 @@ def hold_period():
         now = pendulum.now("Asia/Shanghai")
 
         if now < mk_alpha:
-            print(["remain (s) ",(mk_alpha - now).total_seconds()])
+            logger.debug(["remain (s) ",(mk_alpha - now).total_seconds()])
             time.sleep((mk_alpha - now).total_seconds())
         elif now <= mk_beta:
             return
         elif now < mk_gamma:
-            print(["remain (s) ",(mk_gamma - now).total_seconds()])
+            logger.debug(["remain (s) ",(mk_gamma - now).total_seconds()])
             time.sleep((mk_gamma - now).total_seconds())
         elif now <= mk_delta:
             return
         else:
-            print("Market Closed")
-            print(["remain to end (s) ",(mk_zeta - now).total_seconds()])
+            logger.debug("Market Closed")
+            logger.debug(["remain to end (s) ",(mk_zeta - now).total_seconds()])
             time.sleep((mk_zeta - now).total_seconds() + 3600)
             # sleep @ 1:00
             exit(0)
@@ -249,7 +252,7 @@ def update_nightly(date_online):
 
     with open(nightly_path, 'w', encoding='utf-8') as file:
         json.dump(nightly_dict, file, ensure_ascii=False)
-    print("update nightly complete!")
+    logger.debug("update nightly complete!")
 
 def backup_intraday(date_online):
     source = os.path.join("data", "sina_option_data.json")
@@ -258,7 +261,7 @@ def backup_intraday(date_online):
     if not os.path.exists(target):
         lumos(mv_cmd)
     else:
-        print("backup_intraday twice!! ERR")
+        logger.debug("backup_intraday twice!! ERR")
         raise
     # create new sina_option_data.json
     init_dict = {
@@ -281,20 +284,18 @@ def backup_intraday(date_online):
 
 def lumos(cmd):
     # res = 0
-    print("CMD ➜ " + cmd)
+    logger.debug("CMD ➜ " + cmd)
     res = os.system(cmd)
     return res
 
 if __name__ == '__main__':
     while True:
-        print(pendulum.now("Asia/Shanghai"))
-        print("Lanuch")
+        logger.debug("Lanuch")
         launch()
         if sys.argv[-1] == 'test':
             pass
         else:
             hold_period()
-        print(pendulum.now("Asia/Shanghai"))
         now = pendulum.now("Asia/Shanghai")
         time.sleep(5 - now.second % 5)
-        print("END")
+        logger.debug("END")

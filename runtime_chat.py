@@ -12,6 +12,9 @@ import pandas as pd
 
 from envelopes import Envelope, GMailSMTP
 
+from loguru import logger
+logger.add("log/chat.log")
+
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
 
@@ -65,7 +68,7 @@ def launch():
             fail_count = fail_count + 1
         else:
             break
-    print([count,std_arr[0]])
+    logger.debug([count,std_arr[0]])
 
     if count >= 120:
         if fail_count != 0:
@@ -107,18 +110,18 @@ def hold_period():
         now = pendulum.now("Asia/Shanghai")
 
         if now < mk_alpha:
-            print(["remain (s) ",(mk_alpha - now).total_seconds()])
+            logger.debug(["remain (s) ",(mk_alpha - now).total_seconds()])
             time.sleep((mk_alpha - now).total_seconds())
         elif now <= mk_beta:
             return
         elif now < mk_gamma:
-            print(["remain (s) ",(mk_gamma - now).total_seconds()])
+            logger.debug(["remain (s) ",(mk_gamma - now).total_seconds()])
             time.sleep((mk_gamma - now).total_seconds())
         elif now <= mk_delta:
             return
         else:
-            print("Market Closed")
-            print(["remain to end (s) ",(mk_zeta - now).total_seconds()])
+            logger.debug("Market Closed")
+            logger.debug(["remain to end (s) ",(mk_zeta - now).total_seconds()])
             time.sleep((mk_zeta - now).total_seconds() + 3900)
             # sleep @ 1:05
             exit(0)
@@ -138,7 +141,7 @@ def get_mixin():
         if handle == 0:
             ADDR = []
     except:
-        print("chat_config.json is not ready")
+        logger.warning("chat_config.json is not ready")
         raise
 
 
@@ -159,15 +162,15 @@ def email(addr,msg):
 
 def lumos(cmd):
     # res = 0
-    print("CMD ➜ " + cmd)
+    logger.debug("CMD ➜ " + cmd)
     res = os.system(cmd)
     return res
 
 if __name__ == '__main__':
     get_mixin()
     while True:
+        logger.debug("round it")
         launch()
         hold_period()
-        print(pendulum.now("Asia/Shanghai"))
         now = pendulum.now("Asia/Shanghai").add(seconds = -3)
         time.sleep(5 - now.second % 5)
