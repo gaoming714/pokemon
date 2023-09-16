@@ -76,7 +76,8 @@ def launch():
             berry_it = berry_arr[0]
             berry_long = sum(berry_arr) / len(berry_arr)
             berry_short = sum(berry_arr[0:20]) / len(berry_arr[0:20])
-            margin = round(-1.8 * pd.Series(option_dict["chg_300"][-481:-1]).std() * 100, 2)
+            # margin = round(-1.8 * pd.Series(option_dict["chg_300"][-481:-1]).std() * 100, 2)
+            margin = -round(horizon * 20, 2)
             if berry_it >= berry_long and berry_it >= berry_short:
                 BOX.append(now)
                 msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)

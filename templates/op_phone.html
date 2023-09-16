@@ -72,7 +72,7 @@
           <div class="text-center">
             <div class="fluid ui animated compact large primary active basic button" tabindex="0">
               <div class="visible content" v-text="berry_300.toFixed(2)"></div>
-              <div class="hidden content" v-text="onEdge">
+              <div class="hidden content" v-text="pcr_300.toFixed(2)">
               </div>
             </div>
           </div>
@@ -162,9 +162,9 @@
       <div class="offcanvas-body small">
         <div>Horizon is <span v-text="horizon"></span></div>
         <div class="content">
-          <div class="header"><span>此指标为调整后的PCR, STD稳定在Horizon以下一段时间后拉升，PCR突破平台判断方向。</span></div>
+          <div class="header"><span>此指标为调整后的PCR, STD稳定在1以下一段时间后拉升，PCR突破平台判断方向。</span></div>
           <p>建立平台后，向上突破可做多，指标停滞可平仓，反向同理。建议限制在30分钟内完成交易。</p>
-          <p>本页持续在线自动启动动态止损线，参数为开盘前30分钟行情复刻。</p>
+          <p>本页持续在线可以保留15分钟交易信号。回撤控制在万分之6，动态止损线，标的sh000905。</p>
           <p>右上角手势箭头可以进行手动生成交易信号，用于分析动态止损。</p>
         </div>
       </div>
@@ -498,7 +498,7 @@
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             }
             var plot_set = [tracelineAM, tracelinePM, traceburgerAM, traceburgerPM, traceIFAM, traceIFPM, traceCurAM, traceCurPM]
-            Plotly.newPlot(chart, plot_set, layout)
+            Plotly.newPlot(chart, plot_set, layout, {staticPlot: true})
           }
           var chart_std = document.getElementById('chart_std')
           if (chart_std) {
@@ -580,7 +580,7 @@
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             }
             var plot_set = [tracelineAM, tracelinePM, traceSTDAM, traceSTDPM,]
-            Plotly.newPlot(chart_std, plot_set, layout)
+            Plotly.newPlot(chart_std, plot_set, layout, {staticPlot: true})
           }
         },
       },
