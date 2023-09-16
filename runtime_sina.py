@@ -66,6 +66,9 @@ def launch():
         return
 
     option_dict['now'] = now_str
+    # if option_dict['now_list'] != [] and option_dict['now_list'][-1] == now_online:
+    #     logger.warning("Same now_online")
+    #     return
     option_dict['now_list'].append(now_online)
 
     option_dict['chg_50'].append(round(chg_50,4))
