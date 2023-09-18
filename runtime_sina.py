@@ -1,6 +1,3 @@
-
-
-import re
 import os
 import sys
 import requests
@@ -129,11 +126,12 @@ def fetch_op_sum(op_name):
     detail_url = "http://hq.sinajs.cn/list=" + ",".join(hq_str_op_list)
     res = requests.get(detail_url, headers=SINA, timeout=5)
     res_str = res.text
-    hq_str_con_op_list = re.findall('="[\w,. -:购沽月]*',res_str)
+    # hq_str_con_op_list = re.findall('="[\w,. -:购沽月]*',res_str)
+    hq_str_con_op_list = res_str.split(";\n")
     vol_sum = 0
     for oneline in hq_str_con_op_list:
         tmp_list = oneline.split(",")
-        if len(tmp_list) < 41:
+        if "var hq_str_CON_OP_" not in tmp_list[0] or len(tmp_list) < 41:
             continue
         vol_sum += int(tmp_list[41])
     return vol_sum
