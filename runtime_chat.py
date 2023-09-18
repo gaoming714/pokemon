@@ -167,6 +167,12 @@ def lumos(cmd):
     res = os.system(cmd)
     return res
 
+def clean():
+    # clean box for pytest
+    global BOX
+    BOX = []
+
+
 if __name__ == '__main__':
     get_mixin()
     while True:

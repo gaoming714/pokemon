@@ -1,0 +1,14 @@
+{
+    "email": {
+        "smtp" : "smtp.office365.com",
+        "port" : "587",
+        "login" : "gaoming714@hotmail.com",
+        "password" : "verywell1",
+        "from" : "gaoming714@hotmail.com"
+    },
+    "handle" : 0,
+    "addr_list" : ["gaoming714@icloud.com", "714571185@qq.com"],
+    "user_list" : ["master"],
+    "chatroom_list" : ["PokeScript"]
+
+}
