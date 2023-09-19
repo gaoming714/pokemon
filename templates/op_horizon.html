@@ -256,7 +256,7 @@
           if (this.chg != null) {
             this.cache.push(this.chg)
           }
-          var edgeMargin = -this.horizon*20
+          var edgeMargin = -this.horizon*0.2
           if (this.gear > 0) {
             var edge = Math.max(...this.cache) + edgeMargin
             var gain = this.chg - this.cache[0] - edgeMargin
