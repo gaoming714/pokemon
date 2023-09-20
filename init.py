@@ -5,7 +5,6 @@ import time
 import json
 import pendulum
 import redis
-from util import fetch_deadline
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
@@ -27,9 +26,9 @@ def launch():
     fetch_op("op_up_500",op_up_500_list)
     fetch_op("op_down_500",op_down_500_list)
     create_data()
+    add_settle()
     # save_redis()
     save_json()
-    fetch_deadline()
 
 def fetch_settle():
     settle_list = []
@@ -98,6 +97,27 @@ def create_data():
 #     option_json = json.dumps(option_dict)
 #     db.set("data/sina_op_config.json",option_json)
 #     print(db.get("data/sina_op_config.json"))
+
+def add_settle():
+    detail_url = "http://hq.sinajs.cn/list=" + ",".join(option_dict["op_up_300"])
+    res = requests.get(detail_url, headers=SINA, timeout=5)
+    res_str = res.text
+    hq_str_con_op_list = res_str.split(";\n")
+    date_list = []
+    deadline_list = []
+    for oneline in hq_str_con_op_list:
+        sub_list = oneline.split(",")
+        if "var hq_str_CON_OP_" not in sub_list[0] or len(sub_list) < 41:
+            continue
+        sub_date = sub_list[46]
+        sub_days = int(sub_list[47])
+        date_list.append(sub_date)
+        deadline_list.append(sub_days)
+    date_list = list(set(date_list))
+    date_list.sort()
+    deadline = min(deadline_list)
+    option_dict["settle"] = date_list
+    print([str(deadline) + " days left.", *date_list])
 
 def save_json():
     with open("data/sina_op_config.json", 'w', encoding='utf-8') as file:
