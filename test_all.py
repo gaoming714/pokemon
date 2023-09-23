@@ -108,7 +108,7 @@ def test_func_init(env_full):
     assert len(json_dict["op_up_300"]) == len(json_dict["op_down_300"])
     assert len(json_dict["op_up_500"]) == len(json_dict["op_down_500"])
     assert len(json_dict["op_up_50"]) == 54
-    assert len(json_dict["op_up_300"]) == 47
+    assert len(json_dict["op_up_300"]) == 51
     assert len(json_dict["op_up_500"]) == 44
 
     with open(os.path.join("data","sina_option_data.json"), 'r', encoding='utf-8') as file:

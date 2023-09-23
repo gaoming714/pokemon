@@ -43,7 +43,12 @@ def oppage(code = "IF", name=None):
 def histpage(name=None):
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
-    return render_template('op_hist.html', name=name)
+    night_path = os.path.join("data","nightly_data.json")
+    with open(night_path, 'r', encoding='utf-8') as file:
+        json_dict = json.load(file)
+    night_list = json_dict["time"]
+    night_list.sort(reverse=True)
+    return render_template('hist.html', name=name, night_list=night_list)
 
 
 @app.route("/api/remain")
@@ -230,56 +235,81 @@ def api_op(name=None):
 
 @app.route("/api/hist/<date>")
 def api_hist(name = None, date = None):
-    now = pendulum.now("Asia/Shanghai")
-    now_str = now.to_datetime_string()
+    # now = pendulum.now("Asia/Shanghai")
+    # now_str = now.to_datetime_string()
     # get sum of vol from sina_option_data
-    hist_path = os.path.join("data", date + ".json")
-    if not os.path.exists(hist_path):
-        return json.dumps({"status": '404'})
-
+    hist_path = os.path.join("data",date+".json")
     with open(hist_path, 'r', encoding='utf-8') as file:
         option_dict = json.load(file)
-    last_time = option_dict['now']
+    now = option_dict['now']
     now_list = option_dict['now_list']
+    with open(nightly_path, 'r', encoding='utf-8') as file:
+        nightly_dict = json.load(file)
 
     pcr_50_list = option_dict['pcr_50']
+    chg_50_list = option_dict['chg_50']
     berry_50_list = option_dict['berry_50']
     pcr_300_list = option_dict['pcr_300']
+    chg_300_list = option_dict['chg_300']
     berry_300_list = option_dict['berry_300']
     pcr_500_list = option_dict['pcr_500']
+    chg_500_list = option_dict['chg_500']
     berry_500_list = option_dict['berry_500']
-
     burger_list = option_dict['burger']
+    std_list = option_dict['std_300']
 
-    # df = pd.DataFrame(option_dict,index=option_dict["now_list"])
-    # df = df.drop("now_list",axis=1)
-    # df['burger_ma'] = MA(df['burger'],20)
-    # burger_list = (df["berry_50"]/2+ df["berry_500"]/2 - df["chg_t0"]*10).to_list()
-    # burger_list = df['burger_ma'].to_list()
+    margin = -1.5 * pd.Series(option_dict["chg_300"][-481:-1]).std()
+    if len(now_list) >= 300:
+        horizon = 9 * pd.Series(option_dict["chg_300"][12:280]).std()
+    else:
+        horizon = 0
 
-    readme =  "30 -50- 70  ==   70 -90- 110"
+    yest_shuffle = nightly_dict['shuffle'][-1]
+    yest_berry = nightly_dict['berry_300'][-1]
+    diff_berry = berry_300_list[-1] - yest_berry
+    if diff_berry > -2 and berry_300_list[-1] > 0:
+        today_shuffle = 1
+    elif diff_berry < 2 and berry_300_list[-1] < 0:
+        today_shuffle = -1
+    else:
+        today_shuffle = 0
+
+
+    readme =  "Watch the fork and progress"
     context = {
-            'status': '200',
-            'now': now_str,
-            'last_time': last_time,
+            'now': now,
             'now_list': now_list,
-            'pcr_50': round(pcr_50_list[-1],2),
-            'berry_50': round(berry_50_list[-1],2),
-            'pcr_50_list': pcr_50_list,
-            'berry_50_list': berry_50_list,
+            # 'pcr_50': round(pcr_50_list[-1],2),
+            # 'berry_50': round(berry_50_list[-1],2),
+            # 'pcr_50_list': pcr_50_list,
+            # 'berry_50_list': berry_50_list,
+            'chg_50': round(chg_50_list[-1],4),
+            'chg_300': round(chg_300_list[-1],4),
+            'chg_500': round(chg_500_list[-1],4),
+
+            'chg_50_list': chg_50_list,
+            'chg_300_list': chg_300_list,
+            'chg_500_list': chg_500_list,
 
             'pcr_300': round(pcr_300_list[-1],2),
             'berry_300': round(berry_300_list[-1],2),
             'pcr_300_list': pcr_300_list,
             'berry_300_list': berry_300_list,
+            'margin': round(margin,4),
+            'horizon': round(horizon,4),
+            'std': round(std_list[-1],4),
+            'std_list': std_list,
 
-            'pcr_500': round(pcr_500_list[-1],2),
-            'berry_500': round(berry_500_list[-1],2),
-            'pcr_500_list': pcr_500_list,
-            'berry_500_list': berry_500_list,
+            # 'pcr_500': round(pcr_500_list[-1],2),
+            # 'berry_500': round(berry_500_list[-1],2),
+            # 'pcr_500_list': pcr_500_list,
+            # 'berry_500_list': berry_500_list,
 
             'burger': round(burger_list[-1],2),
             'burger_list': burger_list,
+
+            'yest_shuffle': yest_shuffle,
+            'today_shuffle': today_shuffle,
 
             'readme': readme,
         }
