@@ -71,8 +71,9 @@
         <div class="col-3">
           <div class="text-center">
             <div class="fluid ui animated compact large primary active basic button" tabindex="0">
-              <div class="visible content" v-text="berry_300.toFixed(2)"></div>
-              <div class="hidden content" v-text="onEdge">
+              <div class="visible content" v-text="berry_300.toFixed(2)" v-show="gear==0"></div>
+              <div class="visible content" v-text="onEdge" v-show="gear!=0"></div>
+              <div class="hidden content" v-text="chg">
               </div>
             </div>
           </div>
@@ -256,7 +257,7 @@
           if (this.chg != null) {
             this.cache.push(this.chg)
           }
-          var edgeMargin = -this.horizon*0.16
+          var edgeMargin = -this.horizon*0.12
           if (this.gear > 0) {
             var edge = Math.max(...this.cache) + edgeMargin
             var gain = this.chg - this.cache[0] - edgeMargin
@@ -498,7 +499,7 @@
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             }
             var plot_set = [tracelineAM, tracelinePM, traceburgerAM, traceburgerPM, traceIFAM, traceIFPM, traceCurAM, traceCurPM]
-            Plotly.newPlot(chart, plot_set, layout)
+            Plotly.newPlot(chart, plot_set, layout, {staticPlot: this.isMobile()})
           }
           var chart_std = document.getElementById('chart_std')
           if (chart_std) {
@@ -580,7 +581,14 @@
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             }
             var plot_set = [tracelineAM, tracelinePM, traceSTDAM, traceSTDPM,]
-            Plotly.newPlot(chart_std, plot_set, layout)
+            Plotly.newPlot(chart_std, plot_set, layout, {staticPlot: this.isMobile()})
+          }
+        },
+        isMobile() {
+          if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            return true
+          } else {
+            return false
           }
         },
       },

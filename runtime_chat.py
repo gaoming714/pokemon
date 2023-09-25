@@ -49,7 +49,7 @@ def launch():
         if dtime > now:
             return
     horizon = round(9 * pd.Series(option_dict["chg_300"][12:280]).std(), 2)
-    zero = option_dict["chg_300"][280]
+    zero = option_dict["berry_300"][280]
     if ONCE and now.hour == 9:
         msg = now_str + "\nHorizon🍌\t" + str(horizon)
         if zero >= 10:
@@ -70,7 +70,6 @@ def launch():
             fail_count = fail_count + 1
         else:
             break
-    logger.debug([count,std_arr[0]])
 
     if count >= 120:
         if fail_count != 0:
@@ -79,7 +78,8 @@ def launch():
             berry_long = sum(berry_arr) / len(berry_arr)
             berry_short = sum(berry_arr[0:20]) / len(berry_arr[0:20])
             # margin = round(-1.8 * pd.Series(option_dict["chg_300"][-481:-1]).std() * 100, 2)
-            margin = -round(horizon * 20, 2)
+            margin = -round(horizon * 12, 2)
+            logger.debug([now_str, berry_it, berry_long, berry_short])
             if berry_it >= berry_long and berry_it >= berry_short:
                 BOX.append(now)
                 msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
@@ -92,6 +92,8 @@ def launch():
                 for user in ADDR:
                     email(user,msg)
                 r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=5)
+            else:
+                logger.debug("No Hands Up.")
 
 
 now = pendulum.now("Asia/Shanghai")
