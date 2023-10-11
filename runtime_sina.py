@@ -96,6 +96,8 @@ def launch():
 
     if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=45,seconds=0):
         option_dict['std_300'].append(0)
+    elif len(option_dict['now_list']) <= 2:
+        option_dict['std_300'].append(0)
     else:
         std_300 = pd.Series(option_dict['berry_300'][-240:]).std()
         option_dict['std_300'].append(round(std_300,4))
@@ -213,6 +215,7 @@ def hold_period():
         if now < mk_alpha:
             logger.debug(["remain (s) ",(mk_alpha - now).total_seconds()])
             time.sleep((mk_alpha - now).total_seconds())
+            # lumos("python init.py")
         elif now <= mk_beta:
             return
         elif now < mk_gamma:
