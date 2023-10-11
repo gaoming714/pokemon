@@ -13,6 +13,7 @@
   <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
   <!-- Main CSS -->
   <link href="{{ url_for('static', filename='preloader.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='mate.css') }}" rel="stylesheet" />
 
   <!-- vue -->
   <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.2.47/vue.global.min.js"></script>
@@ -132,21 +133,21 @@
         </div>
       </div>
     </div> -->
-    <div class="row">
-      <div class="col text-center">
-        <div class="dropdown">
-          <button class="btn btn-primary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown"
-            aria-expanded="false" v-text="date">
-            Dropdown button
-          </button>
-          <ul class="dropdown-menu">
-            {% for night in night_list %}
-            <li><a class="dropdown-item" @click="showGenre('{{night}}')">{{ night }}</a></li>
-            {% endfor %}
-          </ul>
-        </div>
-      </div>
+    <div class="progress">
+      <div class="indeterminate"></div>
     </div>
+    <div class="row">
+      <div class="col-3 text-center">
+        <select class="ui search fluid btn selection dropdown">
+          <option value="" @click="showGenre('sina_option_data')">Select Date</option>
+          {% for night in night_list %}
+          <option value="{{night}}" @click="showGenre('{{night}}')">{{night}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col text-center"></div>
+    </div>
+
 
     <div class="row">
       <div class="col">
@@ -345,6 +346,7 @@
       },
       created() { },
       mounted() {
+        this.showGenre('sina_option_data')
         // this.fetch()
         // this.refresh()
         // setInterval(() => {

@@ -241,6 +241,8 @@ def api_hist(name = None, date = None):
     hist_path = os.path.join("data",date+".json")
     with open(hist_path, 'r', encoding='utf-8') as file:
         option_dict = json.load(file)
+    if "now" not in option_dict:
+        return json.dumps({})
     now = option_dict['now']
     now_list = option_dict['now_list']
     with open(nightly_path, 'r', encoding='utf-8') as file:

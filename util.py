@@ -3,6 +3,7 @@ import json
 import pendulum
 import requests
 from loguru import logger
+from rich.console import Console
 
 logger.add("log/loguru_util.log")
 
@@ -22,9 +23,22 @@ def online():
 ### lumos
 def lumos(cmd):
     # res = 0
-    logger.debug("🧪 " + cmd)
+    console = Console()
+    now = pendulum.now("Asia/Shanghai")
+    now_str = now.to_datetime_string()
+    console.print(f"[blue][{now_str}][/blue] [bold green]{cmd}[/bold green]")
     res = os.system(cmd)
     return res
+
+def color(vegetable = "", dessert = "", status = None):
+    if status != None:
+        console = status
+    else:
+        console = Console()
+    now = pendulum.now("Asia/Shanghai")
+    now_str = now.to_datetime_string()
+    console.print(f"[blue][{now_str}][/blue] {vegetable} [bold green]{dessert}[/bold green]")
+    return
 
 def fetch_deadline():
     with open("data/sina_op_config.json", 'r', encoding='utf-8') as file:

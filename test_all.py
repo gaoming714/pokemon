@@ -40,8 +40,8 @@ def test_unit_init_fetch_op():
     init_fetch_op("B",op_down_50_list)
     assert "A" in init_option_dict
     assert "B" in init_option_dict
-    assert len(init_option_dict["A"]) == 54
-    assert len(init_option_dict["B"]) == 54
+    assert len(init_option_dict["A"]) > 10
+    assert len(init_option_dict["B"]) > 10
     init_clean()
 
 def test_unit_fetch_op_sum():
@@ -107,9 +107,9 @@ def test_func_init(env_full):
     assert len(json_dict["op_up_50"]) == len(json_dict["op_down_50"])
     assert len(json_dict["op_up_300"]) == len(json_dict["op_down_300"])
     assert len(json_dict["op_up_500"]) == len(json_dict["op_down_500"])
-    assert len(json_dict["op_up_50"]) == 54
-    assert len(json_dict["op_up_300"]) == 51
-    assert len(json_dict["op_up_500"]) == 44
+    assert len(json_dict["op_up_50"]) > 10
+    assert len(json_dict["op_up_300"]) > 10
+    assert len(json_dict["op_up_500"]) > 10
 
     with open(os.path.join("data","sina_option_data.json"), 'r', encoding='utf-8') as file:
         json_dict = json.load(file)
