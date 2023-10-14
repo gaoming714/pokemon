@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import time
 import pendulum
 from flask import Flask, request, jsonify, Response
 import itchat
@@ -59,7 +60,6 @@ def get_mixin():
 #                 ]
 #     payload = payload.join(str_list)
 #     itchat.send(payload, toUserName='filehelper')
-
 
 def login_wechat():
     itchat.auto_login(enableCmdQR=2, exitCallback=callbackEC)
