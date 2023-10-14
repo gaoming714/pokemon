@@ -48,10 +48,10 @@ def launch():
             dtime = dtime.add(hours = 1, minutes = 30)
         if dtime > now:
             return
-    horizon = round(9 * pd.Series(option_dict["chg_300"][12:280]).std(), 2)
+    horizon = 9 * pd.Series(option_dict["chg_300"][12:280]).std()
     zero = option_dict["berry_300"][280]
     if ONCE and now.hour == 9:
-        msg = now_str + "\nHorizon🍌\t" + str(horizon)
+        msg = now_str + "\nHorizon🍌\t" + str(round(horizon,4))
         if zero >= 10:
             msg = msg + " 🍓 "
         elif zero <= -10:
