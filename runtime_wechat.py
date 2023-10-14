@@ -5,7 +5,7 @@ import pendulum
 from flask import Flask, request, jsonify, Response
 import itchat
 from envelopes import Envelope, GMailSMTP
-from util import color
+from util import color, lumos
 
 from loguru import logger
 logger.add("log/wechat.log")
@@ -89,6 +89,8 @@ def callbackEC():
     now_str = now.to_datetime_string()
     email(ME, now_str)
     color('Logout wechat')
+    time.sleep(5)
+    lumos("pm2 reload wechat")
 
 def email(addr,msg):
     global EMAIL
