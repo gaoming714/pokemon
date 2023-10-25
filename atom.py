@@ -46,7 +46,7 @@ def histpage(name=None):
     night_path = os.path.join("data","nightly_data.json")
     with open(night_path, 'r', encoding='utf-8') as file:
         json_dict = json.load(file)
-    night_list = json_dict["time"]
+    night_list = json_dict["time"][-60:]
     night_list.sort(reverse=True)
     return render_template('hist.html', name=name, night_list=night_list)
 
