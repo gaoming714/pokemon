@@ -85,13 +85,13 @@ def launch():
                 msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
                 for user in ADDR:
                     email(user,msg)
-                r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=5)
+                r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
             elif berry_it <= berry_long and berry_it <= berry_short:
                 BOX.append(now)
                 msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
                 for user in ADDR:
                     email(user,msg)
-                r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=5)
+                r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
             else:
                 logger.debug("No Hands Up.")
 
