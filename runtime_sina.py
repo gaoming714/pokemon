@@ -102,12 +102,12 @@ def launch():
         std_300 = pd.Series(option_dict['berry_300'][-240:]).std()
         option_dict['std_300'].append(round(std_300,4))
 
-    if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=45,seconds=0):
+    if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=40,seconds=0):
         scale = len(option_dict['now_list'])
-        option_dict['berry_50'][-1] = round(option_dict['berry_50'][-1] * scale/180,4)
-        option_dict['berry_300'][-1] = round(option_dict['berry_300'][-1] * scale/180,4)
-        option_dict['berry_500'][-1] = round(option_dict['berry_500'][-1] * scale/180,4)
-        option_dict['burger'][-1] = round(option_dict['burger'][-1] * scale/180,4)
+        option_dict['berry_50'][-1] = round(option_dict['berry_50'][-1] * scale/120,4)
+        option_dict['berry_300'][-1] = round(option_dict['berry_300'][-1] * scale/120,4)
+        option_dict['berry_500'][-1] = round(option_dict['berry_500'][-1] * scale/120,4)
+        option_dict['burger'][-1] = round(option_dict['burger'][-1] * scale/120,4)
 
     with open(json_path, 'w', encoding='utf-8') as file:
         json.dump(option_dict, file, ensure_ascii=False)
