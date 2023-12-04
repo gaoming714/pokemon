@@ -198,7 +198,7 @@ now = pendulum.now("Asia/Shanghai")
 dawn = pendulum.today("Asia/Shanghai")
 mk_mu = dawn.add(hours=9,minutes=20)
 mk_nu = dawn.add(hours=9,minutes=25)
-mk_alpha = dawn.add(hours=9,minutes=30)
+mk_alpha = dawn.add(hours=9,minutes=29,seconds=58)
 mk_beta = dawn.add(hours=11,minutes=30)
 mk_gamma = dawn.add(hours=13,minutes=0)
 mk_delta = dawn.add(hours=15,minutes=0,seconds=20)
@@ -215,7 +215,7 @@ def hold_period():
         if now < mk_alpha:
             logger.debug(["remain (s) ",(mk_alpha - now).total_seconds()])
             time.sleep((mk_alpha - now).total_seconds())
-            # lumos("python init.py")
+            lumos("python init.py")
         elif now <= mk_beta:
             return
         elif now < mk_gamma:
