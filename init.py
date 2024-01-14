@@ -76,6 +76,7 @@ def create_data():
                     'berry_500':[],
                     'inc_t0':[],
                     'burger':[],
+                    'vol_300':[],
                     'std_300':[],
                     'now_list':[]
                 }

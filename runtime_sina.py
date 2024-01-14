@@ -82,6 +82,9 @@ def launch():
     option_dict['pcr_300'].append(round(pcr_300,4))
     option_dict['berry_300'].append(round(berry_300,4))
 
+    vol_300 = vol_down_300 + vol_up_300
+    option_dict['vol_300'].append(round(vol_300,4))
+
     option_dict['chg_500'].append(round(chg_500,4))
     pcr_500 = vol_down_500 / vol_up_500 * 100
     mid_500 = vol_down_500 / vol_up_500 * 100 - 114
@@ -280,6 +283,7 @@ def backup_intraday(date_online):
                 'berry_500':[],
                 'inc_t0':[],
                 'burger':[],
+                'vol_300':[],
                 'std_300':[],
                 'now_list':[]
             }
