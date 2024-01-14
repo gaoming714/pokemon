@@ -83,7 +83,7 @@ def launch():
     option_dict['berry_300'].append(round(berry_300,4))
 
     vol_300 = vol_down_300 + vol_up_300
-    option_dict['vol_300'].append(round(vol_300,4))
+    option_dict['vol_300'].append(round(vol_300))
 
     option_dict['chg_500'].append(round(chg_500,4))
     pcr_500 = vol_down_500 / vol_up_500 * 100
