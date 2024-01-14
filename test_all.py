@@ -190,6 +190,7 @@ def test_func_sina_first(env_full):
                 'berry_500':[],
                 'inc_t0':[],
                 'burger':[],
+                'vol_300':[],
                 'std_300':[],
                 'now_list':[]
             }
