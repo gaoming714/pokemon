@@ -41,7 +41,7 @@ def launch():
         return
     if BOX != []:
         btime = BOX[-1]
-        dtime = BOX[-1].add(minutes = 5)
+        dtime = BOX[-1].add(minutes = 1)
         if dtime > btime.at(0,0,0).add(hours = 11,minutes = 30) and dtime < btime.at(0,0,0).add(hours = 13):
             dtime = dtime.add(hours = 1, minutes = 30)
         if dtime > now:
@@ -51,7 +51,7 @@ def launch():
 
     if vol_diff > 10000:
         BOX.append(now)
-        msg = now_str + "\n Turn ☣️ " + "{:8.2f} K".format(round(vol_diff/1000, 2))
+        msg = now_str + "\n 🧊 Turn " + "{:8.2f} K".format(round(vol_diff/1000, 2))
         for user in ADDR:
             email(user,msg)
         r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
