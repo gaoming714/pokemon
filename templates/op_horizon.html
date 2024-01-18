@@ -113,8 +113,8 @@
           <i class="notched icon red arrow circle up" v-show="gear==1"></i>
           <i class="notched icon green arrow circle down" v-show="gear==-1"></i>
           <div class="content" v-show="gear==0">
-            <div class="header"><span v-text="std.toFixed(4)"></span></div>
-            <p v-show="gear==0">STD detail</p>
+            <div class="header"><span v-text="vol_diff.toFixed(2)"></span><span> K</span></div>
+            <p v-show="gear==0">Vol diff</p>
           </div>
           <div class="content" v-show="gear!=0">
             <div class="header" v-show="gear==1"><span
@@ -225,6 +225,7 @@
           berry_300: 0,
           berry_300_list: [],
           std_list: [],
+          vol_diff: 0,
           std: 0,
           horizon: 0,
           gear: 0,
@@ -354,6 +355,7 @@
               that.chg = response.data["chg_300"]
               that.pcr_300 = response.data["pcr_300"]
               that.berry_300 = response.data["berry_300"]
+              that.vol_diff = response.data["vol_diff"] / 1000
               that.std = response.data["std"]
               that.horizon = response.data["horizon"]
               that.burger = response.data["burger"]

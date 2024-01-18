@@ -41,7 +41,7 @@ def launch():
         return
     if BOX != []:
         btime = BOX[-1]
-        dtime = BOX[-1].add(minutes = 1)
+        dtime = BOX[-1].add(minutes = 2)
         if dtime > btime.at(0,0,0).add(hours = 11,minutes = 30) and dtime < btime.at(0,0,0).add(hours = 13):
             dtime = dtime.add(hours = 1, minutes = 30)
         if dtime > now:

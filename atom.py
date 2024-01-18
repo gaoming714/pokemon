@@ -179,6 +179,8 @@ def api_op(name=None):
     berry_500_list = option_dict['berry_500']
     burger_list = option_dict['burger']
     std_list = option_dict['std_300']
+    vol_mean = pd.Series(option_dict["vol_300"][-13:]).mean()
+    vol_diff = (option_dict["vol_300"][-1] - vol_mean)
 
     margin = -1.5 * pd.Series(option_dict["chg_300"][-481:-1]).std()
     if len(now_list) >= 300:
@@ -213,6 +215,7 @@ def api_op(name=None):
             'berry_300': round(berry_300_list[-1],2),
             'pcr_300_list': pcr_300_list,
             'berry_300_list': berry_300_list,
+            'vol_diff': vol_diff,
             'margin': round(margin,4),
             'horizon': round(horizon,4),
             'std': round(std_list[-1],4),
