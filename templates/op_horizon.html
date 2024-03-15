@@ -2,70 +2,23 @@
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
-
-  <!-- <semantic CSS> -->
-  <link href="https://cdn.bootcdn.net/ajax/libs/semantic-ui/2.5.0/semantic.min.css" rel="stylesheet" />
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Main CSS -->
-  <link href="{{ url_for('static', filename='preloader.css') }}" rel="stylesheet" />
-
-  <!-- vue -->
-  <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.2.47/vue.global.min.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.3.6/axios.min.js"></script>
 
   {% include 'components/analytics.html' %}
 
   <title>Poke PCR Optimized</title>
+
 </head>
 
 <body>
+
+  {% include 'components/meta.html' %}
+
   {% include 'components/preload.html' %}
+
   <div class="container" id="app">
-    <nav class="navbar navbar-expand-md bg-body-tertiary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-          <img src="{{ url_for('static', filename='platform-linux.svg') }}" />
-          Poke PCR Optimized
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01"
-          aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-            </li>
-            <li class="nav-item">
-            </li>
-          </ul>
-          <div class="d-flex">
-            <div class="ui labeled button" tabindex="0">
-              <div class="ui red button"
-                onclick="window.open('https://widget2.sentryd.com/widget/#/15490A29-95E3-4296-999E-28D0B35E0D12/USD-CNH/4')">
-                <i class="yen sign icon"></i>离岸
-              </div>
-              <a class="ui basic btn red left pointing label" onclick="window.open('/op/plot')">
-                Solo
-              </a>
-            </div>
-            <div class="ui labeled button" tabindex="0">
-              <div class="ui basic blue button" onclick="window.open('http://github.com/gaoming714/pokemon')">
-                <i class="fork icon"></i>Forks
-              </div>
-              <a class="ui basic btn left pointing blue label"
-                onclick="window.open('http://www.sse.com.cn/assortment/options/date/')">
-                期权统计
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
+
+    {% include 'components/navbar.html' %}
+
     <div class="ui segment">
       <div class="row">
         <div class="col-3">
@@ -99,10 +52,10 @@
             <p>Auto refresh during market opening.</p>
           </div>
           <div class="ui right buttons">
-            <button class="ui button" :class="{negative: yest_shuffle==1, positive: yest_shuffle==-1}"><img
+            <button class="ui button" :class="{negative: xbox_shuffle==1, positive: xbox_shuffle==-1}"><img
                 src="{{ url_for('static', filename='xbox.svg') }}" /></button>
             <div class="or"></div>
-            <button class="ui button" :class="{negative: today_shuffle==1, positive: today_shuffle==-1}"><img
+            <button class="ui button" :class="{negative: apple_shuffle==1, positive: apple_shuffle==-1}"><img
                 src="{{ url_for('static', filename='apple.svg') }}" /></button>
           </div>
         </div>
@@ -141,6 +94,11 @@
     </div>
     <div class="row">
       <div class="col">
+        <div id="chart_vol" style="width: 100%; height: 200px"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
         <div id="chart_std" style="width: 100%; height: 200px"></div>
       </div>
     </div>
@@ -161,56 +119,22 @@
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
       <div class="offcanvas-body small">
-        <div>Horizon is <span v-text="horizon"></span></div>
+        <div>动态止损线参数 <span v-text="horizon"></span></div>
         <div class="content">
-          <div class="header"><span>此指标为调整后的PCR, STD稳定在Horizon以下一段时间后拉升，PCR突破平台判断方向。</span></div>
-          <p>建立平台后，向上突破可做多，指标停滞可平仓，反向同理。建议限制在30分钟内完成交易。</p>
-          <p>本页持续在线自动启动动态止损线，参数为开盘前30分钟行情复刻。</p>
+          <div class="header"><span>蓝色线位调制后的PCR（标的沪深300指数），红色为当前指标的MA（10min）。</span></div>
+          <p>通常突破平台是一种失衡状态，考虑参与。</p>
+          <p>9:55决定当天主力方向，PCR大于+10在10:00到14:00择机做多,PCR小于-10在10:00到14:00择机做空。中部xbox图标。</p>
+          <p>MA（红色线）持续可以在当前方向上持有至蓝线破均线。中部苹果图标给出建议。</p>
           <p>右上角手势箭头可以进行手动生成交易信号，用于分析动态止损。</p>
         </div>
       </div>
     </div>
-    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-      <div class="col-md-4 d-flex align-items-center">
-        <a href="/" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
-        </a>
-        <span class="text-muted"><i class="closed captioning icon"></i>Email:
-          gaoming714@126.com</span>
-      </div>
 
-      <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-        <li class="ms-3">
-          <a class="text-muted" href="#"><svg class="bi" width="24" height="24">
-              <use xlink:href="#twitter"></use>
-            </svg></a>
-        </li>
-        <li class="ms-3">
-          <a class="text-muted" href="#"><svg class="bi" width="24" height="24">
-              <use xlink:href="#instagram"></use>
-            </svg></a>
-        </li>
-        <li class="ms-3">
-          <a class="text-muted" href="#"><svg class="bi" width="24" height="24">
-              <use xlink:href="#facebook"></use>
-            </svg></a>
-        </li>
-      </ul>
-    </footer>
+    {% include 'components/footer.html' %}
+
   </div>
 
-  <!-- Option 1: Bootstrap Bundle with Popper -->
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Option 2: Separate Popper and Bootstrap JS -->
-  <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
-    -->
-  <!-- <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script> -->
-  <!-- <script src="https://cdn.bootcdn.net/ajax/libs/semantic-ui/2.5.0/semantic.min.js"></script> -->
-  <!-- <script src="{{ url_for('static', filename='semantic/semantic.min.js') }}"></script> -->
-
-  <script src="https://cdn.bootcdn.net/ajax/libs/plotly.js/2.21.0/plotly.min.js"></script>
+  {% include 'components/script.html' %}
 
   <script type="text/javascript">
     const { createApp } = Vue
@@ -224,7 +148,9 @@
           pcr_300: 0,
           berry_300: 0,
           berry_300_list: [],
+          ma_300_list: [],
           std_list: [],
+          vol_list: [],
           vol_diff: 0,
           std: 0,
           horizon: 0,
@@ -232,8 +158,8 @@
           burger: 0,
           burger_list: [],
           cache: [],
-          yest_shuffle: 0,
-          today_shuffle: 0,
+          xbox_shuffle: 0,
+          apple_shuffle: 0,
           now: null,
           now_list: [],
           readme: null
@@ -258,19 +184,19 @@
           if (this.chg != null) {
             this.cache.push(this.chg)
           }
-          var edgeMargin = -this.horizon*0.12
+          var edgeMargin = -this.horizon * 0.12
           if (this.gear > 0) {
             var edge = Math.max(...this.cache) + edgeMargin
             var gain = this.chg - this.cache[0] - edgeMargin
             if (this.chg >= edge) {
-              return Math.round(100 * (this.chg - edge + gain) * (-0.2)/edgeMargin)
+              return Math.round(100 * (this.chg - edge + gain) * (-0.2) / edgeMargin)
             }
           }
           else {
             var edge = Math.min(...this.cache) - edgeMargin
             var gain = this.chg - this.cache[0] + edgeMargin
             if (this.chg <= edge) {
-              return Math.round(-100 * (this.chg - edge + gain) * (-0.2)/edgeMargin)
+              return Math.round(-100 * (this.chg - edge + gain) * (-0.2) / edgeMargin)
             }
           }
           this.gear = 0
@@ -301,7 +227,7 @@
               var berry_arr = this.berry_300_list.slice().reverse().slice(0, 180)
               var berry_it = berry_arr[0]
               var berry_long = berry_arr.reduce((acc, curr) => acc + curr) / berry_arr.length;
-              var berry_short = berry_arr.slice(0,20).reduce((acc, curr) => acc + curr) / berry_arr.slice(0,20).length;
+              var berry_short = berry_arr.slice(0, 20).reduce((acc, curr) => acc + curr) / berry_arr.slice(0, 20).length;
               if (berry_it >= berry_long && berry_it >= berry_short) {
                 this.gear = 1
                 return 100
@@ -311,8 +237,8 @@
                 return 100
               }
               else {
-                  // this.gear = 0
-                  // return 0
+                // this.gear = 0
+                // return 0
               }
             }
             return Math.round(120 * (2 + std_part) / 360 * 100)
@@ -355,16 +281,18 @@
               that.chg = response.data["chg_300"]
               that.pcr_300 = response.data["pcr_300"]
               that.berry_300 = response.data["berry_300"]
-              that.vol_diff = response.data["vol_diff"] / 1000
+              that.vol_diff = response.data["vol_diff"]
               that.std = response.data["std"]
               that.horizon = response.data["horizon"]
               that.burger = response.data["burger"]
               that.now_list = response.data["now_list"]
               that.berry_300_list = response.data["berry_300_list"]
+              that.ma_300_list = response.data["ma_300_list"]
               that.burger_list = response.data["burger_list"]
               that.std_list = response.data["std_list"]
-              that.yest_shuffle = response.data["yest_shuffle"]
-              that.today_shuffle = response.data["today_shuffle"]
+              that.vol_list = response.data["vol_list"]
+              that.xbox_shuffle = response.data["xbox_shuffle"]
+              that.apple_shuffle = response.data["apple_shuffle"]
             })
             .catch(function (error) {
               console.log(error)
@@ -402,7 +330,7 @@
             }
             var traceburgerAM = {
               x: this.now_list,
-              y: this.burger_list,
+              y: this.ma_300_list,
               xaxis: 'x1',
               yaxis: 'y1',
               mode: 'lines',
@@ -414,7 +342,7 @@
             }
             var traceburgerPM = {
               x: this.now_list,
-              y: this.burger_list,
+              y: this.ma_300_list,
               xaxis: 'x2',
               yaxis: 'y2',
               mode: 'lines',
@@ -452,7 +380,7 @@
             }
             var traceCurAM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "15:30:00", this.now.slice(0, 11) + "15:30:00", this.now.slice(0, 11) + "09:30:00"],
-              y: [this.berry_300, this.berry_300, this.burger, this.burger],
+              y: [this.berry_300, this.berry_300],
               xaxis: 'x1',
               yaxis: 'y1',
               mode: 'lines',
@@ -465,7 +393,7 @@
             }
             var traceCurPM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "15:30:00", this.now.slice(0, 11) + "15:30:00", this.now.slice(0, 11) + "09:30:00"],
-              y: [this.berry_300, this.berry_300, this.burger, this.burger],
+              y: [this.berry_300, this.berry_300],
               xaxis: 'x2',
               yaxis: 'y2',
               mode: 'lines',
@@ -501,7 +429,7 @@
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             }
             var plot_set = [tracelineAM, tracelinePM, traceburgerAM, traceburgerPM, traceIFAM, traceIFPM, traceCurAM, traceCurPM]
-            Plotly.newPlot(chart, plot_set, layout, {staticPlot: this.isMobile()})
+            Plotly.newPlot(chart, plot_set, layout, { staticPlot: this.isMobile() })
           }
           var chart_std = document.getElementById('chart_std')
           if (chart_std) {
@@ -583,11 +511,97 @@
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             }
             var plot_set = [tracelineAM, tracelinePM, traceSTDAM, traceSTDPM,]
-            Plotly.newPlot(chart_std, plot_set, layout, {staticPlot: this.isMobile()})
+            Plotly.newPlot(chart_std, plot_set, layout, { staticPlot: this.isMobile() })
+          }
+          var chart_vol = document.getElementById('chart_vol')
+          if (chart_vol) {
+            var hori = this.horizon
+            var traceVolAM = {
+              x: this.now_list,
+              y: this.vol_list,
+              xaxis: 'x1',
+              yaxis: 'y1',
+              fill: 'tozeroy',
+              type: 'scatter',
+              mode: 'lines',
+              line: {
+                color: '#FFA500',
+                width: 2
+              },
+              name: 'IF 510300 STD',
+            }
+            var traceVolPM = {
+              x: this.now_list,
+              y: this.vol_list,
+              xaxis: 'x2',
+              yaxis: 'y2',
+              fill: 'tozeroy',
+              type: 'scatter',
+              mode: 'lines',
+              line: {
+                color: '#FFA500',
+                width: 2
+              },
+              name: 'IF 510300 STD',
+            }
+            var tracelineAM = {
+              x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "11:30:00"],
+              y: [10, 10],
+              xaxis: 'x1',
+              yaxis: 'y1',
+              mode: 'lines',
+              name: 'dashdot',
+              line: {
+                dash: 'dashdot',
+                color: '#002c37',
+                width: 1
+              }
+            }
+            var tracelinePM = {
+              x: [this.now.slice(0, 11) + "13:00:00", this.now.slice(0, 11) + "15:00:00"],
+              y: [10, 10],
+              xaxis: 'x2',
+              yaxis: 'y2',
+              mode: 'lines',
+              name: 'Solid',
+              line: {
+                dash: 'dashdot',
+                color: '#002c37',
+                width: 1
+              }
+            }
+            var layout = {
+              showlegend: false,
+              xaxis: {
+                title: 'AM',
+                type: 'date',
+                range: [this.now.slice(0, 11) + "09:29:00", this.now.slice(0, 11) + "11:31:00"],
+              },
+              yaxis: {
+                title: 'Vol',
+                range: [-0.1, 16],
+              },
+              xaxis2: {
+                title: 'PM',
+                type: 'date',
+                range: [this.now.slice(0, 11) + "12:59:00", this.now.slice(0, 11) + "15:01:00"],
+              },
+              yaxis2: {
+                range: [-0.1, 16],
+              },
+              margin: {
+                l: 40,
+                r: 40,
+                t: 20,
+              },
+              grid: { rows: 1, columns: 2, pattern: 'coupled' }
+            }
+            var plot_set = [tracelineAM, tracelinePM, traceVolAM, traceVolPM,]
+            Plotly.newPlot(chart_vol, plot_set, layout, { staticPlot: this.isMobile() })
           }
         },
         isMobile() {
-          if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+          if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             return true
           } else {
             return false

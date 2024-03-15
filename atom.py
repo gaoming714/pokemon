@@ -179,8 +179,11 @@ def api_op(name=None):
     berry_500_list = option_dict['berry_500']
     burger_list = option_dict['burger']
     std_list = option_dict['std_300']
+    ma_300_list = list(MA(option_dict['berry_300'], 120))
     vol_mean = pd.Series(option_dict["vol_300"][-13:]).mean()
-    vol_diff = (option_dict["vol_300"][-1] - vol_mean)
+    vol_diff = (option_dict["vol_300"][-1] - vol_mean) / 1000
+    vol_diff_series = create_list(option_dict["vol_300"])
+    vol_diff_list = list((vol_diff_series)/1000)
 
     margin = -1.5 * pd.Series(option_dict["chg_300"][-481:-1]).std()
     if len(now_list) >= 300:
@@ -188,15 +191,23 @@ def api_op(name=None):
     else:
         horizon = 0
 
-    yest_shuffle = nightly_dict['shuffle'][-1]
-    yest_berry = nightly_dict['berry_300'][-1]
-    diff_berry = berry_300_list[-1] - yest_berry
-    if diff_berry > -2 and berry_300_list[-1] > 0:
-        today_shuffle = 1
-    elif diff_berry < 2 and berry_300_list[-1] < 0:
-        today_shuffle = -1
+    if len(now_list) > 300:
+        open_berry = option_dict['berry_300'][299]
+        if open_berry >= 10:
+            xbox_shuffle = 1
+        elif open_berry <= -10:
+            xbox_shuffle = -1
+        else:
+            xbox_shuffle = 0
+        if ma_300_list[-1] > pd.Series(ma_300_list[-47:]).mean() + 0.47 and berry_300_list[-1] > ma_300_list[-1] + 1.5:
+            apple_shuffle = 1
+        elif ma_300_list[-1] < pd.Series(ma_300_list[-47:]).mean() - 0.47 and berry_300_list[-1] < ma_300_list[-1] - 1.5:
+            apple_shuffle = -1
+        else:
+            apple_shuffle = 0
     else:
-        today_shuffle = 0
+        xbox_shuffle = 0
+        apple_shuffle = 0
 
 
     readme =  "Watch the fork and progress"
@@ -215,7 +226,9 @@ def api_op(name=None):
             'berry_300': round(berry_300_list[-1],2),
             'pcr_300_list': pcr_300_list,
             'berry_300_list': berry_300_list,
-            'vol_diff': vol_diff,
+            'ma_300_list': ma_300_list,
+            'vol_diff': round(vol_diff, 2),
+            'vol_list' : vol_diff_list,
             'margin': round(margin,4),
             'horizon': round(horizon,4),
             'std': round(std_list[-1],4),
@@ -229,8 +242,8 @@ def api_op(name=None):
             'burger': round(burger_list[-1],2),
             'burger_list': burger_list,
 
-            'yest_shuffle': yest_shuffle,
-            'today_shuffle': today_shuffle,
+            'xbox_shuffle': xbox_shuffle,
+            'apple_shuffle': apple_shuffle,
 
             'readme': readme,
         }
@@ -269,15 +282,15 @@ def api_hist(name = None, date = None):
     else:
         horizon = 0
 
-    yest_shuffle = nightly_dict['shuffle'][-1]
+    xbox_shuffle = nightly_dict['shuffle'][-1]
     yest_berry = nightly_dict['berry_300'][-1]
     diff_berry = berry_300_list[-1] - yest_berry
     if diff_berry > -2 and berry_300_list[-1] > 0:
-        today_shuffle = 1
+        apple_shuffle = 1
     elif diff_berry < 2 and berry_300_list[-1] < 0:
-        today_shuffle = -1
+        apple_shuffle = -1
     else:
-        today_shuffle = 0
+        apple_shuffle = 0
 
 
     readme =  "Watch the fork and progress"
@@ -313,8 +326,8 @@ def api_hist(name = None, date = None):
             'burger': round(burger_list[-1],2),
             'burger_list': burger_list,
 
-            'yest_shuffle': yest_shuffle,
-            'today_shuffle': today_shuffle,
+            'xbox_shuffle': xbox_shuffle,
+            'apple_shuffle': apple_shuffle,
 
             'readme': readme,
         }
@@ -329,10 +342,16 @@ def test_wechat():
         image = f.read()
     return Response(image, mimetype='image/jpeg')
 
-# def MA(S,N):
-#     return pd.Series(S).rolling(N,min_periods=1).mean().values
-# def STD(S,N):
-#     return  pd.Series(S).rolling(N).std(ddof=0).values
+def create_list(S):
+    vol_mean_list = pd.Series(S).rolling(13).mean().values
+    vol_series = (pd.Series(S) - vol_mean_list)
+    vol_series.fillna(0, inplace=True)
+    return vol_series
+
+def MA(S,N):
+    return pd.Series(S).rolling(N,min_periods = 1).mean().values
+
+
 
 if __name__ == '__main__':
     app.run(debug=True,port=8009)
