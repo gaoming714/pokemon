@@ -49,6 +49,7 @@ def launch():
         if dtime > now:
             return
     horizon = 9 * pd.Series(option_dict["chg_300"][12:280]).std()
+    horizon = 1
     zero = option_dict["berry_300"][280]
     if ONCE and now.hour == 9:
         msg = now_str + "\nHorizon🍌\t" + str(round(horizon,4))

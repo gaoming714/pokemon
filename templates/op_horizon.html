@@ -3,6 +3,8 @@
 
 <head>
 
+  {% include 'components/meta.html' %}
+
   {% include 'components/analytics.html' %}
 
   <title>Poke PCR Optimized</title>
@@ -10,8 +12,6 @@
 </head>
 
 <body>
-
-  {% include 'components/meta.html' %}
 
   {% include 'components/preload.html' %}
 
@@ -123,7 +123,7 @@
         <div class="content">
           <div class="header"><span>蓝色线位调制后的PCR（标的沪深300指数），红色为当前指标的MA（10min）。</span></div>
           <p>通常突破平台是一种失衡状态，考虑参与。</p>
-          <p>9:55决定当天主力方向，PCR大于+10在10:00到14:00择机做多,PCR小于-10在10:00到14:00择机做空。中部xbox图标。</p>
+          <p>9:55决定当天主力方向，PCR大于+10在10:00到14:00择机做多,PCR小于-10在10:00到14:00择机做空。</p>
           <p>MA（红色线）持续可以在当前方向上持有至蓝线破均线。中部苹果图标给出建议。</p>
           <p>右上角手势箭头可以进行手动生成交易信号，用于分析动态止损。</p>
         </div>
@@ -433,7 +433,7 @@
           }
           var chart_std = document.getElementById('chart_std')
           if (chart_std) {
-            var hori = this.horizon
+            var hori = 1
             var traceSTDAM = {
               x: this.now_list,
               y: this.std_list,
@@ -515,7 +515,6 @@
           }
           var chart_vol = document.getElementById('chart_vol')
           if (chart_vol) {
-            var hori = this.horizon
             var traceVolAM = {
               x: this.now_list,
               y: this.vol_list,

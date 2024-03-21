@@ -192,16 +192,15 @@ def api_op(name=None):
         horizon = 0
 
     if len(now_list) > 300:
-        open_berry = option_dict['berry_300'][299]
-        if open_berry >= 10:
+        if berry_300_list[-1] > ma_300_list[-1] + 1.0:
             xbox_shuffle = 1
-        elif open_berry <= -10:
+        elif berry_300_list[-1] < ma_300_list[-1] - 1.0:
             xbox_shuffle = -1
         else:
             xbox_shuffle = 0
-        if ma_300_list[-1] > pd.Series(ma_300_list[-47:]).mean() + 0.47 and berry_300_list[-1] > ma_300_list[-1] + 1.5:
+        if ma_300_list[-1] > pd.Series(ma_300_list[-47:]).mean() + 0.47:
             apple_shuffle = 1
-        elif ma_300_list[-1] < pd.Series(ma_300_list[-47:]).mean() - 0.47 and berry_300_list[-1] < ma_300_list[-1] - 1.5:
+        elif ma_300_list[-1] < pd.Series(ma_300_list[-47:]).mean() - 0.47:
             apple_shuffle = -1
         else:
             apple_shuffle = 0
