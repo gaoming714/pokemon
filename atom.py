@@ -274,6 +274,11 @@ def api_hist(name = None, date = None):
     berry_500_list = option_dict['berry_500']
     burger_list = option_dict['burger']
     std_list = option_dict['std_300']
+    ma_300_list = list(MA(option_dict['berry_300'], 120))
+    vol_mean = pd.Series(option_dict["vol_300"][-13:]).mean()
+    vol_diff = (option_dict["vol_300"][-1] - vol_mean) / 1000
+    vol_diff_series = create_list(option_dict["vol_300"])
+    vol_diff_list = list((vol_diff_series)/1000)
 
     margin = -1.5 * pd.Series(option_dict["chg_300"][-481:-1]).std()
     if len(now_list) >= 300:
@@ -310,6 +315,9 @@ def api_hist(name = None, date = None):
 
             'pcr_300': round(pcr_300_list[-1],2),
             'berry_300': round(berry_300_list[-1],2),
+            'ma_300_list': ma_300_list,
+            'vol_diff': round(vol_diff, 2),
+            'vol_list' : vol_diff_list,
             'pcr_300_list': pcr_300_list,
             'berry_300_list': berry_300_list,
             'margin': round(margin,4),
