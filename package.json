@@ -7,10 +7,11 @@
     "atom": "pm2 start daemon.atom.sh --name atom --silent --log",
     "chat": "pm2 start daemon.runtime_chat.sh --name chat --silent --log",
     "turn": "pm2 start daemon.runtime_turn.sh --name turn --silent --log",
+    "fox": "pm2 start daemon.runtime_fox.sh --name fox --silent --log",
     "sina": "pm2 start daemon.runtime_sina.sh --name sina --silent --log",
     "wechat": "pm2 start daemon.runtime_wechat.sh --name wechat --silent --log",
     "qr": "cat ~/.pm2/logs/wechat-out.log | tail -n 50",
-    "start": "npm run atom && npm run sina && npm run wechat && npm run chat && npm run turn && pm2 status",
+    "start": "npm run atom && npm run sina && npm run fox && npm run wechat && npm run chat && npm run turn && pm2 status",
     "stop": "pm2 delete atom sina chat wechat",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

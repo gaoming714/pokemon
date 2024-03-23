@@ -60,31 +60,16 @@ def fetch_op(name, op_list):
     option_dict[name] = hq_str_op_list
 
 def create_data():
-    intraday_data_json = os.path.join("data", "sina_option_data.json")
-    nightly_data_json = os.path.join("data", "nightly_data.json")
+    intraday_data_json = os.path.join("data", "fox_data.json")
+    nightly_data_json = os.path.join("data", "fox_nightly.json")
     chat_config_json = os.path.join("data", "chat_config.json")
     if not os.path.exists(intraday_data_json):
-        init_intraday = {
-                    'chg_50':[],
-                    'pcr_50':[],
-                    'berry_50':[],
-                    'chg_300':[],
-                    'pcr_300':[],
-                    'berry_300':[],
-                    'chg_500':[],
-                    'pcr_500':[],
-                    'berry_500':[],
-                    'inc_t0':[],
-                    'burger':[],
-                    'vol_300':[],
-                    'std_300':[],
-                    'now_list':[]
-                }
+        init_intraday = { "data":[] }
         with open(intraday_data_json, 'w', encoding='utf-8') as file:
             json.dump(init_intraday, file, ensure_ascii=False)
         print("create sina_option_data.json")
     if not os.path.exists(nightly_data_json):
-        init_nightly = {"time": ["1970-01-01"], "chg_300": [0], "pcr_300": [100], "berry_300": [0],"shuffle": [0]}
+        init_nightly = {"data": [], "records":["1970-01-01"]}
         with open(nightly_data_json, 'w', encoding='utf-8') as file:
             json.dump(init_nightly, file, ensure_ascii=False)
         print("create nightly_data.json")
@@ -121,7 +106,7 @@ def add_settle():
     print([str(deadline) + " days left.", *date_list])
 
 def save_json():
-    with open("data/sina_op_config.json", 'w', encoding='utf-8') as file:
+    with open("data/fox_op_config.json", 'w', encoding='utf-8') as file:
         json.dump(option_dict, file, ensure_ascii=False)
 
 def clean():

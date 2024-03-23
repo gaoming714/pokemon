@@ -31,16 +31,22 @@ def launch():
     now_str is local
     now_online is the online time
     '''
-    json_path = os.path.join("data", "sina_option_data.json")
+    json_path = os.path.join("data", "fox_data.json")
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
     with open(json_path, 'r', encoding='utf-8') as file:
-        option_dict = json.load(file)
+        op_dict = json.load(file)
 
-    if 'now' not in option_dict:
+    if "now" in op_dict and op_dict["now"] != "":
+        op_df = pd.DataFrame(op_dict["data"])
+        op_df.set_index("dt", inplace = True)
+    else:
         return
-    if option_dict["std_300"] == 0:
+
+    atm = op_df.iloc[-1]
+    if atm["std_300"] == 0:
         return
+
     if BOX != []:
         btime = BOX[-1]
         dtime = BOX[-1].add(minutes = 15)
@@ -48,9 +54,9 @@ def launch():
             dtime = dtime.add(hours = 1, minutes = 30)
         if dtime > now:
             return
-    horizon = 9 * pd.Series(option_dict["chg_300"][12:280]).std()
+    horizon = 9 * pd.Series(op_df["chg_300"][12:280]).std()
     horizon = 1
-    zero = option_dict["berry_300"][280]
+    zero = op_df["berry_300"].iloc[280]
     if ONCE and now.hour == 9:
         msg = now_str + "\nHorizon🍌\t" + str(round(horizon,4))
         if zero >= 10:
@@ -59,8 +65,8 @@ def launch():
             msg = msg + " 🍏 "
         r = requests.get('http://127.0.0.1:8010/msg/' + msg)
         ONCE = False
-    std_arr = option_dict["std_300"][-1:-181:-1]
-    if std_arr[0] == 0 or std_arr[120] == 0:
+    std_arr = op_df["std_300"][-1:-181:-1]
+    if std_arr.iloc[0] == 0 or std_arr.iloc[120] == 0:
         return
     count = 0
     fail_count = 0
@@ -74,22 +80,24 @@ def launch():
 
     if count >= 120:
         if fail_count != 0:
-            berry_arr = option_dict["berry_300"][-1:-181:-1]
-            berry_it = berry_arr[0]
+            berry_arr = op_df["berry_300"][-1:-181:-1]
+            berry_it = berry_arr.iloc[0]
             berry_long = sum(berry_arr) / len(berry_arr)
             berry_short = sum(berry_arr[0:20]) / len(berry_arr[0:20])
-            # margin = round(-1.8 * pd.Series(option_dict["chg_300"][-481:-1]).std() * 100, 2)
-            margin = -round(horizon * 12, 2)
+            # margin = round(-1.8 * pd.Series(op_df["chg_300"][-481:-1]).std() * 100, 2)
+            margin = - round(horizon * 12, 2)
             logger.debug([now_str, berry_it, berry_long, berry_short])
             if berry_it >= berry_long and berry_it >= berry_short:
                 BOX.append(now)
                 msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
+                logger.debug(msg)
                 for user in ADDR:
                     email(user,msg)
                 r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
             elif berry_it <= berry_long and berry_it <= berry_short:
                 BOX.append(now)
                 msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
+                logger.debug(msg)
                 for user in ADDR:
                     email(user,msg)
                 r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)

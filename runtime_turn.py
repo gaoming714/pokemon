@@ -13,7 +13,7 @@ import pandas as pd
 from envelopes import Envelope, GMailSMTP
 
 from loguru import logger
-logger.add("log/chat.log")
+logger.add("log/turn.log")
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
@@ -31,14 +31,22 @@ def launch():
     now_str is local
     now_online is the online time
     '''
-    json_path = os.path.join("data", "sina_option_data.json")
+    json_path = os.path.join("data", "fox_data.json")
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
     with open(json_path, 'r', encoding='utf-8') as file:
-        option_dict = json.load(file)
+        op_dict = json.load(file)
 
-    if 'now' not in option_dict:
+    if "now" in op_dict and op_dict["now"] != "":
+        op_df = pd.DataFrame(op_dict["data"])
+        op_df.set_index("dt", inplace = True)
+    else:
         return
+
+    atm = op_df.iloc[-1]
+    if atm["vol_300"] == 0:
+        return
+
     if BOX != []:
         btime = BOX[-1]
         dtime = BOX[-1].add(minutes = 2)
@@ -46,12 +54,19 @@ def launch():
             dtime = dtime.add(hours = 1, minutes = 30)
         if dtime > now:
             return
-    vol_mean = pd.Series(option_dict["vol_300"][-13:]).mean()
-    vol_diff = (option_dict["vol_300"][-1] - vol_mean)
 
-    if vol_diff > 10000:
+    # ma_300_se = op_df['berry_300'].rolling(120, min_periods = 1).mean().values
+    # vol_mean_se = op_df["vol_300"].rolling(13, min_periods = 1).mean().values
+    # vol_diff_se = (op_df["vol_300"] - vol_mean_se) / 1000
+    # vol_diff_se.fillna(0, inplace=True)
+    # vol_diff = vol_diff_se.iloc[-1]
+    vol_mean = op_df["vol_300"][-13:].mean()
+    vol_diff = (atm["vol_300"] - vol_mean) / 1000
+
+    if vol_diff >= 10:
         BOX.append(now)
-        msg = now_str + "\n 🧊 Turn " + "{:8.2f} K".format(round(vol_diff/1000, 2))
+        msg = now_str + "\n 🧊 Turn " + "{:8.2f} K".format(round(vol_diff, 2))
+        logger.debug(msg)
         for user in ADDR:
             email(user,msg)
         r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)

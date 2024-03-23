@@ -8,7 +8,7 @@ import pickle
 import pandas as pd
 
 from loguru import logger
-logger.add("log/sina.log")
+logger.add("log/fox.log")
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
@@ -20,8 +20,8 @@ def launch():
     now_str is local
     now_online is the online time
     '''
-    json_path = os.path.join("data", "sina_option_data.json")
-    pickle_path = os.path.join("data", "sina_option_data.pickle")
+    json_path = os.path.join("data", "fox_data.json")
+    # pickle_path = os.path.join("data", "fox_option_data.pickle")
 
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
@@ -43,6 +43,7 @@ def launch():
     vol_down_50 = fetch_op_sum('op_down_50')
     vol_up_300 = fetch_op_sum('op_up_300')
     vol_down_300 = fetch_op_sum('op_down_300')
+    vol_300 = vol_up_300 + vol_down_300
     vol_up_500 = fetch_op_sum('op_up_500')
     vol_down_500 = fetch_op_sum('op_down_500')
 
@@ -51,76 +52,76 @@ def launch():
 
     if pendulum.today("Asia/Shanghai") == pendulum.parse(now_online,tz="Asia/Shanghai").at(0,0,0):
         with open(json_path, 'r', encoding='utf-8') as file:
-            option_dict = json.load(file)
+            op_dict = json.load(file)
     else:
-        record_path = os.path.join("data", "sina_" + date_online + ".json")
+        record_path = os.path.join("data", date_online + ".json")
         if not os.path.exists(record_path):
-            # update_nightly(date_online)
+            update_nightly(date_online)
             backup_intraday(date_online)
         elif now.hour == 9 and now.minute == 30:
             logger.debug("Market is not opened today. Sleep 6 hours.")
             time.sleep(60*60*6)
         logger.debug('after backup_intraday return')
         return
+    if "now" in op_dict and op_dict["now"] != "":
+        op_df = pd.DataFrame(op_dict["data"])
+        op_df.set_index("dt", inplace = True)
+    else:
+        op_df = pd.DataFrame()
 
-    option_dict['now'] = now_str
-    # if option_dict['now_list'] != [] and option_dict['now_list'][-1] == now_online:
-    #     logger.warning("Same now_online")
-    #     return
-    option_dict['now_list'].append(now_online)
+    if len(op_df.index) != 0 and op_df.index[-1] == now_online:
+        logger.debug('Same now_online')
+        return
 
-    option_dict['chg_50'].append(round(chg_50,4))
+    el = {}
+    el["dt"] = now_online
+
+    el["chg_50"] = round(chg_50,4)
     pcr_50 = vol_down_50 / vol_up_50 * 100
     mid_50 = vol_down_50 / vol_up_50 * 100 - 86
     berry_50 = (chg_50 * 10) + mid_50
-    option_dict['pcr_50'].append(round(pcr_50,4))
-    option_dict['berry_50'].append(round(berry_50,4))
+    el["pcr_50"] = round(pcr_50,4)
+    el["berry_50"] = round(berry_50,4)
 
-    option_dict['chg_300'].append(round(chg_300,4))
+    el["chg_300"] = round(chg_300,4)
     pcr_300 = vol_down_300 / vol_up_300 * 100
     mid_300 = vol_down_300 / vol_up_300 * 100 - 92
     berry_300 = (chg_300 * 10) + mid_300
-    option_dict['pcr_300'].append(round(pcr_300,4))
-    option_dict['berry_300'].append(round(berry_300,4))
+    el["pcr_300"] = round(pcr_300,4)
+    el["berry_300"] = round(berry_300,4)
 
-    vol_300 = vol_down_300 + vol_up_300
-    option_dict['vol_300'].append(round(vol_300))
-
-    option_dict['chg_500'].append(round(chg_500,4))
+    el["chg_500"] = round(chg_500,4)
     pcr_500 = vol_down_500 / vol_up_500 * 100
     mid_500 = vol_down_500 / vol_up_500 * 100 - 114
     berry_500 = (chg_500 * 10) + mid_500
-    option_dict['pcr_500'].append(round(pcr_500,4))
-    option_dict['berry_500'].append(round(berry_500,4))
+    el["pcr_500"] = round(pcr_500,4)
+    el["berry_500"] = round(berry_500,4)
 
-    option_dict['inc_t0'].append(round(inc_t0,4))
-    burger = (berry_50 + berry_500 + berry_300) / 3 - inc_t0 * 30
-    # burger = (berry_50 + berry_500 + berry_300) / 3
-    option_dict['burger'].append(round(burger,4))
+    el["inc_t0"] = round(inc_t0,4)
+    burger = (berry_500 + berry_300) / 2 - inc_t0 * 30
+    el["burger"] = round(burger,4)
+    el["vol_300"] = round(vol_300,4)
 
     if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=45,seconds=0):
-        option_dict['std_300'].append(0)
-    elif len(option_dict['now_list']) <= 2:
-        option_dict['std_300'].append(0)
+        el["std_300"] = 0
+    elif len(op_df.index) <=2:
+        el["std_300"] = 0
     else:
-        std_300 = pd.Series(option_dict['berry_300'][-240:]).std()
-        option_dict['std_300'].append(round(std_300,4))
+        std_300 = op_df["berry_300"][-240:].std()  # not new one
+        el["std_300"] = round(std_300,4)
 
     if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=40,seconds=0):
-        scale = len(option_dict['now_list'])
-        option_dict['berry_50'][-1] = round(option_dict['berry_50'][-1] * scale/120,4)
-        option_dict['berry_300'][-1] = round(option_dict['berry_300'][-1] * scale/120,4)
-        option_dict['berry_500'][-1] = round(option_dict['berry_500'][-1] * scale/120,4)
-        option_dict['burger'][-1] = round(option_dict['burger'][-1] * scale/120,4)
+        scale = len(op_df.index)
+        el['berry_50'] = round(el['berry_50'] * scale/120,4)
+        el['berry_300'] = round(el['berry_300'] * scale/120,4)
+        el['berry_500'] = round(el['berry_500'] * scale/120,4)
+        el['burger'] = round(el['burger'] * scale/120,4)
+
+    op_dict["data"].append(el)
+    op_dict['now'] = now_str
 
     with open(json_path, 'w', encoding='utf-8') as file:
-        json.dump(option_dict, file, ensure_ascii=False)
-
-    # df = pd.DataFrame(option_dict,index=option_dict["now_list"])
-    # df = df.drop("now_list",axis=1)
-    # logger.debug(df)
-    # with open(pickle_path, 'wb') as f:
-    #     pickle.dump(df, f)
+        json.dump(op_dict, file, ensure_ascii=False)
 
 
 def fetch_op_sum(op_name):
@@ -189,15 +190,6 @@ def fetch_future(code):
 #var hq_str_nf_T0="101.890,101.980,101.850,101.855,34713,3537949.870,203919.000,0.000,0.000,103.930,99.860,0.000,0.000,101.890,101.895,201585.000,101.855,74,0.000,0,0.000,0,0.000,0,0.000,0,101.860,167,0.000,0,0.000,0,0.000,0,0.000,0,2023-06-12,11:29:26,100,1,,,,,,,,,101.920,10年期国债期货连续";
 
 
-def fixture(input_list):
-    if input_list[-1] > 15:
-        input_list[-1] = 15
-    elif input_list[-1] < -15:
-        input_list[-1] = -15
-    else:
-        pass
-
-
 now = pendulum.now("Asia/Shanghai")
 dawn = pendulum.today("Asia/Shanghai")
 mk_mu = dawn.add(hours=9,minutes=20)
@@ -235,59 +227,35 @@ def hold_period():
             exit(0)
 
 def update_nightly(date_online):
-    nightly_path = os.path.join("data", "nightly_data.json")
-    json_path = os.path.join("data", "sina_option_data.json")
+    nightly_path = os.path.join("data", "fox_nightly.json")
+    json_path = os.path.join("data", "fox_data.json")
     with open(nightly_path, 'r', encoding='utf-8') as file:
         nightly_dict = json.load(file)
     with open(json_path, 'r', encoding='utf-8') as file:
-        option_dict = json.load(file)
+        op_dict = json.load(file)
 
-    yest_shuffle = nightly_dict['shuffle'][-1]
-    yest_berry = nightly_dict['berry_300'][-1]
-    berry_300 = option_dict['berry_300'][-1]
-    diff_berry = berry_300 - yest_berry
-    if diff_berry > -2 and berry_300 > 0:
-        today_shuffle = 1
-    elif diff_berry < 2 and berry_300 < 0:
-        today_shuffle = -1
-    else:
-        today_shuffle = 0
-    nightly_dict['time'].append(date_online)
-    nightly_dict['chg_300'].append(option_dict['chg_300'][-1])
-    nightly_dict['pcr_300'].append(option_dict['pcr_300'][-1])
-    nightly_dict['berry_300'].append(option_dict['berry_300'][-1])
-    nightly_dict['shuffle'].append(today_shuffle)
+    el = {}
+    el = op_dict["data"][-1]
+    el["dt"] = date_online
+
+    nightly_dict["data"].append(el)
+    nightly_dict["records"].append(date_online)
 
     with open(nightly_path, 'w', encoding='utf-8') as file:
         json.dump(nightly_dict, file, ensure_ascii=False)
     logger.debug("update nightly complete!")
 
 def backup_intraday(date_online):
-    source = os.path.join("data", "sina_option_data.json")
-    target = os.path.join("data", "sina_" + date_online + ".json")
+    source = os.path.join("data", "fox_data.json")
+    target = os.path.join("data", date_online + ".json")
     mv_cmd = "mv " + source + " " + target
     if not os.path.exists(target):
         lumos(mv_cmd)
     else:
         logger.debug("backup_intraday twice!! ERR")
         raise
-    # create new sina_option_data.json
-    init_dict = {
-                'chg_50':[],
-                'pcr_50':[],
-                'berry_50':[],
-                'chg_300':[],
-                'pcr_300':[],
-                'berry_300':[],
-                'chg_500':[],
-                'pcr_500':[],
-                'berry_500':[],
-                'inc_t0':[],
-                'burger':[],
-                'vol_300':[],
-                'std_300':[],
-                'now_list':[]
-            }
+    # create new fox_data.json
+    init_dict = { "data":[] }
     with open(source, 'w', encoding='utf-8') as file:
         json.dump(init_dict, file, ensure_ascii=False)
 
