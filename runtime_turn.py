@@ -43,8 +43,8 @@ def launch():
     else:
         return
 
-    atm = op_df.iloc[-1]
-    if atm["vol_300"] == 0:
+    arrow = op_df.iloc[-1]
+    if arrow["vol_300"] == 0:
         return
 
     if BOX != []:
@@ -61,7 +61,7 @@ def launch():
     # vol_diff_se.fillna(0, inplace=True)
     # vol_diff = vol_diff_se.iloc[-1]
     vol_mean = op_df["vol_300"][-13:].mean()
-    vol_diff = (atm["vol_300"] - vol_mean) / 1000
+    vol_diff = (arrow["vol_300"] - vol_mean) / 1000
 
     if vol_diff >= 10:
         BOX.append(now)

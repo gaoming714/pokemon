@@ -43,8 +43,8 @@ def launch():
     else:
         return
 
-    atm = op_df.iloc[-1]
-    if atm["std_300"] == 0:
+    arrow = op_df.iloc[-1]
+    if arrow["std_300"] == 0:
         return
 
     if BOX != []:

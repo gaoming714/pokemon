@@ -100,7 +100,7 @@ def api_op(name=None):
     else:
         return json.dumps({})
 
-    atm = op_df.iloc[-1]
+    arrow = op_df.iloc[-1]
     now_list = list(op_df.index)
 
     ma_300_se = op_df['berry_300'].rolling(120, min_periods = 1).mean().values
@@ -116,9 +116,9 @@ def api_op(name=None):
         horizon = 0
 
     if len(now_list) > 300:
-        if atm["berry_300"] > ma_300_se[-1] + 1.0:
+        if arrow["berry_300"] > ma_300_se[-1] + 1.0:
             xbox_shuffle = 1
-        elif atm["berry_300"] < ma_300_se[-1] - 1.0:
+        elif arrow["berry_300"] < ma_300_se[-1] - 1.0:
             xbox_shuffle = -1
         else:
             xbox_shuffle = 0
@@ -138,12 +138,12 @@ def api_op(name=None):
             'now': now,
             'now_list': now_list,
 
-            'chg_50': round(atm["chg_50"],4),
-            'chg_300': round(atm["chg_300"],4),
-            'chg_500': round(atm["chg_500"],4),
+            'chg_50': round(arrow["chg_50"],4),
+            'chg_300': round(arrow["chg_300"],4),
+            'chg_500': round(arrow["chg_500"],4),
 
-            'pcr_300': round(atm["pcr_300"],2),
-            'berry_300': round(atm["berry_300"],2),
+            'pcr_300': round(arrow["pcr_300"],2),
+            'berry_300': round(arrow["berry_300"],2),
             'pcr_300_list': list(op_df["pcr_300"]),
             'berry_300_list': list(op_df["berry_300"]),
             'ma_300_list': list(ma_300_se),
@@ -151,10 +151,10 @@ def api_op(name=None):
             'vol_list' : list(vol_diff_se),
             'margin': round(margin,4),
             'horizon': round(horizon,4),
-            'std': round(atm["std_300"],4),
+            'std': round(arrow["std_300"],4),
             'std_list': list(op_df["std_300"]),
 
-            'burger': round(atm["burger"],2),
+            'burger': round(arrow["burger"],2),
             'burger_list': list(op_df["burger"]),
 
             'xbox_shuffle': xbox_shuffle,
@@ -180,7 +180,7 @@ def api_hist(name = None, date = None):
     else:
         return json.dumps({})
 
-    atm = op_df.iloc[-1]
+    arrow = op_df.iloc[-1]
     now_list = list(op_df.index)
 
     ma_300_se = op_df['berry_300'].rolling(120, min_periods = 1).mean().values
@@ -196,9 +196,9 @@ def api_hist(name = None, date = None):
         horizon = 0
 
     if len(now_list) > 300:
-        if atm["berry_300"] > ma_300_se[-1] + 1.0:
+        if arrow["berry_300"] > ma_300_se[-1] + 1.0:
             xbox_shuffle = 1
-        elif atm["berry_300"] < ma_300_se[-1] - 1.0:
+        elif arrow["berry_300"] < ma_300_se[-1] - 1.0:
             xbox_shuffle = -1
         else:
             xbox_shuffle = 0
@@ -218,12 +218,12 @@ def api_hist(name = None, date = None):
             'now': now,
             'now_list': now_list,
 
-            'chg_50': round(atm["chg_50"],4),
-            'chg_300': round(atm["chg_300"],4),
-            'chg_500': round(atm["chg_500"],4),
+            'chg_50': round(arrow["chg_50"],4),
+            'chg_300': round(arrow["chg_300"],4),
+            'chg_500': round(arrow["chg_500"],4),
 
-            'pcr_300': round(atm["pcr_300"],2),
-            'berry_300': round(atm["berry_300"],2),
+            'pcr_300': round(arrow["pcr_300"],2),
+            'berry_300': round(arrow["berry_300"],2),
             'pcr_300_list': list(op_df["pcr_300"]),
             'berry_300_list': list(op_df["berry_300"]),
             'ma_300_list': list(ma_300_se),
@@ -232,10 +232,10 @@ def api_hist(name = None, date = None):
             'vol_list' : list(vol_diff_se),
             'margin': round(margin,4),
             'horizon': round(horizon,4),
-            'std': round(atm["std_300"],4),
+            'std': round(arrow["std_300"],4),
             'std_list': list(op_df["std_300"]),
 
-            'burger': round(atm["burger"],2),
+            'burger': round(arrow["burger"],2),
             'burger_list': list(op_df["burger"]),
 
             'xbox_shuffle': xbox_shuffle,
