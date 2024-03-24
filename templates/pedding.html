@@ -2,56 +2,22 @@
 <html lang="en">
 
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  {% include 'components/meta.html' %}
 
-  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
-  <!-- Required meta tags -->
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  {% include 'components/analytics.html' %}
+
   <meta http-equiv="refresh" content="{{remain}}" />
-
-  <!-- Bootstrap -->
-  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Fonts -->
-  <!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,900&display=swap" rel="stylesheet" /> -->
-  <!-- Material ui icons - google web fonts -->
-  <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
-  <!-- CSS -->
   <link href="{{ url_for('static', filename='pedding.css') }}" rel="stylesheet" />
 
-      <!-- Main CSS -->
-      <link href="{{ url_for('static', filename='preloader.css') }}" rel="stylesheet" />
-    <!-- vue -->
-    <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.2.47/vue.global.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.3.6/axios.min.js"></script>
+  <title>Poke PCR Optimized - pedding</title>
 
-    <title>Poke PCR Optimized - pedding</title>
 </head>
 
 <body>
-      <!-- Start preloader -->
-      <div class="preloader bg-dark flex-column justify-content-center align-items-center">
-        <svg id="loader-logo" xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 64 78.4">
-            <path fill="#fff" d="M10,0h1.2V11.2H0V10A10,10,0,0,1,10,0Z" />
-            <rect fill="none" stroke="#fff" stroke-width="11.2" x="40" y="17.6" width="0" height="25.6" />
-            <rect fill="none" stroke="#fff" stroke-opacity="0.4" stroke-width="11.2" x="23" y="35.2" width="0"
-                height="25.6" />
-            <path fill="#fff" d="M52.8,35.2H64V53.8a7,7,0,0,1-7,7H52.8V35.2Z" />
-            <rect fill="none" stroke="#fff" stroke-width="11.2" x="6" y="52.8" width="0" height="25.6" />
-            <path fill="#fff" d="M52.8,0H57a7,7,0,0,1,7,7h0v4.2H52.8V0Z" />
-            <rect fill="none" stroke="#fff" stroke-opacity="0.4" stroke-width="11.2" x="57.8" y="17.6" width="0"
-                height="11.2" />
-            <rect fill="none" stroke="#0d6efd" stroke-width="11.2" x="6" y="35.2" width="0" height="11.2" />
-            <rect fill="none" stroke="#fff" stroke-width="11.2" x="40.2" y="49.6" width="0" height="11.2" />
-            <path fill="#fff" d="M17.6,67.2H28.8v1.2a10,10,0,0,1-10,10H17.6V67.2Z" />
-            <rect fill="none" stroke="#0d6efd" stroke-opacity="0.4" stroke-width="28.8" x="31.6" width="0"
-                height="11.2" />
-            <rect fill="none" stroke="#fff" x="14" stroke-width="28.8" y="17.6" width="0" height="11.2" />
-        </svg>
-    </div>
-    <!-- End preloader -->
+
+  {% include 'components/preload.html' %}
   <div class="container">
+    {% include 'components/navbar.html' %}
     <div class="row justify-content-center">
       <div class="col-md-10 main-title">
         <h1>Relax</h1>
@@ -175,29 +141,10 @@
   </div>
   <footer class="footer">
     <div class="container text-center">
-      <span>pokescript.com</span>
+      <span>pokescript.com   wx:gaoming714</span>
     </div>
   </footer>
 
-
-    <!-- preloader need -->
-    <script src="https://cdn.bootcdn.net/ajax/libs/vivus/0.4.6/vivus.min.js"></script>
-
-    <!-- Start preloader -->
-    <script type="text/javascript">
-        var preloader = document.querySelector('.preloader')
-        if (preloader) {
-
-            const animations = ['oneByOne', 'delayed', 'sync', 'scenario']
-
-            new Vivus('loader-logo', { duration: 50, type: 'oneByOne' }, function () { })
-
-            setTimeout(function () {
-                preloader.classList.add('show')
-            }, 1500)
-        }
-    </script>
-    <!-- End preloader -->
 
 </body>
 

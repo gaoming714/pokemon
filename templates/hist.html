@@ -25,7 +25,7 @@
     </div>
 
     <div class="row">
-      <div class="col text-center">
+      <!-- <div class="col text-center">
         <div class="dropdown">
           <button class="btn btn-primary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown"
             aria-expanded="false" v-text="date">
@@ -36,8 +36,22 @@
             {% endfor %}
           </ul>
         </div>
+        </div> -->
+      <div class="col align-self-center text-center">
+        <div class="input-group">
+          <span class="input-group-text">Input the Date: </span>
+          <button class="btn btn-primary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown"
+            aria-expanded="false" v-text="date">Dropdown</button>
+          <ul class="dropdown-menu">
+            {% for night in night_list %}
+            <li><a class="dropdown-item" @click="showGenre('{{ night }}')">{{ night }}</a></li>
+            {% endfor %}
+          </ul>
+          <input type="text" class="form-control" aria-label="Text input with dropdown button" v-model.lazy="date">
+        </div>
       </div>
     </div>
+
 
     <div class="row">
       <div class="col">
@@ -189,6 +203,12 @@
         //   }
         //   this.timer--
         // }, 1000)
+      },
+      watch: {
+        date(newVal, oldVal) {
+          // 每次message更新后，这个函数都会被调用
+          this.showGenre(newVal);
+        }
       },
       methods: {
         showGenre(item) {
