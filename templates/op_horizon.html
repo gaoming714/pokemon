@@ -149,6 +149,7 @@
           berry_300: 0,
           berry_300_list: [],
           ma_300_list: [],
+          chg_300_list: [],
           std_list: [],
           vol_list: [],
           vol_diff: 0,
@@ -288,6 +289,7 @@
               that.now_list = response.data["now_list"]
               that.berry_300_list = response.data["berry_300_list"]
               that.ma_300_list = response.data["ma_300_list"]
+              that.chg_300_list = response.data["chg_300_list"].map(item => item * 10)
               that.burger_list = response.data["burger_list"]
               that.std_list = response.data["std_list"]
               that.vol_list = response.data["vol_list"]
@@ -314,7 +316,7 @@
                 color: '#0d6efd',
                 width: 2
               },
-              name: 'IF 510300',
+              name: 'IF HS300',
             }
             var traceIFPM = {
               x: this.now_list,
@@ -326,7 +328,7 @@
                 color: '#0d6efd',
                 width: 2
               },
-              name: 'IF 510300',
+              name: 'IF HS300',
             }
             var traceburgerAM = {
               x: this.now_list,
@@ -338,7 +340,7 @@
                 color: '#b31b1b',
                 width: 2
               },
-              name: 'Burger',
+              name: 'IF HS300 MA',
             }
             var traceburgerPM = {
               x: this.now_list,
@@ -350,7 +352,7 @@
                 color: '#b31b1b',
                 width: 2
               },
-              name: 'Burger',
+              name: 'IF HS300 MA',
             }
             var tracelineAM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "11:30:00"],
@@ -378,9 +380,35 @@
                 width: 3
               }
             }
+            var traceIndexAM = {
+              x: this.now_list,
+              y: this.chg_300_list,
+              xaxis: 'x1',
+              yaxis: 'y1',
+              mode: 'lines',
+              name: 'HS300 index',
+              line: {
+                // dash: 'dashdot',
+                color: '#666666',
+                width: 2
+              }
+            }
+            var traceIndexPM = {
+              x: this.now_list,
+              y: this.chg_300_list,
+              xaxis: 'x2',
+              yaxis: 'y2',
+              mode: 'lines',
+              name: 'HS300 index',
+              line: {
+                // dash: 'dashdot',
+                color: '#666666',
+                width: 2
+              }
+            }
             var traceCurAM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "15:30:00", this.now.slice(0, 11) + "15:30:00", this.now.slice(0, 11) + "09:30:00"],
-              y: [this.berry_300, this.berry_300],
+              y: [this.berry_300, this.berry_300, this.chg*10, this.chg*10],
               xaxis: 'x1',
               yaxis: 'y1',
               mode: 'lines',
@@ -393,7 +421,7 @@
             }
             var traceCurPM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "15:30:00", this.now.slice(0, 11) + "15:30:00", this.now.slice(0, 11) + "09:30:00"],
-              y: [this.berry_300, this.berry_300],
+              y: [this.berry_300, this.berry_300, this.chg*10, this.chg*10],
               xaxis: 'x2',
               yaxis: 'y2',
               mode: 'lines',
@@ -428,7 +456,7 @@
               },
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             }
-            var plot_set = [tracelineAM, tracelinePM, traceburgerAM, traceburgerPM, traceIFAM, traceIFPM, traceCurAM, traceCurPM]
+            var plot_set = [tracelineAM, tracelinePM, traceburgerAM, traceburgerPM, traceIndexAM, traceIndexPM, traceIFAM, traceIFPM, traceCurAM, traceCurPM]
             Plotly.newPlot(chart, plot_set, layout, { staticPlot: this.isMobile() })
           }
           var chart_std = document.getElementById('chart_std')
@@ -444,7 +472,7 @@
                 color: '#5F9EA0',
                 width: 2
               },
-              name: 'IF 510300 STD',
+              name: 'IF HS300 STD',
             }
             var traceSTDPM = {
               x: this.now_list,
@@ -456,7 +484,7 @@
                 color: '#5F9EA0',
                 width: 2
               },
-              name: 'IF 510300 STD',
+              name: 'IF HS300 STD',
             }
             var tracelineAM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "11:30:00"],
@@ -527,7 +555,7 @@
                 color: '#FFA500',
                 width: 2
               },
-              name: 'IF 510300 STD',
+              name: 'IF HS300 STD',
             }
             var traceVolPM = {
               x: this.now_list,
@@ -541,7 +569,7 @@
                 color: '#FFA500',
                 width: 2
               },
-              name: 'IF 510300 STD',
+              name: 'IF HS300 STD',
             }
             var tracelineAM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "11:30:00"],

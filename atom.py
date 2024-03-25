@@ -147,6 +147,7 @@ def api_op(name=None):
             'pcr_300_list': list(op_df["pcr_300"]),
             'berry_300_list': list(op_df["berry_300"]),
             'ma_300_list': list(ma_300_se),
+            'chg_300_list': list(op_df["chg_300"]),
             'vol_diff': round(vol_diff, 2),
             'vol_list' : list(vol_diff_se),
             'margin': round(margin,4),
@@ -170,6 +171,8 @@ def api_hist(name = None, date = None):
     if date == "Today":
         date = "fox_data"
     hist_path = os.path.join("data", date + ".json")
+    if not os.path.exists(hist_path):
+        return json.dumps({})
     with open(hist_path, 'r', encoding='utf-8') as file:
         op_dict = json.load(file)
 
