@@ -248,6 +248,49 @@ def api_hist(name = None, date = None):
         }
     return json.dumps(context)
 
+@app.route("/api/symbol/<date>")
+def api_symbol(name = None, date = None):
+    # get info from sina_option_data
+    if date == "Today":
+        date = "fox_data"
+    json_path = os.path.join("data", "fox_symbol.json")
+    if not os.path.exists(json_path):
+        return json.dumps({})
+    with open(json_path, 'r', encoding='utf-8') as file:
+        op_dict = json.load(file)
+
+
+    op_df = pd.DataFrame(op_dict["data"])
+    op_df.set_index("dt", inplace = True)
+
+    symbol_list = []
+    position_list = []
+    color_list = []
+    for row_index, row in op_df.iterrows():
+        if row["symbol"] == "up":
+            symbol_list.append("arrow-up")
+            position_list.append(row["chg_300"])
+            color_list.append("red")
+        elif row["symbol"] == "down":
+            symbol_list.append("arrow-down")
+            position_list.append(row["chg_300"])
+            color_list.append("green")
+        elif row["symbol"] == "turn":
+            symbol_list.append("diamond")
+            position_list.append(row["chg_300"])
+            color_list.append("orange")
+
+    readme =  ""
+    context = {
+
+            'dt': list(op_df.index),
+            'symbol': symbol_list,
+            'position': position_list,
+            'color': color_list
+
+        }
+    return json.dumps(context)
+
 @app.route('/welogin',methods=['GET','POST'])
 def test_wechat():
     qr_path = Path("QR.png")

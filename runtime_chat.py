@@ -55,8 +55,11 @@ def launch():
         if dtime > now:
             return
     horizon = 9 * pd.Series(op_df["chg_300"][12:280]).std()
-    horizon = 1
-    zero = op_df["berry_300"].iloc[280]
+    if len(op_df.index) > 280:
+        zero = op_df["berry_300"].iloc[280]
+    else:
+        logger.warning("op_df.index is not enough => " + len(op_df.index)) 
+        zero = 0
     if ONCE and now.hour == 9:
         msg = now_str + "\nHorizon🍌\t" + str(round(horizon,4))
         if zero >= 10:
@@ -90,20 +93,13 @@ def launch():
             if berry_it >= berry_long and berry_it >= berry_short:
                 BOX.append(now)
                 msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
-                logger.debug(msg)
-                for user in ADDR:
-                    email(user,msg)
-                r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
+                owl(msg)
             elif berry_it <= berry_long and berry_it <= berry_short:
                 BOX.append(now)
                 msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
-                logger.debug(msg)
-                for user in ADDR:
-                    email(user,msg)
-                r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
+                owl(msg)
             else:
                 logger.debug("No Hands Up.")
-
 
 now = pendulum.now("Asia/Shanghai")
 dawn = pendulum.today("Asia/Shanghai")
@@ -114,7 +110,6 @@ mk_beta = dawn.add(hours=11,minutes=30)
 mk_gamma = dawn.add(hours=13,minutes=0)
 mk_delta = dawn.add(hours=15,minutes=0,seconds=20)
 mk_zeta = pendulum.tomorrow("Asia/Shanghai")
-
 
 def hold_period():
     """
@@ -140,7 +135,26 @@ def hold_period():
             # sleep @ 1:05
             exit(0)
 
+def owl(msg):
+    logger.info("Wol => " + msg)
+    for user in ADDR:
+        try:
+            email(user,msg)
+        except:
+            logger.warning("Email Fail " + user)
+    try:
+        r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
+    except:
+        logger.warning("Wechat Fail " + msg)
 
+# def save_symbol(arrow):
+#     try:
+#         symbol_path("data", "fox_symbol.json")
+#         with open(symbol_path, 'r', encoding='utf-8') as file:
+#             symbol_dict = json.load(file)
+#         symbol_dict["data"].append(arrow)
+#     except:
+#         logger.warning("Symbol Fail Chat => " + arrow["dt"])
 
 def get_mixin():
     global EMAIL
@@ -158,8 +172,6 @@ def get_mixin():
         logger.warning("chat_config.json is not ready")
         raise
 
-
-
 def email(addr,msg):
     global EMAIL
     envelope = Envelope(
@@ -172,7 +184,6 @@ def email(addr,msg):
     # Send the envelope using an ad-hoc connection...
     envelope.send(EMAIL['smtp'], port=EMAIL['port'], login=EMAIL['login'],
                 password=EMAIL['password'], tls=True)
-
 
 def lumos(cmd):
     # res = 0
@@ -189,7 +200,7 @@ def clean():
 if __name__ == '__main__':
     get_mixin()
     while True:
-        logger.debug("round it")
+        logger.debug("Heart Beat")
         launch()
         hold_period()
         now = pendulum.now("Asia/Shanghai").add(seconds = -3)

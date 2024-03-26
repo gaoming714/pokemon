@@ -55,23 +55,13 @@ def launch():
         if dtime > now:
             return
 
-    # ma_300_se = op_df['berry_300'].rolling(120, min_periods = 1).mean().values
-    # vol_mean_se = op_df["vol_300"].rolling(13, min_periods = 1).mean().values
-    # vol_diff_se = (op_df["vol_300"] - vol_mean_se) / 1000
-    # vol_diff_se.fillna(0, inplace=True)
-    # vol_diff = vol_diff_se.iloc[-1]
     vol_mean = op_df["vol_300"][-13:].mean()
     vol_diff = (arrow["vol_300"] - vol_mean) / 1000
 
     if vol_diff >= 10:
         BOX.append(now)
         msg = now_str + "\n 🧊 Turn " + "{:8.2f} K".format(round(vol_diff, 2))
-        logger.debug(msg)
-        for user in ADDR:
-            email(user,msg)
-        r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
-
-
+        wol(msg)
 
 now = pendulum.now("Asia/Shanghai")
 dawn = pendulum.today("Asia/Shanghai")
@@ -82,7 +72,6 @@ mk_beta = dawn.add(hours=11,minutes=30)
 mk_gamma = dawn.add(hours=13,minutes=0)
 mk_delta = dawn.add(hours=15,minutes=0,seconds=20)
 mk_zeta = pendulum.tomorrow("Asia/Shanghai")
-
 
 def hold_period():
     """
@@ -108,8 +97,6 @@ def hold_period():
             # sleep @ 1:05
             exit(0)
 
-
-
 def get_mixin():
     global EMAIL
     global ADDR
@@ -126,8 +113,6 @@ def get_mixin():
         logger.warning("chat_config.json is not ready")
         raise
 
-
-
 def email(addr,msg):
     global EMAIL
     envelope = Envelope(
@@ -141,6 +126,17 @@ def email(addr,msg):
     envelope.send(EMAIL['smtp'], port=EMAIL['port'], login=EMAIL['login'],
                 password=EMAIL['password'], tls=True)
 
+def owl(msg):
+    logger.info("Wol => " + msg)
+    for user in ADDR:
+        try:
+            email(user,msg)
+        except:
+            logger.warning("Email Fail " + user)
+    try:
+        r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
+    except:
+        logger.warning("Wechat Fail " + msg)
 
 def lumos(cmd):
     # res = 0
@@ -157,7 +153,7 @@ def clean():
 if __name__ == '__main__':
     get_mixin()
     while True:
-        logger.debug("round it")
+        logger.debug("Heart Beat")
         launch()
         hold_period()
         now = pendulum.now("Asia/Shanghai").add(seconds = -3)
