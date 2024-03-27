@@ -61,7 +61,8 @@ def launch():
     if vol_diff >= 10:
         BOX.append(now)
         msg = now_str + "\n 🧊 Turn " + "{:8.2f} K".format(round(vol_diff, 2))
-        wol(msg)
+        logger.info("online => " + now_str)
+        owl(msg)
 
 now = pendulum.now("Asia/Shanghai")
 dawn = pendulum.today("Asia/Shanghai")
@@ -153,7 +154,6 @@ def clean():
 if __name__ == '__main__':
     get_mixin()
     while True:
-        logger.debug("Heart Beat")
         launch()
         hold_period()
         now = pendulum.now("Asia/Shanghai").add(seconds = -3)

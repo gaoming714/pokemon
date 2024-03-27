@@ -74,7 +74,7 @@ def launch():
     count = 0
     fail_count = 0
     for item in std_arr:
-        if item < horizon:
+        if item < 1:
             count = count + 1
         elif fail_count < 4 and count < 8:
             fail_count = fail_count + 1
@@ -93,10 +93,12 @@ def launch():
             if berry_it >= berry_long and berry_it >= berry_short:
                 BOX.append(now)
                 msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
+                logger.info("online => " + now_str)
                 owl(msg)
             elif berry_it <= berry_long and berry_it <= berry_short:
                 BOX.append(now)
                 msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
+                logger.info("online => " + now_str)
                 owl(msg)
             else:
                 logger.debug("No Hands Up.")
@@ -200,7 +202,6 @@ def clean():
 if __name__ == '__main__':
     get_mixin()
     while True:
-        logger.debug("Heart Beat")
         launch()
         hold_period()
         now = pendulum.now("Asia/Shanghai").add(seconds = -3)
