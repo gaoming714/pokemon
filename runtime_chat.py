@@ -1,9 +1,8 @@
-
-
 import re
 import os
 import sys
 import requests
+import sqlite3
 import time
 import json
 import pendulum
@@ -58,7 +57,7 @@ def launch():
     if len(op_df.index) > 280:
         zero = op_df["berry_300"].iloc[280]
     else:
-        logger.warning("op_df.index is not enough => " + len(op_df.index)) 
+        logger.warning("op_df.index is not enough => " + len(op_df.index))
         zero = 0
     if ONCE and now.hour == 9:
         msg = now_str + "\nHorizon🍌\t" + str(round(horizon,4))
@@ -95,11 +94,13 @@ def launch():
                 msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
                 logger.info("online => " + now_str)
                 owl(msg)
+                send_db(arrow, "up")
             elif berry_it <= berry_long and berry_it <= berry_short:
                 BOX.append(now)
                 msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
                 logger.info("online => " + now_str)
                 owl(msg)
+                send_db(arrow, "down")
             else:
                 logger.debug("No Hands Up.")
 
@@ -173,6 +174,28 @@ def get_mixin():
     except:
         logger.warning("chat_config.json is not ready")
         raise
+
+def send_db(arrow, symbol = ""):
+    if os.path.exists("db.sqlite3"):
+        # connect
+        conn = sqlite3.connect('db.sqlite3')
+        cursor = conn.cursor()
+    else:
+        return
+    # insert
+    cursor.execute('''INSERT INTO stock (dt, symbol,
+                    chg_50, pcr_50, berry_50,
+                    chg_300, pcr_300, berry_300,
+                    chg_500, pcr_500, berry_500,
+                    inc_t0, burger, vol_300, std_300)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
+                    (arrow.name, symbol,
+                    arrow['chg_50'], arrow['pcr_50'], arrow['berry_50'],
+                    arrow['chg_300'], arrow['pcr_300'], arrow['berry_300'],
+                    arrow['chg_500'], arrow['pcr_500'], arrow['berry_500'],
+                    arrow['inc_t0'], arrow['burger'], arrow['vol_300'], arrow['std_300']))
+    conn.commit()
+    conn.close()
 
 def email(addr,msg):
     global EMAIL

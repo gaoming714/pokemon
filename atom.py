@@ -1,6 +1,7 @@
 import re
 import os
 import requests
+import sqlite3
 import time
 import json
 import pendulum
@@ -132,7 +133,6 @@ def api_op(name=None):
         xbox_shuffle = 0
         apple_shuffle = 0
 
-
     readme =  "Watch the fork and progress"
     context = {
             'now': now,
@@ -162,6 +162,55 @@ def api_op(name=None):
             'apple_shuffle': apple_shuffle,
 
             'readme': readme,
+        }
+    return json.dumps(context)
+
+
+@app.route("/api/stock/<date>")
+def api_stock(name = None, date = None):
+    # get info from sina_option_data
+    if date == "Today":
+        date = "fox_data"
+    if os.path.exists("db.sqlite3"):
+        # connect
+        conn = sqlite3.connect('db.sqlite3')
+        cursor = conn.cursor()
+    else:
+        return json.dumps({})
+    # select
+    op_df = pd.read_sql_query("SELECT * FROM stock;", conn)
+    op_df.set_index("dt", inplace = True)
+    if len(op_df.index) == 0:
+         return json.dumps({})
+
+    # op_df = pd.DataFrame(op_dict)
+    # op_df.set_index("dt", inplace = True)
+
+    symbol_list = []
+    position_list = []
+    color_list = []
+    for row_index, row in op_df.iterrows():
+        if row["symbol"] == "up":
+            symbol_list.append("arrow-up")
+            position_list.append(row["chg_300"])
+            color_list.append("red")
+        elif row["symbol"] == "down":
+            symbol_list.append("arrow-down")
+            position_list.append(row["chg_300"])
+            color_list.append("green")
+        elif row["symbol"] == "turn":
+            symbol_list.append("diamond")
+            position_list.append(row["chg_300"])
+            color_list.append("orange")
+
+    readme =  ""
+    context = {
+
+            'dt': list(op_df.index),
+            'symbol': symbol_list,
+            'position': position_list,
+            'color': color_list
+
         }
     return json.dumps(context)
 

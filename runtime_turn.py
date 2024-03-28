@@ -1,9 +1,8 @@
-
-
 import re
 import os
 import sys
 import requests
+import sqlite3
 import time
 import json
 import pendulum
@@ -63,6 +62,7 @@ def launch():
         msg = now_str + "\n 🧊 Turn " + "{:8.2f} K".format(round(vol_diff, 2))
         logger.info("online => " + now_str)
         owl(msg)
+        send_db(arrow, "turn")
 
 now = pendulum.now("Asia/Shanghai")
 dawn = pendulum.today("Asia/Shanghai")
@@ -98,6 +98,18 @@ def hold_period():
             # sleep @ 1:05
             exit(0)
 
+def owl(msg):
+    logger.info("Wol => " + msg)
+    for user in ADDR:
+        try:
+            email(user,msg)
+        except:
+            logger.warning("Email Fail " + user)
+    try:
+        r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
+    except:
+        logger.warning("Wechat Fail " + msg)
+
 def get_mixin():
     global EMAIL
     global ADDR
@@ -114,6 +126,28 @@ def get_mixin():
         logger.warning("chat_config.json is not ready")
         raise
 
+def send_db(arrow, symbol = ""):
+    if os.path.exists("db.sqlite3"):
+        # connect
+        conn = sqlite3.connect('db.sqlite3')
+        cursor = conn.cursor()
+    else:
+        return
+    # insert
+    cursor.execute('''INSERT INTO stock (dt, symbol,
+                    chg_50, pcr_50, berry_50,
+                    chg_300, pcr_300, berry_300,
+                    chg_500, pcr_500, berry_500,
+                    inc_t0, burger, vol_300, std_300)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
+                    (arrow.name, symbol,
+                    arrow['chg_50'], arrow['pcr_50'], arrow['berry_50'],
+                    arrow['chg_300'], arrow['pcr_300'], arrow['berry_300'],
+                    arrow['chg_500'], arrow['pcr_500'], arrow['berry_500'],
+                    arrow['inc_t0'], arrow['burger'], arrow['vol_300'], arrow['std_300']))
+    conn.commit()
+    conn.close()
+
 def email(addr,msg):
     global EMAIL
     envelope = Envelope(
@@ -126,18 +160,6 @@ def email(addr,msg):
     # Send the envelope using an ad-hoc connection...
     envelope.send(EMAIL['smtp'], port=EMAIL['port'], login=EMAIL['login'],
                 password=EMAIL['password'], tls=True)
-
-def owl(msg):
-    logger.info("Wol => " + msg)
-    for user in ADDR:
-        try:
-            email(user,msg)
-        except:
-            logger.warning("Email Fail " + user)
-    try:
-        r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
-    except:
-        logger.warning("Wechat Fail " + msg)
 
 def lumos(cmd):
     # res = 0
