@@ -170,7 +170,8 @@ def api_op(name=None):
 def api_stock(name = None, date = None):
     # get info from sina_option_data
     if date == "Today":
-        date = "fox_data"
+        now = pendulum.now("Asia/Shanghai")
+        date = now.to_datetime_string()[:10]
     if os.path.exists("db.sqlite3"):
         # connect
         conn = sqlite3.connect('db.sqlite3')
@@ -178,7 +179,10 @@ def api_stock(name = None, date = None):
     else:
         return json.dumps({})
     # select
-    op_df = pd.read_sql_query("SELECT * FROM stock;", conn)
+    query = '''SELECT * FROM stock WHERE dt LIKE "{}%";'''.format(date)
+    op_df = pd.read_sql_query(query, conn)
+    # op_df = pd.read_sql_query("SELECT * FROM stock;", conn)
+    # op_df = op_df[op_df["dt"].str.contains(date)]
     op_df.set_index("dt", inplace = True)
     if len(op_df.index) == 0:
          return json.dumps({})
@@ -191,18 +195,17 @@ def api_stock(name = None, date = None):
     color_list = []
     for row_index, row in op_df.iterrows():
         if row["symbol"] == "up":
-            symbol_list.append("arrow-up")
+            symbol_list.append("star-triangle-up")
             position_list.append(row["chg_300"])
             color_list.append("red")
         elif row["symbol"] == "down":
-            symbol_list.append("arrow-down")
+            symbol_list.append("star-triangle-down")
             position_list.append(row["chg_300"])
             color_list.append("green")
         elif row["symbol"] == "turn":
-            symbol_list.append("diamond")
+            symbol_list.append("star-square-dot")
             position_list.append(row["chg_300"])
-            color_list.append("orange")
-
+            color_list.append("purple")
     readme =  ""
     context = {
 

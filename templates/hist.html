@@ -375,7 +375,7 @@
               mode: 'markers',
               marker: {
                 color: this.symbolcolor,
-                size: 15,
+                size: 16,
                 symbol: this.symbol,
               },
               type: 'scatter'
@@ -389,7 +389,7 @@
               mode: 'markers',
               marker: {
                 color: this.symbolcolor,
-                size: 15,
+                size: 16,
                 symbol: this.symbol,
               },
               type: 'scatter'
@@ -418,7 +418,7 @@
               },
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             }
-            var plot_set = [tracelineAM, tracelinePM, traceSymAM, traceSymPM, traceburgerAM, traceburgerPM, traceIFAM, traceIFPM, traceIndexAM, traceIndexPM]
+            var plot_set = [tracelineAM, tracelinePM, traceburgerAM, traceburgerPM, traceIFAM, traceIFPM, traceIndexAM, traceIndexPM, traceSymAM, traceSymPM]
             Plotly.newPlot(chart, plot_set, layout, { staticPlot: this.isMobile() })
           }
           var chart_std = document.getElementById('chart_std')

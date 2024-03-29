@@ -211,7 +211,7 @@
           var fail_count = 0
           var std_part = std_arr[0] / this.horizon
           for (item of std_arr) {
-            if (item < this.horizon) { count = count + 1 }
+            if (item < 1) { count = count + 1 }
             else if (fail_count < 4 && count < 8) {
               fail_count = fail_count + 1
             }
