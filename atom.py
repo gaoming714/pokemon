@@ -51,6 +51,9 @@ def histpage(name=None):
     night_list.insert(0,"Today")
     return render_template('hist.html', name=name, night_list=night_list)
 
+@app.errorhandler(404)
+def show_404_page(e):
+    return render_template('404.html'), 404
 
 @app.route("/api/remain")
 def api_remain(name=None):

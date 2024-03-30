@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Error 404 - Page Not Found!</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./assets/css/style_404.css') }}" />
+    <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon"
+        type="image/x-icon" />
+</head>
+
+<body>
+    <div class="container">
+        <img class="ops" src="{{ url_for('static', filename='./assets/images/404.svg') }}" />
+        <br />
+        <h3>这页面无法找到
+            <br /> 你是不是迷路了
+        </h3>
+        <br />
+        <a class="buton" href="http://shadow.pokescript.com/">shadow.pokescript.com</a>
+    </div>
+</body>
+
+</html>
+
