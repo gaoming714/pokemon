@@ -350,7 +350,7 @@ def api_symbol(name = None, date = None):
 def test_wechat():
     qr_path = Path("QR.png")
     if not qr_path.exists():
-        return "<p>No QR.png.</p>"
+        return render_template('404.html')
     with open(qr_path, 'rb') as f:
         image = f.read()
     return Response(image, mimetype='image/jpeg')
