@@ -198,11 +198,11 @@ def api_stock(name = None, date = None):
     color_list = []
     for row_index, row in op_df.iterrows():
         if row["symbol"] == "up":
-            symbol_list.append("star-triangle-up")
+            symbol_list.append("arrow-up")
             position_list.append(row["chg_300"])
             color_list.append("red")
         elif row["symbol"] == "down":
-            symbol_list.append("star-triangle-down")
+            symbol_list.append("arrow-down")
             position_list.append(row["chg_300"])
             color_list.append("green")
         elif row["symbol"] == "turn":
