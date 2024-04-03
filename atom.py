@@ -8,9 +8,12 @@ import pendulum
 import pandas as pd
 from pathlib import Path
 from flask import Flask
+from flask import request
 from flask import Response
 from flask import redirect, url_for
 from flask import render_template
+from flask import render_template_string
+import flask_login
 
 from loguru import logger
 logger.add("log/atom.log")
@@ -21,11 +24,13 @@ json_path = os.path.join("data", "fox_data.json")
 nightly_path = os.path.join("data", "fox_nightly.json")
 
 app = Flask(__name__)
-
+app.secret_key = "super secret string"  # Change this!
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
 
 @app.route("/")
 def index(name=None):
-    return redirect("/op/horizon")
+    return render_template('home.html', name=name)
 
 @app.route("/op/<code>")
 def oppage(code = "IF", name=None):
@@ -355,6 +360,43 @@ def test_wechat():
         image = f.read()
     return Response(image, mimetype='image/jpeg')
 
+class User(flask_login.UserMixin):
+    def __init__(self, email, password):
+        self.id = email
+        self.password = password
+
+users = {"leafstorm@126.com": User("leafstorm@126.com", "secret")}
+
+@login_manager.user_loader
+def user_loader(id):
+    return users.get(id)
+
+
+@app.route("/login", methods=['GET','POST'])
+def login():
+    if request.method == "GET":
+        return render_template('we_login.html', guest="guest")
+    else:
+        user = users.get(request.form["email"])
+
+        if user is None or user.password != request.form["password"]:
+            return redirect(url_for("login"))
+
+        flask_login.login_user(user)
+        return redirect(url_for("protected"))
+
+@app.route("/protected")
+@flask_login.login_required
+def protected():
+    return render_template_string(
+        "Logged in as: {{ user.id }}",
+        user=flask_login.current_user
+    )
+
+@app.route("/logout")
+def logout():
+    flask_login.logout_user()
+    return "Logged out"
 
 if __name__ == '__main__':
     app.run(debug=True,port=8009)
