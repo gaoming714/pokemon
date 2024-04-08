@@ -12,12 +12,13 @@
 </head>
 
 <body>
+
   {% include 'components/preload.html' %}
 
   <!-- Responsive navbar-->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container px-5">
-      <a class="navbar-brand" href="#!">PokeScript</a>
+      <a class="navbar-brand" href="/"><i class="fa-brands fa-github-alt"></i> PokeScript</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -25,7 +26,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#!">Home</a>
+            <a class="nav-link active" aria-current="page" href="">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#feature">特性</a>
@@ -76,7 +77,7 @@
             虽然这部分在现货端成交量可能不足为奇，但是期权端当前市场成交量并不大，
             略微的成交量放大都比较容易观察。反过来说期权端是否就是现货的一个缩影，或者踪迹。
           </p>
-          <a class="text-decoration-none" href="#!">
+          <a class="text-decoration-none" href="">
             Call to action
             <i class="fa-solid fa-arrows-turn-right"></i>
           </a>
@@ -90,7 +91,7 @@
             当前期权成交量不足，为了保证PCR平滑，期权跨期累计可以对标股指期货主连。
             或者说跨期期权的不均匀并不会影响到PCR。
           </p>
-          <a class="text-decoration-none" href="#!">
+          <a class="text-decoration-none" href="">
             Call to action
             <i class="fa-solid fa-arrows-turn-right"></i>
           </a>
@@ -105,7 +106,7 @@
             但是这里本人为了能够获得一个平稳序列，就是将PCR（比值）与股指期货（涨跌）进行了拟合，
             或者近似平稳序列。
           </p>
-          <a class="text-decoration-none" href="#!">
+          <a class="text-decoration-none" href="">
             Call to action
             <i class="fa-solid fa-arrows-turn-right"></i>
           </a>
@@ -281,6 +282,9 @@
   <section class="py-5 border-bottom" id="wechat">
     <div class="container px-5 my-5 px-5">
       <div class="text-center mb-5">
+        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-3">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
         <h2 class="fw-bolder">微信公众号</h2>
         <p class="lead mb-0">扫码了解更多</p>
       </div>
@@ -396,7 +400,7 @@
   <footer class="py-5 bg-dark">
     <div class="container px-5">
       <p class="m-0 text-center text-white">
-        Copyright &copy; PokeScript.com 2024 Email:gaoming714@126.com
+        Copyright &copy; PokeScript.com 2024 <i class="fa-solid fa-wand-magic-sparkles"></i> Email:gaoming714@126.com
       </p>
     </div>
   </footer>
