@@ -150,9 +150,9 @@ def analyse2(op_df):
     global DIRECT
     horizon = op_df["chg_300"][12:280].std() * 9
     if horizon > 1:
-        std_horizon = 1
+        std_horizon = 0.5
     else:
-        std_horizon = horizon
+        std_horizon = 0.5
     berry_300_ma = op_df['berry_300'].rolling(120, min_periods = 1).mean()
     for pointer, index in enumerate(op_df.index):
         now_str = op_df.index[pointer]
@@ -167,12 +167,12 @@ def analyse2(op_df):
         margin = - round(horizon * 12, 2)
         berry_top = op_df["berry_300"].iloc[360:pointer].iloc[-480:].max()
         berry_bottom = op_df["berry_300"].iloc[360:pointer].iloc[-480:].min()
-        if arrow["berry_300"] > berry_top and arrow["std_300"] <= std_horizon:
+        if arrow["berry_300"] > berry_top and arrow["std_300"] >= std_horizon:
             BOX.append(now_str)
             DIRECT.append("up")
             msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
             # send_db(arrow, "up")
-        if arrow["berry_300"] < berry_bottom and arrow["std_300"] <= std_horizon:
+        if arrow["berry_300"] < berry_bottom and arrow["std_300"] >= std_horizon:
             BOX.append(now_str)
             DIRECT.append("down")
             msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
@@ -284,13 +284,17 @@ def play_core(op_df, direct, berry_300_ma, horizon):
 def gap(open_dt, close_dt):
     open_ts = pendulum.parse(open_dt,tz="Asia/Shanghai")
     close_ts = pendulum.parse(close_dt,tz="Asia/Shanghai")
-    left_ts = pendulum.parse(open_dt,tz="Asia/Shanghai").add(hours = 11,minutes = 30)
-    right_ts = pendulum.parse(open_dt,tz="Asia/Shanghai").add(hours = 11,minutes = 30)
+    left_ts = pendulum.parse(open_dt,tz="Asia/Shanghai").at(hour = 11,minute = 30)
+    right_ts = pendulum.parse(open_dt,tz="Asia/Shanghai").at(hour = 13)
+    print([open_ts,close_ts])
     if open_ts <= left_ts and close_ts >= right_ts:
-        duration = close_ts.diff(open_ts.add(hours=2)).in_seconds()
+        duration = close_ts.diff(open_ts.add(hours=1,minutes=30)).in_seconds()
     else:
         duration = close_ts.diff(open_ts).in_seconds()
-    return duration
+    duration_m = duration // 60
+    duration_s = duration % 60
+    duration_o = duration_m + duration_s / 60
+    return duration_o
 
 def skipbox(box_list, now_str, minutes = 15):
     now = pendulum.parse(now_str,tz="Asia/Shanghai")
