@@ -93,11 +93,16 @@ def show_df():
     fig = px.line(df, x=df.index, y=["cumsum"], title='')
     fig.show()
 
-def analyse(op_df):
+def analyse1(op_df):
     # traditional
     global BOX
     global DIRECT
     horizon = op_df["chg_300"][12:280].std() * 9
+    print(horizon)
+    if horizon > 1:
+        std_horizon = 1
+    else:
+        std_horizon = horizon ** 0.5
     for length in range(280, len(op_df.index)):
         sub_df = op_df.iloc[:length]
         now_str = sub_df.index[-1]
@@ -110,7 +115,7 @@ def analyse(op_df):
         count = 0
         fail_count = 0
         for item in std_arr:
-            if item < 1:
+            if item < std_horizon:
                 count = count + 1
             elif fail_count < 4 and count < 8:
                 fail_count = fail_count + 1
@@ -160,18 +165,18 @@ def analyse2(op_df):
             continue
         arrow = op_df.loc[index]
         margin = - round(horizon * 12, 2)
-        berry_top = op_df["berry_300"].iloc[pointer-360:pointer].max()
-        berry_bottom = op_df["berry_300"].iloc[pointer-360:pointer].min()
+        berry_top = op_df["berry_300"].iloc[360:pointer].iloc[-480:].max()
+        berry_bottom = op_df["berry_300"].iloc[360:pointer].iloc[-480:].min()
         if arrow["berry_300"] > berry_top and arrow["std_300"] <= std_horizon:
             BOX.append(now_str)
             DIRECT.append("up")
             msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
-            send_db(arrow, "up")
+            # send_db(arrow, "up")
         if arrow["berry_300"] < berry_bottom and arrow["std_300"] <= std_horizon:
             BOX.append(now_str)
             DIRECT.append("down")
             msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
-            send_db(arrow, "down")
+            # send_db(arrow, "down")
 
 def analyse3(op_df):
     # test 9:50
