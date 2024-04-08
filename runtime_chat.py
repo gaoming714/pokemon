@@ -42,18 +42,56 @@ def launch():
     else:
         return
 
-    arrow = op_df.iloc[-1]
-    if arrow["std_300"] == 0:
+    if now < now.at(0,0,0).add(hours = 9,minutes = 55):
         return
-
-    if BOX != []:
-        btime = BOX[-1]
-        dtime = BOX[-1].add(minutes = 15)
-        if dtime > btime.at(0,0,0).add(hours = 11,minutes = 30) and dtime < btime.at(0,0,0).add(hours = 13):
-            dtime = dtime.add(hours = 1, minutes = 30)
-        if dtime > now:
-            return
+    if skipbox(BOX, now_str, minutes = 30):
+        return
     horizon = 9 * pd.Series(op_df["chg_300"][12:280]).std()
+
+    # send one day signal
+    if len(op_df.index) > 280:
+        zero = op_df["berry_300"].iloc[280]
+    else:
+        logger.warning("op_df.index is not enough => " + len(op_df.index))
+        zero = 0
+    if ONCE and now.hour == 9:
+        msg = now_str + "\nHorizon🍌\t" + str(round(horizon,4))
+        if zero >= 10:
+            msg = msg + " 🍓 "
+        elif zero <= -10:
+            msg = msg + " 🍏 "
+        owl(msg)
+        ONCE = False
+
+    # send real chat
+    arrow = op_df.iloc[-1]
+    margin = - round(horizon * 12, 2)
+    if horizon > 1:
+        std_horizon = 1
+    else:
+        std_horizon = horizon
+    berry_top = op_df["berry_300"].iloc[-240:-1].max()
+    berry_bottom = op_df["berry_300"].iloc[-240:-1].min()
+    print(berry_bottom)
+    print(arrow["berry_300"])
+    if arrow["berry_300"] > berry_top and arrow["std_300"] <= std_horizon:
+        BOX.append(now_str)
+        # DIRECT.append("up")
+        msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
+        logger.info("online => " + now_str)
+        owl(msg)
+        send_db(arrow, "up")
+    if arrow["berry_300"] < berry_bottom and arrow["std_300"] <= std_horizon:
+        BOX.append(now_str)
+        # DIRECT.append("down")
+        msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
+        logger.info("online => " + now_str)
+        owl(msg)
+        send_db(arrow, "down")
+    else:
+        logger.debug("No Hands Up.")
+
+def dump():
     if len(op_df.index) > 280:
         zero = op_df["berry_300"].iloc[280]
     else:
@@ -73,7 +111,7 @@ def launch():
     count = 0
     fail_count = 0
     for item in std_arr:
-        if item < 1:
+        if item < horizon ** 0.5:
             count = count + 1
         elif fail_count < 4 and count < 8:
             fail_count = fail_count + 1
@@ -174,6 +212,17 @@ def get_mixin():
     except:
         logger.warning("chat_config.json is not ready")
         raise
+
+def skipbox(box_list, now_str, minutes = 15):
+    now = pendulum.parse(now_str,tz="Asia/Shanghai")
+    if box_list != []:
+        btime = pendulum.parse(BOX[-1],tz="Asia/Shanghai")
+        dtime = btime.add(minutes = minutes)
+        if dtime > btime.at(0,0,0).add(hours = 11,minutes = 30) and dtime < btime.at(0,0,0).add(hours = 13):
+            dtime = dtime.add(hours = 1, minutes = 30)
+        if dtime > now:
+            return True
+    return False
 
 def send_db(arrow, symbol = ""):
     if os.path.exists("db.sqlite3"):

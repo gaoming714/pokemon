@@ -126,10 +126,10 @@ def launch():
 
 def fetch_op_sum(op_name):
     # get sum of vol from one op_name
-    with open("data/sina_op_config.json", 'r', encoding='utf-8') as file:
-        sina_option_dict = json.load(file)
-    # sina_option_dict = json.loads(db.get("data/sina_op_config.json"))
-    hq_str_op_list = sina_option_dict[op_name]
+    with open("data/fox_op_config.json", 'r', encoding='utf-8') as file:
+        op_dict = json.load(file)
+    # op_dict = json.loads(db.get("data/sina_op_config.json"))
+    hq_str_op_list = op_dict[op_name]
     detail_url = "http://hq.sinajs.cn/list=" + ",".join(hq_str_op_list)
     res = requests.get(detail_url, headers=SINA, timeout=5)
     res_str = res.text

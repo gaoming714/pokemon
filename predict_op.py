@@ -4,6 +4,7 @@ import re
 import os
 import sys
 import requests
+import sqlite3
 import time
 import json
 import pendulum
@@ -14,6 +15,8 @@ import pandas as pd
 import plotly.express as px
 from rich.progress import track
 
+from loguru import logger
+logger.add("log/predict_op.log")
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
@@ -29,239 +32,295 @@ def launch():
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
 
-    nightly_path = os.path.join("data", "nightly_data.json")
+    nightly_path = os.path.join("data", "fox_nightly.json")
 
     with open(nightly_path, 'r', encoding='utf-8') as file:
         nightly_data = json.load(file)
-    nightly_list = nightly_data["time"]
+    nightly_list = nightly_data["records"]
 
-    with open(os.path.join("data", "sina_option_data.json"), 'r', encoding='utf-8') as file:
+    with open(os.path.join("data", "fox_data.json"), 'r', encoding='utf-8') as file:
         sina_option_data = json.load(file)
         if "now" in sina_option_data:
-            nightly_list.append("sina_option_data")
+            nightly_list.append("fox_data")
 
     print(np.array(nightly_list))
     for night in track(nightly_list):
         intraday_path = os.path.join("data", night + ".json")
         if os.path.exists(intraday_path):
             with open(intraday_path, 'r', encoding='utf-8') as file:
-                intraday = json.load(file)
-            # print(night)
-            analyse(intraday)
+                op_dict = json.load(file)
+            if "now" in op_dict and op_dict["now"] != "":
+                op_df = pd.DataFrame(op_dict["data"])
+                op_df.set_index("dt", inplace = True)
+                # print(op_df)
+                analyse2(op_df)
+                play_day(op_df)
 
-    show_df(len(nightly_list))
+    show_df()
 
 
 def launch_solo(night):
     intraday_path = os.path.join("data", night + ".json")
-    if os.path.exists(intraday_path):
-        with open(intraday_path, 'r', encoding='utf-8') as file:
-            intraday = json.load(file)
-        df = analyse(intraday)
+    if not os.path.exists(intraday_path):
+        return
+    with open(intraday_path, 'r', encoding='utf-8') as file:
+        op_dict = json.load(file)
+    if "now" in op_dict and op_dict["now"] != "":
+        op_df = pd.DataFrame(op_dict["data"])
+        op_df.set_index("dt", inplace = True)
+        analyse2(op_df)
+        play_day(op_df)
 
+    show_df()
 
-    df["edge_up"] = UPPER(df["chg_500"], N = 12 * 5, R = -20*0.01)
-    df["edge_down"] = LOWER(df["chg_500"], N = 12 * 5, R = -20*0.01)
-    fig = px.line(df, x=df.index, y=["chg_500","edge_up","edge_down"], title='')
-    # fig.show()
-    show_df(1)
-
-def show_df(days):
+def show_df():
     global PANEL
     df = pd.DataFrame(PANEL)
-    # pd.set_option('display.max_rows',500)
+    pd.set_option('display.max_rows',900)
     # pd.set_option('display.max_columns',500)
     # pd.set_option('display.width',1000)
+    df["cumsum"] = df["diff_chg"].cumsum()
     print(df)
     print(df.describe())
-    print(df.sort_values("prod"))
+    # print(df.sort_values("prod"))
 
     # t_format = pd.to_datetime(df["time"])
     # new_df = df.set_index(t_format)
     # print(new_df["output"].resample('W').sum())
 
     # print(df["output"].cumsum())
-    print("AVE   ", df["prod"].sum()/days)
+    # print("AVE   ", df["prod"].sum()/days)
+    fig = px.line(df, x=df.index, y=["cumsum"], title='')
+    fig.show()
 
-
-def analyse(option_dict):
-
-    df = pd.DataFrame(option_dict,index=option_dict["now_list"])
-    df.drop_duplicates(subset='now_list',inplace=True)
-    df = df.drop("now_list",axis=1)
-    # df = df.round({"berry_300":1})
-    df["high_300"],df["mid_300"],df["low_300"] = BOLL(df["berry_300"], N = 180, P = 3 )
-    df["short_300"] = MA(df["berry_300"], 20)
-    if "std_300" not in df:
-        df["std_300"] = STD(df["berry_300"], 240)
-    # df = df.round({"std":4})
-    horizon = df["chg_300"][12:280].std() * 9
-    # df["std_300"] = STD(df["berry_300"], 240)
-    # horizon = df["std_300"][240:].min() * 3
-    # print(horizon)
-    # print("Origin Signal")
-    # pd.Series(df["std_300"]).rolling(180).apply(lambda x:fix(x, horizon))
-    # print("Unique Signal")
-    # print("Time\t-\t\tberry_300\t-\tmean_300")
-    # clean_sign()
-    # print(BOX)
-    get_direct(df)
-    get_value(df)
-
-    # print("\n时间\t\t\t 方向\t最大利润 平均利润 最大亏损")
-    # play(df["chg_500"],df["chg_300"])
-
-    # df["high_300"] = df["high_300"].shift(24)
-    # df["low_300"] = df["low_300"].shift(24)
-    # se = df["berry_300"] < df["low_300"]
-    # print(se)
-    # fig = px.line(df, x=df.index, y=["berry_300","burger","high_300","low_300","std_300"], title='Life expectancy in Canada')
-    # fig.show()
-    return df
-
-
-def get_direct(df):
+def analyse(op_df):
+    # traditional
     global BOX
     global DIRECT
-    global BERRY
-    out_box = []
-    time_catch = pendulum.parse(df.index[0], tz="Asia/Shanghai").at(0,0,0).add(hours = 9,minutes = 55)
-    for row_index,row in df.iterrows():
-        row_time = pendulum.parse(row_index, tz="Asia/Shanghai")
-        if row_time > time_catch:
-            break
-
-    if row["berry_300"] > 10:
-        BOX.append(row.name)
-        DIRECT.append("up")
-        BERRY.append(row["berry_300"])
-    elif row["berry_300"] < -10:
-        BOX.append(row.name)
-        DIRECT.append("down")
-        BERRY.append(row["berry_300"])
-    else:
-        pass
-    # print("Real Signal")
-    # print(BOX)
-    # print(DIRECT)
-
-def get_value(df):
-    global BOX
-    global DIRECT
-    global PANEL
-    global BERRY
-    if BOX == []:
-        return
-    # row = df.iloc[360]
-    zero = df["chg_300"].iloc[280]
-    if DIRECT[0] == "up":
-        if df["berry_300"][280:].min() >= 0:
-            PANEL.append({"time":BOX[0],"berry":BERRY[0],"direct":DIRECT[0],"prod":round(df["chg_300"][1920:2220].mean()-zero,2)})
-        else:
-            PANEL.append({"time":BOX[0],"berry":BERRY[0],"direct":DIRECT[0],"prod":round(df["chg_300"][1920:2220].min()-zero,2)})
-
-    if DIRECT[0] == "down":
-        if df["berry_300"][280:].max() <= 0:
-            PANEL.append({"time":BOX[0],"berry":BERRY[0],"direct":DIRECT[0],"prod":round(-df["chg_300"][1920:2220].mean()+zero,2)})
-        else:
-            PANEL.append({"time":BOX[0],"berry":BERRY[0],"direct":DIRECT[0],"prod":round(-df["chg_300"][1920:2220].max()+zero,2)})
-
-    BOX = []
-    DIRECT = []
-    BERRY = []
-
-
-def play(chg_se,margin_se):
-    global BOX
-    global DIRECT
-    global BERRY
-    global PANEL
-
-    for index, btime in enumerate(BOX):
-        btime = pendulum.parse(BOX[index], tz="Asia/Shanghai")
-        dtime = pendulum.parse(BOX[index], tz="Asia/Shanghai").add(minutes = 47)
-        atime = pendulum.parse(BOX[index], tz="Asia/Shanghai").add(minutes = -40)
-        if dtime > btime.at(0,0,0).add(hours = 11,minutes = 30) and dtime < btime.at(0,0,0).add(hours = 13):
-            dtime = dtime.add(hours = 1, minutes = 30)
-        if dtime >= btime.at(0,0,0).add(hours = 15):
-            dtime = btime.at(0,0,0).add(hours = 15)
-        if atime > btime.at(0,0,0).add(hours = 11,minutes = 30) and atime < btime.at(0,0,0).add(hours = 13):
-            atime = dtime.add(hours = -1, minutes = -30)
-        # cal cache
-        cache = []
-        for seindex,subvalue in chg_se[BOX[index]:].items():
-            ctime = pendulum.parse(seindex, tz="Asia/Shanghai")
-            cache.append(subvalue * 100)
-            if ctime >= dtime:
+    horizon = op_df["chg_300"][12:280].std() * 9
+    for length in range(280, len(op_df.index)):
+        sub_df = op_df.iloc[:length]
+        now_str = sub_df.index[-1]
+        now = pendulum.parse(now_str,tz="Asia/Shanghai")
+        if skipbox(BOX, now_str):
+            continue
+        std_arr = sub_df["std_300"][-1:-181:-1]
+        if std_arr.iloc[0] == 0 or std_arr.iloc[120] == 0:
+            continue
+        count = 0
+        fail_count = 0
+        for item in std_arr:
+            if item < 1:
+                count = count + 1
+            elif fail_count < 4 and count < 8:
+                fail_count = fail_count + 1
+            else:
                 break
 
-        # cal std(pre_cahce)
-        pre_cache = []
-        for seindex,subvalue in margin_se[:BOX[index]].items():
-            ctime = pendulum.parse(seindex, tz="Asia/Shanghai")
-            if ctime < atime:
+        if count >= 120:
+            if fail_count != 0:
+                berry_arr = sub_df["berry_300"][-1:-181:-1]
+                berry_it = berry_arr.iloc[0]
+                berry_long = sum(berry_arr) / len(berry_arr)
+                berry_short = sum(berry_arr[0:20]) / len(berry_arr[0:20])
+                margin = - round(horizon * 12, 2)
+                # logger.debug([now_str, berry_it, berry_long, berry_short])
+                if berry_it >= berry_long and berry_it >= berry_short:
+                    BOX.append(now_str)
+                    DIRECT.append("up")
+                    msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
+                    # logger.info(msg)
+                elif berry_it <= berry_long and berry_it <= berry_short:
+                    BOX.append(now_str)
+                    DIRECT.append("down")
+                    msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
+                    # logger.info(msg)
+                else:
+                    pass
+                    # logger.debug("No Hands Up.")
+
+def analyse2(op_df):
+    # new low std
+    global BOX
+    global DIRECT
+    horizon = op_df["chg_300"][12:280].std() * 9
+    if horizon > 1:
+        std_horizon = 1
+    else:
+        std_horizon = horizon
+    berry_300_ma = op_df['berry_300'].rolling(120, min_periods = 1).mean()
+    for pointer, index in enumerate(op_df.index):
+        now_str = op_df.index[pointer]
+        now = pendulum.parse(now_str,tz="Asia/Shanghai")
+        if now < now.at(0,0,0).add(hours = 9,minutes = 55):
+            continue
+        if now > now.at(0,0,0).add(hours = 14,minutes = 45):
+            continue
+        if skipbox(BOX, now_str, minutes = 30):
+            continue
+        arrow = op_df.loc[index]
+        margin = - round(horizon * 12, 2)
+        berry_top = op_df["berry_300"].iloc[pointer-360:pointer].max()
+        berry_bottom = op_df["berry_300"].iloc[pointer-360:pointer].min()
+        if arrow["berry_300"] > berry_top and arrow["std_300"] <= std_horizon:
+            BOX.append(now_str)
+            DIRECT.append("up")
+            msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
+            send_db(arrow, "up")
+        if arrow["berry_300"] < berry_bottom and arrow["std_300"] <= std_horizon:
+            BOX.append(now_str)
+            DIRECT.append("down")
+            msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
+            send_db(arrow, "down")
+
+def analyse3(op_df):
+    # test 9:50
+    global BOX
+    global DIRECT
+    horizon = op_df["chg_300"][12:280].std() * 9
+    for pointer, index in enumerate(op_df.index):
+        now_str = op_df.index[pointer]
+        now = pendulum.parse(now_str,tz="Asia/Shanghai")
+        if now < now.at(0,0,0).add(hours = 9,minutes = 50):
+            continue
+        arrow = op_df.loc[index]
+        margin = - round(horizon * 12, 2)
+        if arrow["berry_300"] > 10:
+            BOX.append(now_str)
+            DIRECT.append("up")
+            # send_db(arrow, "up")
+        if arrow["berry_300"] < -10:
+            BOX.append(now_str)
+            DIRECT.append("down")
+            # send_db(arrow, "down")
+        return
+
+def play_day(op_df):
+    global BOX
+    global DIRECT
+    global PANEL
+    horizon = op_df["chg_300"][12:280].std() * 9
+    # print(["horizon", horizon])
+    berry_300_ma = op_df['berry_300'].rolling(120, min_periods = 1).mean()
+    for pointer, btime in enumerate(BOX):
+        if PANEL != []:
+            last_dt = pendulum.parse(PANEL[-1]["close_dt"],tz="Asia/Shanghai")
+            new_dt = pendulum.parse(BOX[pointer],tz="Asia/Shanghai")
+            if last_dt > new_dt:
                 continue
-            pre_cache.append(subvalue * 100)
-        edgeMargin = -1.8 * pd.Series(pre_cache).std()
-        # print(edgeMargin)
-        # edgeMargin = -8
-        # ana direct
-        if DIRECT[index] == "up":
-            for subindex, subchg in enumerate(cache):
-                if subindex==0:continue
-                edge = max(cache[0:subindex]) + edgeMargin
-                if subchg <= edge or subindex == len(cache) -1:
-                    PANEL.append({"time":BOX[index],"direct":DIRECT[index],"berry":max(cache[0:subindex]) - cache[0],
-                    "stoploss":edgeMargin,"duration":subindex*5/60,"output":round(subchg - cache[0],2)})
-                    break
-        if DIRECT[index] == "down":
-            for subindex, subchg in enumerate(cache):
-                if subindex==0:continue
-                edge = min(cache[0:subindex]) - edgeMargin
-                if subchg >= edge or subindex == len(cache) -1:
-                    PANEL.append({"time":BOX[index],"direct":DIRECT[index],"berry":cache[0] - min(cache[0:subindex]),
-                    "stoploss":edgeMargin,"duration":subindex*5/60,"output":round(-(subchg - cache[0]),2)})
-                    break
+        play_core(op_df.loc[btime:], DIRECT[pointer], berry_300_ma, horizon)
+
+
     BOX = []
     DIRECT = []
     BERRY = []
 
+def play_core(op_df, direct, berry_300_ma, horizon):
+    global PANEL
+    edgeMargin = - horizon * 0.16
+    if edgeMargin < -0.3:
+        edgeMargin = -0.3
+    # print(["edgeMargin", edgeMargin])
+    origin = op_df.iloc[0]
+    el = {"open_dt": origin.name, "direct": direct}
+    for index in op_df.index:
+        arrow = op_df.loc[index]
+        # print([index, op_df["berry_300"][index],berry_300_ma[index] - 0.2])
+        if direct == "up":
+            edge = op_df["chg_300"][:index].max() + edgeMargin
+            if op_df["chg_300"][index] < edge:
+                el["close_dt"] = arrow.name
+                el["open_chg"] = origin["chg_300"]
+                el["close_chg"] = arrow["chg_300"]
+                el["diff_chg"] = arrow["chg_300"] - origin["chg_300"]
+                el["gap"] = gap(origin.name,arrow.name)
+                el["res"] = "stop-ss-up"
+                break
+            if op_df["berry_300"][index] < berry_300_ma[index] - 0.3:
+                el["close_dt"] = arrow.name
+                el["open_chg"] = origin["chg_300"]
+                el["close_chg"] = arrow["chg_300"]
+                el["diff_chg"] = arrow["chg_300"] - origin["chg_300"]
+                el["gap"] = gap(origin.name,arrow.name)
+                el["res"] = "stop-ma-up"
+                break
+        elif direct == "down":
+            edge = op_df["chg_300"][:index].min() - edgeMargin
+            if op_df["chg_300"][index] > edge:
+                el["close_dt"] = arrow.name
+                el["open_chg"] = origin["chg_300"]
+                el["close_chg"] = arrow["chg_300"]
+                el["diff_chg"] = - arrow["chg_300"] + origin["chg_300"]
+                el["gap"] = gap(origin.name,arrow.name)
+                el["res"] = "stop-ss-dw"
+                break
+            if op_df["berry_300"][index] > berry_300_ma[index]  + 0.3:
+                el["close_dt"] = arrow.name
+                el["open_chg"] = origin["chg_300"]
+                el["close_chg"] = arrow["chg_300"]
+                el["diff_chg"] = - arrow["chg_300"] + origin["chg_300"]
+                el["gap"] = gap(origin.name,arrow.name)
+                el["res"] = "stop-ma-dw"
+                break
 
-def fix(S, horizon):
-    std_arr = S[::-1]
-    if std_arr[0] == 0 or std_arr[160] == 0:
-        return 0
-    count = 0
-    fail_count = 0
-    for item in std_arr:
-        if item < horizon:
-            count = count + 1
-        elif fail_count < 4 and count < 8:
-            fail_count = fail_count + 1
-        else:
-            break
-    if count > 120:
-        if fail_count != 0:
-            # print(std_arr.index[0])
-            BOX.append(std_arr.index[0])
-    return 0
+    if "res" not in el:
+        arrow = op_df.iloc[-1]
+        el["close_dt"] = arrow.name
+        el["open_chg"] = origin["chg_300"]
+        el["close_chg"] = arrow["chg_300"]
+        el["diff_chg"] = arrow["chg_300"] - origin["chg_300"]
+        el["gap"] = gap(origin.name,arrow.name)
+        el["res"] = "no-stop"
+    PANEL.append(el)
+    # print(el)
 
-def UPPER(S,N,R):
-    return pd.Series(S).rolling(N).max().values+R
-def LOWER(S,N,R):
-    return pd.Series(S).rolling(N).min().values-R
 
-def MA(S,N):
-    return pd.Series(S).rolling(N).mean().values
 
-def STD(S,N):
-    return  pd.Series(S).rolling(N).std().values
+def gap(open_dt, close_dt):
+    open_ts = pendulum.parse(open_dt,tz="Asia/Shanghai")
+    close_ts = pendulum.parse(close_dt,tz="Asia/Shanghai")
+    left_ts = pendulum.parse(open_dt,tz="Asia/Shanghai").add(hours = 11,minutes = 30)
+    right_ts = pendulum.parse(open_dt,tz="Asia/Shanghai").add(hours = 11,minutes = 30)
+    if open_ts <= left_ts and close_ts >= right_ts:
+        duration = close_ts.diff(open_ts.add(hours=2)).in_seconds()
+    else:
+        duration = close_ts.diff(open_ts).in_seconds()
+    return duration
 
-def BOLL(CLOSE,N=20, P=2):
-    MID = MA(CLOSE, N);
-    UPPER = MID + STD(CLOSE, N) * P
-    LOWER = MID - STD(CLOSE, N) * P
-    return UPPER, MID, LOWER
+def skipbox(box_list, now_str, minutes = 15):
+    now = pendulum.parse(now_str,tz="Asia/Shanghai")
+    if box_list != []:
+        btime = pendulum.parse(BOX[-1],tz="Asia/Shanghai")
+        dtime = btime.add(minutes = minutes)
+        if dtime > btime.at(0,0,0).add(hours = 11,minutes = 30) and dtime < btime.at(0,0,0).add(hours = 13):
+            dtime = dtime.add(hours = 1, minutes = 30)
+        if dtime > now:
+            return True
+    return False
+
+def send_db(arrow, symbol = ""):
+    if os.path.exists("db.sqlite3"):
+        # connect
+        conn = sqlite3.connect('db.sqlite3')
+        cursor = conn.cursor()
+    else:
+        return
+    # insert
+    cursor.execute('''INSERT INTO stock (dt, symbol,
+                    chg_50, pcr_50, berry_50,
+                    chg_300, pcr_300, berry_300,
+                    chg_500, pcr_500, berry_500,
+                    inc_t0, burger, vol_300, std_300)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
+                    (arrow.name, symbol,
+                    arrow['chg_50'], arrow['pcr_50'], arrow['berry_50'],
+                    arrow['chg_300'], arrow['pcr_300'], arrow['berry_300'],
+                    arrow['chg_500'], arrow['pcr_500'], arrow['berry_500'],
+                    arrow['inc_t0'], arrow['burger'], arrow['vol_300'], arrow['std_300']))
+
+    conn.commit()
+    conn.close()
+
 
 
 if __name__ == '__main__':

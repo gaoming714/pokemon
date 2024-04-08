@@ -2,69 +2,69 @@
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>404 - Page Not Found!</title>
-    <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon" type="image/x-icon" />
-    <!-- <link href="{{ url_for('static', filename='assets/css/404.css') }}" rel="stylesheet" /> -->
-    <style>
-        body,
-        html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-            /* 隐藏滚动条 */
-        }
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>404 - Page Not Found!</title>
+  <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon" type="image/x-icon" />
+  <!-- <link href="{{ url_for('static', filename='assets/css/404.css') }}" rel="stylesheet" /> -->
+  <style>
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      /* 隐藏滚动条 */
+    }
 
-        .video-container {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            /* 设置容器高度为视口高度 */
-            overflow: hidden;
-            /* 隐藏超出容器的部分 */
-        }
+    .video-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      /* 设置容器高度为视口高度 */
+      overflow: hidden;
+      /* 隐藏超出容器的部分 */
+    }
 
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            /* 确保视频全屏显示 */
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      /* 确保视频全屏显示 */
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
 
-        .video-overlay {
-            position: absolute;
-            top: 60%;
-            /* 定位文字位置 */
-            left: 50%;
-            transform: translate(-50%, -50%);
-            /* 居中文字 */
-            color: white;
-            /* 文字颜色 */
-            font-size: 4em;
-            /* 文字大小 */
-            text-shadow: 2px 2px 4px rgba(220, 21, 54, 0.5);
-            /* 文字阴影，增加可读性 */
-            z-index: 1;
-            /* 确保文字在视频之上 */
-            pointer-events: none;
-            /* 允许点击穿透，不影响视频操作 */
-        }
-    </style>
+    .video-overlay {
+      position: absolute;
+      top: 60%;
+      /* 定位文字位置 */
+      left: 50%;
+      transform: translate(-50%, -50%);
+      /* 居中文字 */
+      color: white;
+      /* 文字颜色 */
+      font-size: 4em;
+      /* 文字大小 */
+      text-shadow: 2px 2px 4px rgba(220, 21, 54, 0.5);
+      /* 文字阴影，增加可读性 */
+      z-index: 1;
+      /* 确保文字在视频之上 */
+      pointer-events: none;
+      /* 允许点击穿透，不影响视频操作 */
+    }
+  </style>
 </head>
 
 <body>
 
-    <div class="video-container" onclick="window.open('/')"> <video autoplay loop muted playsinline>
-            <source src="{{ url_for('static', filename='assets/images/404.webm') }}" type="video/webm"> Your browser
-            does not support the video tag.
-        </video>
-        <div class="video-overlay">4 0 4</div>
-    </div>
+  <div class="video-container" onclick="window.open('/')"> <video autoplay loop muted playsinline>
+      <source src="{{ url_for('static', filename='assets/images/404.webm') }}" type="video/webm"> Your browser
+      does not support the video tag.
+    </video>
+    <div class="video-overlay">4 0 4</div>
+  </div>
 </body>
 
 </html>

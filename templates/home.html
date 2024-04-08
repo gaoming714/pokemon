@@ -2,10 +2,12 @@
 <html lang="en">
 
 <head>
-  {% include 'components/meta.html' %} {% include 'components/analytics.html'
-  %}
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
+  {% include 'components/meta.html' %}
+
+  {% include 'components/analytics.html' %}
+
   <link href="{{ url_for('static', filename='assets/css/home.css') }}" rel="stylesheet" />
+
   <title>PokeScript - Home</title>
 </head>
 
@@ -28,7 +30,9 @@
           <li class="nav-item">
             <a class="nav-link" href="#feature">特性</a>
           </li>
-          <li class="nav-item"><a class="nav-link" href="#wechat">公众号</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="#wechat">公众号</a>
+          </li>
           <!-- <li class="nav-item"><a class="nav-link" href="#!">Services</a></li> -->
         </ul>
       </div>
@@ -44,12 +48,14 @@
               用期权的全新视角看待股指期货
             </h1>
             <p class="lead text-white-50 mb-4">
-              PCR（Put-Call-Ratio）是从期权市场衍生出来的指标<br/>
-              通过这个指标从侧面预判股指期货走势
+              PCR（Put-Call-Ratio）-期权市场衍生出指标<br />
+              从侧面预判股指期货走势
             </p>
             <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-              <a class="btn btn-primary btn-lg px-4 me-sm-3" href="/op/horizon">开始</a>
-              <a class="btn btn-outline-light btn-lg px-4" href="/op/horizon">历史</a>
+              <a class="btn btn-primary btn-lg px-4 me-sm-3" href="/op/horizon"><i class="fa-solid fa-meteor"></i>
+                开始</a>
+              <a class="btn btn-outline-light btn-lg px-4" href="/hist"><i class="fa-solid fa-clock-rotate-left"></i>
+                历史</a>
             </div>
           </div>
         </div>
@@ -62,7 +68,7 @@
       <div class="row gx-5">
         <div class="col-lg-4 mb-5 mb-lg-0">
           <div class="feature bg-primary bg-gradient text-white rounded-3 mb-3">
-            <i class="bi bi-collection"></i>
+            <i class="fa-solid fa-shield-halved"></i>
           </div>
           <h2 class="h4 fw-bolder">假设1：期权保护头寸</h2>
           <p>
@@ -72,12 +78,12 @@
           </p>
           <a class="text-decoration-none" href="#!">
             Call to action
-            <i class="bi bi-arrow-right"></i>
+            <i class="fa-solid fa-arrows-turn-right"></i>
           </a>
         </div>
         <div class="col-lg-4 mb-5 mb-lg-0">
           <div class="feature bg-primary bg-gradient text-white rounded-3 mb-3">
-            <i class="bi bi-building"></i>
+            <i class="fa-solid fa-handshake-angle"></i>
           </div>
           <h2 class="h4 fw-bolder">假设2：跨期期权累计有效</h2>
           <p>
@@ -86,12 +92,12 @@
           </p>
           <a class="text-decoration-none" href="#!">
             Call to action
-            <i class="bi bi-arrow-right"></i>
+            <i class="fa-solid fa-arrows-turn-right"></i>
           </a>
         </div>
         <div class="col-lg-4">
           <div class="feature bg-primary bg-gradient text-white rounded-3 mb-3">
-            <i class="bi bi-toggles2"></i>
+            <i class="fa-solid fa-fire"></i>
           </div>
           <h2 class="h4 fw-bolder">假设3：PCR可以与标的物累加</h2>
           <p>
@@ -101,7 +107,7 @@
           </p>
           <a class="text-decoration-none" href="#!">
             Call to action
-            <i class="bi bi-arrow-right"></i>
+            <i class="fa-solid fa-arrows-turn-right"></i>
           </a>
         </div>
       </div>
@@ -126,35 +132,35 @@
               </div>
               <ul class="list-unstyled mb-4">
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   <strong>1 users</strong>
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   5GB storage
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   Unlimited public projects
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   Community access
                 </li>
                 <li class="mb-2 text-muted">
-                  <i class="bi bi-x"></i>
+                  <i class="fa-solid fa-x"></i>
                   Unlimited private projects
                 </li>
                 <li class="mb-2 text-muted">
-                  <i class="bi bi-x"></i>
+                  <i class="fa-solid fa-x"></i>
                   Dedicated support
                 </li>
                 <li class="mb-2 text-muted">
-                  <i class="bi bi-x"></i>
+                  <i class="fa-solid fa-x"></i>
                   Free linked domain
                 </li>
                 <li class="text-muted">
-                  <i class="bi bi-x"></i>
+                  <i class="fa-solid fa-x"></i>
                   Monthly status reports
                 </li>
               </ul>
@@ -169,7 +175,7 @@
           <div class="card mb-5 mb-xl-0">
             <div class="card-body p-5">
               <div class="small text-uppercase fw-bold">
-                <i class="bi bi-star-fill text-warning"></i>
+                <i class="fa-solid fa-meteor"></i>
                 Pro
               </div>
               <div class="mb-3">
@@ -178,35 +184,35 @@
               </div>
               <ul class="list-unstyled mb-4">
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   <strong>5 users</strong>
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   5GB storage
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   Unlimited public projects
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   Community access
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   Unlimited private projects
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   Dedicated support
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   Free linked domain
                 </li>
                 <li class="text-muted">
-                  <i class="bi bi-x"></i>
+                  <i class="fa-solid fa-x"></i>
                   Monthly status reports
                 </li>
               </ul>
@@ -229,36 +235,36 @@
               </div>
               <ul class="list-unstyled mb-4">
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   <strong>Unlimited users</strong>
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   5GB storage
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   Unlimited public projects
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   Community access
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   Unlimited private projects
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   Dedicated support
                 </li>
                 <li class="mb-2">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   <strong>Unlimited</strong>
                   linked domains
                 </li>
                 <li class="text-muted">
-                  <i class="bi bi-check text-primary"></i>
+                  <i class="fa-solid fa-check text-primary"></i>
                   Monthly status reports
                 </li>
               </ul>
@@ -284,14 +290,10 @@
           <div class="card mb-4">
             <div class="card-body p-4">
               <div class="d-flex justify-content-center">
-
                 <img src="{{ url_for('static', filename='/assets/images/wechat.png') }}" />
-
               </div>
             </div>
           </div>
-
-
         </div>
       </div>
     </div>
@@ -302,7 +304,7 @@
     <div class="container px-5 my-5 px-5">
       <div class="text-center mb-5">
         <div class="feature bg-primary bg-gradient text-white rounded-3 mb-3">
-          <i class="bi bi-envelope"></i>
+          <i class="fa-solid fa-envelope"></i>
         </div>
         <h2 class="fw-bolder">留言板（功能未开放）</h2>
         <p class="lead mb-0">We'd love to hear from you</p>

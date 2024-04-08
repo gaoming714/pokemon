@@ -107,7 +107,7 @@
       Winner Winner Chicken Dinner
     </h4>
     <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom"
-      aria-controls="offcanvasBottom">
+      aria-controls="offcanvasBottom"><i class="fa-solid fa-microchip"></i>
       Readme 使用说明
     </button>
 
@@ -211,7 +211,7 @@
           var fail_count = 0
           var std_part = std_arr[0] / this.horizon
           for (item of std_arr) {
-            if (item < 1) { count = count + 1 }
+            if (item < Math.sqrt(this.horizon)) { count = count + 1 }
             else if (fail_count < 4 && count < 8) {
               fail_count = fail_count + 1
             }
@@ -408,7 +408,7 @@
             }
             var traceCurAM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "15:30:00", this.now.slice(0, 11) + "15:30:00", this.now.slice(0, 11) + "09:30:00"],
-              y: [this.berry_300, this.berry_300, this.chg*10, this.chg*10],
+              y: [this.berry_300, this.berry_300, this.chg * 10, this.chg * 10],
               xaxis: 'x1',
               yaxis: 'y1',
               mode: 'lines',
@@ -421,7 +421,7 @@
             }
             var traceCurPM = {
               x: [this.now.slice(0, 11) + "09:30:00", this.now.slice(0, 11) + "15:30:00", this.now.slice(0, 11) + "15:30:00", this.now.slice(0, 11) + "09:30:00"],
-              y: [this.berry_300, this.berry_300, this.chg*10, this.chg*10],
+              y: [this.berry_300, this.berry_300, this.chg * 10, this.chg * 10],
               xaxis: 'x2',
               yaxis: 'y2',
               mode: 'lines',
@@ -461,7 +461,7 @@
           }
           var chart_std = document.getElementById('chart_std')
           if (chart_std) {
-            var hori = 1
+            var hori = Math.sqrt(this.horizon)
             var traceSTDAM = {
               x: this.now_list,
               y: this.std_list,
