@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>FilePond from CDN</title>
+  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Filepond stylesheet -->
+  <link href="https://cdn.bootcdn.net/ajax/libs/filepond/4.30.4/filepond.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+  <div class="container" id="app">
+    <div class="row gx-5 justify-content-center">
+      <div class="col-lg-6">
+        <!-- Testimonial 1-->
+        <input type="file" class="filepond" name="file" data-allow-reorder="true" data-max-file-size="3MB"
+          data-max-files="3">
+      </div>
+    </div>
+  </div>
+
+  <!-- Load FilePond library -->
+  <script src="https://cdn.bootcdn.net/ajax/libs/filepond/4.30.4/filepond.min.js"></script>
+
+  <!-- Turn all file input elements into ponds -->
+  <script>
+    FilePond.parse(document.body);
+    FilePond.setOptions({
+      server: '/upload',
+    });
+  </script>
+
+
+</body>
+
+</html>
