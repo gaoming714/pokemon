@@ -70,8 +70,8 @@ def launch():
         std_horizon = 1
     else:
         std_horizon = horizon
-    berry_top = op_df["berry_300"].iloc[360:-1].iloc[-480:].max()
-    berry_bottom = op_df["berry_300"].iloc[360:-1].iloc[-480:].min()
+    berry_top = op_df["berry_300"].iloc[-480:-1].max()
+    berry_bottom = op_df["berry_300"].iloc[-480:-1].min()
     print(berry_bottom)
     print(arrow["berry_300"])
     if arrow["berry_300"] > berry_top and arrow["std_300"] <= std_horizon:
