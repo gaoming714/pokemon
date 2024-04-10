@@ -102,9 +102,7 @@ def launch():
     el["burger"] = round(burger,4)
     el["vol_300"] = round(vol_300,4)
 
-    if now < pendulum.today("Asia/Shanghai").add(hours=9,minutes=45,seconds=0):
-        el["std_300"] = 0
-    elif len(op_df.index) <=2:
+    if len(op_df.index) <=2:
         el["std_300"] = 0
     else:
         std_300 = op_df["berry_300"][-240:].std()  # not new one
