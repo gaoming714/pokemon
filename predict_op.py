@@ -150,9 +150,9 @@ def analyse2(op_df):
     global DIRECT
     horizon = op_df["chg_300"][12:280].std() * 9
     if horizon > 1:
-        std_horizon = 0.5
+        std_horizon = 1
     else:
-        std_horizon = 0.5
+        std_horizon = horizon
     berry_300_ma = op_df['berry_300'].rolling(120, min_periods = 1).mean()
     for pointer, index in enumerate(op_df.index):
         now_str = op_df.index[pointer]
@@ -165,14 +165,17 @@ def analyse2(op_df):
             continue
         arrow = op_df.loc[index]
         margin = - round(horizon * 12, 2)
-        berry_top = op_df["berry_300"].iloc[360:pointer].iloc[-480:].max()
-        berry_bottom = op_df["berry_300"].iloc[360:pointer].iloc[-480:].min()
-        if arrow["berry_300"] > berry_top and arrow["std_300"] >= std_horizon:
+        berry_top = op_df["berry_300"].iloc[0:pointer].iloc[-480:].max()
+        berry_bottom = op_df["berry_300"].iloc[0:pointer].iloc[-480:].min()
+        berry_300_ma_max = berry_300_ma.iloc[0:pointer].iloc[-180:].max()
+        berry_300_ma_min = berry_300_ma.iloc[0:pointer].iloc[-180:].min()
+
+        if arrow["berry_300"] > berry_top and berry_300_ma.iloc[pointer] >= berry_300_ma_max and arrow["std_300"] >= std_horizon and arrow["std_300"] <=1.5:
             BOX.append(now_str)
             DIRECT.append("up")
             msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
             # send_db(arrow, "up")
-        if arrow["berry_300"] < berry_bottom and arrow["std_300"] >= std_horizon:
+        if arrow["berry_300"] < berry_bottom and berry_300_ma.iloc[pointer] <= berry_300_ma_min and arrow["std_300"] >= std_horizon and arrow["std_300"] <=1.5:
             BOX.append(now_str)
             DIRECT.append("down")
             msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
@@ -241,7 +244,7 @@ def play_core(op_df, direct, berry_300_ma, horizon):
                 el["gap"] = gap(origin.name,arrow.name)
                 el["res"] = "stop-ss-up"
                 break
-            if op_df["berry_300"][index] < berry_300_ma[index] - 0.3:
+            if op_df["berry_300"][index] < berry_300_ma[index] - 0.5:
                 el["close_dt"] = arrow.name
                 el["open_chg"] = origin["chg_300"]
                 el["close_chg"] = arrow["chg_300"]
@@ -259,7 +262,7 @@ def play_core(op_df, direct, berry_300_ma, horizon):
                 el["gap"] = gap(origin.name,arrow.name)
                 el["res"] = "stop-ss-dw"
                 break
-            if op_df["berry_300"][index] > berry_300_ma[index]  + 0.3:
+            if op_df["berry_300"][index] > berry_300_ma[index]  + 0.5:
                 el["close_dt"] = arrow.name
                 el["open_chg"] = origin["chg_300"]
                 el["close_chg"] = arrow["chg_300"]
@@ -286,7 +289,6 @@ def gap(open_dt, close_dt):
     close_ts = pendulum.parse(close_dt,tz="Asia/Shanghai")
     left_ts = pendulum.parse(open_dt,tz="Asia/Shanghai").at(hour = 11,minute = 30)
     right_ts = pendulum.parse(open_dt,tz="Asia/Shanghai").at(hour = 13)
-    print([open_ts,close_ts])
     if open_ts <= left_ts and close_ts >= right_ts:
         duration = close_ts.diff(open_ts.add(hours=1,minutes=30)).in_seconds()
     else:
