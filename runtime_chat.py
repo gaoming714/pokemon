@@ -34,7 +34,11 @@ def launch():
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
     with open(json_path, 'r', encoding='utf-8') as file:
-        op_dict = json.load(file)
+        try:
+            op_dict = json.load(file)
+        except:
+            logger.warning("Main op_dict fail")
+            return
 
     if "now" in op_dict and op_dict["now"] != "":
         op_df = pd.DataFrame(op_dict["data"])
@@ -276,5 +280,5 @@ if __name__ == '__main__':
     while True:
         launch()
         hold_period()
-        now = pendulum.now("Asia/Shanghai").add(seconds = -3)
+        now = pendulum.now("Asia/Shanghai").add(seconds = -2)
         time.sleep(5 - now.second % 5)
