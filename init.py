@@ -12,13 +12,13 @@ option_dict = {}
 
 
 def launch():
-    settle_list = fetch_settle()
-    op_up_50_list = create_op_list('OP_UP_510050', settle_list)
-    op_down_50_list = create_op_list('OP_DOWN_510050', settle_list)
-    op_up_300_list = create_op_list('OP_UP_510300', settle_list)
-    op_down_300_list = create_op_list('OP_DOWN_510300', settle_list)
-    op_up_500_list = create_op_list('OP_UP_510500', settle_list)
-    op_down_500_list = create_op_list('OP_DOWN_510500', settle_list)
+    expiry_list = fetch_expiry()
+    op_up_50_list = create_op_list('OP_UP_510050', expiry_list)
+    op_down_50_list = create_op_list('OP_DOWN_510050', expiry_list)
+    op_up_300_list = create_op_list('OP_UP_510300', expiry_list)
+    op_down_300_list = create_op_list('OP_DOWN_510300', expiry_list)
+    op_up_500_list = create_op_list('OP_UP_510500', expiry_list)
+    op_down_500_list = create_op_list('OP_DOWN_510500', expiry_list)
     fetch_op("op_up_50",op_up_50_list)
     fetch_op("op_down_50",op_down_50_list)
     fetch_op("op_up_300",op_up_300_list)
@@ -26,12 +26,12 @@ def launch():
     fetch_op("op_up_500",op_up_500_list)
     fetch_op("op_down_500",op_down_500_list)
     create_data()
-    add_settle()
+    add_expiry()
     # save_redis()
     save_json()
 
-def fetch_settle():
-    settle_list = []
+def fetch_expiry():
+    expiry_list = []
     base_name = "300ETF"
     url = "http://stock.finance.sina.com.cn/futures/api/openapi.php/StockOptionService.getStockName?exchange=null&cate=" + base_name
     res = requests.get(url, headers = SINA)
@@ -39,14 +39,14 @@ def fetch_settle():
     month_list = list(set(res_dict["result"]["data"]["contractMonth"]))
     for month in month_list:
         pretty_month = month[2:4] + month[5:7]
-        settle_list.append(pretty_month)
-    settle_list.sort()
-    return settle_list
+        expiry_list.append(pretty_month)
+    expiry_list.sort()
+    return expiry_list
 
-def create_op_list(pre_name, settle_list):
+def create_op_list(pre_name, expiry_list):
     # opdata_list = ['2304','2306','2309','2209']
     op_str_list = []
-    for item in settle_list:
+    for item in expiry_list:
         op_str_list.append(pre_name+item)
     print(op_str_list)
     return op_str_list
@@ -57,7 +57,9 @@ def fetch_op(name, op_list):
     res_str = res.text
     #hq_str_op_list = re.findall('="[A-Z_0-9,]*";',res_str)
     hq_str_op_list = re.findall(r'CON_OP_\d*',res_str)
-    option_dict[name] = hq_str_op_list
+    hq_str_code_list = [item.split("_")[-1] for item in hq_str_op_list]
+    # print(hq_str_code_list)
+    option_dict[name] = hq_str_code_list
 
 def create_data():
     intraday_data_json = os.path.join("data", "fox_data.json")
@@ -84,8 +86,9 @@ def create_data():
 #     db.set("data/sina_op_config.json",option_json)
 #     print(db.get("data/sina_op_config.json"))
 
-def add_settle():
-    detail_url = "http://hq.sinajs.cn/list=" + ",".join(option_dict["op_up_300"])
+def add_expiry():
+    code_list = ['CON_OP_' + item for item in option_dict["op_up_300"]]
+    detail_url = "http://hq.sinajs.cn/list=" + ",".join(code_list)
     res = requests.get(detail_url, headers=SINA, timeout=5)
     res_str = res.text
     hq_str_con_op_list = res_str.split(";\n")
@@ -102,7 +105,7 @@ def add_settle():
     date_list = list(set(date_list))
     date_list.sort()
     deadline = min(deadline_list)
-    option_dict["settle"] = date_list
+    option_dict["expiry"] = date_list
     print([str(deadline) + " days left.", *date_list])
 
 def save_json():

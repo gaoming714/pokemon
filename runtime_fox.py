@@ -46,6 +46,14 @@ def launch():
     vol_300 = vol_up_300 + vol_down_300
     vol_up_500 = fetch_op_sum('op_up_500')
     vol_down_500 = fetch_op_sum('op_down_500')
+    vol_50 = vol_up_50 + vol_down_50
+    vol_500 = vol_up_500 + vol_down_500
+    print(vol_50)
+    print(vol_down_50/vol_up_50)
+    print(vol_300)
+    print(vol_down_300/vol_up_300)
+    print(vol_500)
+    print(vol_down_500/vol_up_500)
 
     if vol_up_300 == 0:
         return
@@ -78,21 +86,21 @@ def launch():
 
     el["chg_50"] = round(chg_50,4)
     pcr_50 = vol_down_50 / vol_up_50 * 100
-    mid_50 = vol_down_50 / vol_up_50 * 100 - 86
+    mid_50 = vol_down_50 / vol_up_50 * 100 - 65
     berry_50 = (chg_50 * 10) + mid_50
     el["pcr_50"] = round(pcr_50,4)
     el["berry_50"] = round(berry_50,4)
 
     el["chg_300"] = round(chg_300,4)
     pcr_300 = vol_down_300 / vol_up_300 * 100
-    mid_300 = vol_down_300 / vol_up_300 * 100 - 92
+    mid_300 = vol_down_300 / vol_up_300 * 100 - 65
     berry_300 = (chg_300 * 10) + mid_300
     el["pcr_300"] = round(pcr_300,4)
     el["berry_300"] = round(berry_300,4)
 
     el["chg_500"] = round(chg_500,4)
     pcr_500 = vol_down_500 / vol_up_500 * 100
-    mid_500 = vol_down_500 / vol_up_500 * 100 - 114
+    mid_500 = vol_down_500 / vol_up_500 * 100 - 65
     berry_500 = (chg_500 * 10) + mid_500
     el["pcr_500"] = round(pcr_500,4)
     el["berry_500"] = round(berry_500,4)
@@ -127,18 +135,29 @@ def fetch_op_sum(op_name):
     with open("data/fox_op_config.json", 'r', encoding='utf-8') as file:
         op_dict = json.load(file)
     # op_dict = json.loads(db.get("data/sina_op_config.json"))
-    hq_str_op_list = op_dict[op_name]
-    detail_url = "http://hq.sinajs.cn/list=" + ",".join(hq_str_op_list)
+    code_list = op_dict[op_name]
+    codeplus_list = ['CON_SO_' + item for item in code_list]
+    detail_url = "http://hq.sinajs.cn/list=" + ",".join(codeplus_list)
     res = requests.get(detail_url, headers=SINA, timeout=5)
     res_str = res.text
     # hq_str_con_op_list = re.findall('="[\w,. -:购沽月]*',res_str)
     hq_str_con_op_list = res_str.split(";\n")
     vol_sum = 0
+    # print(hq_str_con_op_list)
     for oneline in hq_str_con_op_list:
-        tmp_list = oneline.split(",")
-        if "var hq_str_CON_OP_" not in tmp_list[0] or len(tmp_list) < 41:
+        op_detail = oneline.split(",")
+        if op_detail == [""]:
             continue
-        vol_sum += int(tmp_list[41])
+        if "var hq_str_CON_SO_" not in op_detail[0] or len(op_detail) < 10:
+            print(op_detail)
+            continue
+        # var hq_str_CON_SO_10007234="
+        # '500ETF沽12月6500', '', '', '', '13', '-0.6462', '0.272', '-0.2126', '1.6678', '0.2753', '0.9775', '0.9504', 
+        # '510500P2412M06500', '6.5000', '0.9612', '1.0097', 'M
+        # 0期权合约简称，，，,4成交量,5Delta,6Gamma,7Theta,8vega,9隐含波动率,10最高价,11最低价,
+        # 12交易代码,13行权价,14最新价,15理论价值
+        # vol_sum += abs(int(op_detail[4])*float(op_detail[5]))
+        vol_sum += int(op_detail[4])
     return vol_sum
 
 
