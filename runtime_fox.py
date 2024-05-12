@@ -39,21 +39,15 @@ def launch():
     chg_500, inc_500 = fetch_stock("sh000905")
     chg_t0,  inc_t0  = fetch_future("nf_T0")
 
-    vol_up_50 = fetch_op_sum('op_up_50')
-    vol_down_50 = fetch_op_sum('op_down_50')
-    vol_up_300 = fetch_op_sum('op_up_300')
-    vol_down_300 = fetch_op_sum('op_down_300')
+    vol_up_50 = fetch_op_sum('510050C')
+    vol_down_50 = fetch_op_sum('510050P')
+    vol_up_300 = fetch_op_sum('510300C')
+    vol_down_300 = fetch_op_sum('510300P')
     vol_300 = vol_up_300 + vol_down_300
-    vol_up_500 = fetch_op_sum('op_up_500')
-    vol_down_500 = fetch_op_sum('op_down_500')
+    vol_up_500 = fetch_op_sum('510500C')
+    vol_down_500 = fetch_op_sum('510500P')
     vol_50 = vol_up_50 + vol_down_50
     vol_500 = vol_up_500 + vol_down_500
-    print(vol_50)
-    print(vol_down_50/vol_up_50)
-    print(vol_300)
-    print(vol_down_300/vol_up_300)
-    print(vol_500)
-    print(vol_down_500/vol_up_500)
 
     if vol_up_300 == 0:
         return
@@ -93,15 +87,15 @@ def launch():
 
     el["chg_300"] = round(chg_300,4)
     pcr_300 = vol_down_300 / vol_up_300 * 100
-    mid_300 = vol_down_300 / vol_up_300 * 100 - 92
-    berry_300 = (chg_300 * 10) + mid_300
+    mid_300 = vol_down_300 / vol_up_300 * 100 - 93
+    berry_300 = (chg_300 * 11) + mid_300
     el["pcr_300"] = round(pcr_300,4)
     el["berry_300"] = round(berry_300,4)
 
     el["chg_500"] = round(chg_500,4)
     pcr_500 = vol_down_500 / vol_up_500 * 100
-    mid_500 = vol_down_500 / vol_up_500 * 100 - 114
-    berry_500 = (chg_500 * 10) + mid_500
+    mid_500 = vol_down_500 / vol_up_500 * 100 - 104
+    berry_500 = (chg_500 * 13) + mid_500
     el["pcr_500"] = round(pcr_500,4)
     el["berry_500"] = round(berry_500,4)
 
@@ -135,7 +129,12 @@ def fetch_op_sum(op_name):
     with open("data/fox_op_config.json", 'r', encoding='utf-8') as file:
         op_dict = json.load(file)
     # op_dict = json.loads(db.get("data/sina_op_config.json"))
-    code_list = op_dict[op_name]
+    expiry_list = op_dict["expiry"]
+    code_list = []
+    for expiry in expiry_list:
+        one_list = op_dict[op_name + expiry]
+        code_list.extend(one_list)
+    # code_list = op_dict[op_name]
     codeplus_list = ['CON_OP_' + item for item in code_list]
     detail_url = "http://hq.sinajs.cn/list=" + ",".join(codeplus_list)
     res = requests.get(detail_url, headers=SINA, timeout=5)

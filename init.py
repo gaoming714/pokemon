@@ -6,60 +6,64 @@ import json
 import pendulum
 import redis
 
+from loguru import logger
+logger.add("log/init.log")
+
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
-option_dict = {}
+OPTIONS = {}
 
 
 def launch():
-    expiry_list = fetch_expiry()
-    op_up_50_list = create_op_list('OP_UP_510050', expiry_list)
-    op_down_50_list = create_op_list('OP_DOWN_510050', expiry_list)
-    op_up_300_list = create_op_list('OP_UP_510300', expiry_list)
-    op_down_300_list = create_op_list('OP_DOWN_510300', expiry_list)
-    op_up_500_list = create_op_list('OP_UP_510500', expiry_list)
-    op_down_500_list = create_op_list('OP_DOWN_510500', expiry_list)
-    fetch_op("op_up_50",op_up_50_list)
-    fetch_op("op_down_50",op_down_50_list)
-    fetch_op("op_up_300",op_up_300_list)
-    fetch_op("op_down_300",op_down_300_list)
-    fetch_op("op_up_500",op_up_500_list)
-    fetch_op("op_down_500",op_down_500_list)
+    fetch_expiry()
+    logger.info(OPTIONS["expiry"])
+    fetch_op("510050C", 'OP_UP_510050')
+    fetch_op("510050P", 'OP_DOWN_510050')
+    fetch_op("510300C", 'OP_UP_510300')
+    fetch_op("510300P", 'OP_DOWN_510300')
+    fetch_op("510500C", 'OP_UP_510500')
+    fetch_op("510500P", 'OP_DOWN_510500')
     create_data()
     add_expiry()
     # save_redis()
     save_json()
+#var hq_str_CON_SO_10007040="50ETF购5月2500,,,,132800,0.7981,4.965,-0.3219,0.1298,0.1241,0.0590,0.0397,510050C2405M02500,2.5000,0.0529,0.0528,M";
 
 def fetch_expiry():
-    expiry_list = []
     base_name = "300ETF"
     url = "http://stock.finance.sina.com.cn/futures/api/openapi.php/StockOptionService.getStockName?exchange=null&cate=" + base_name
     res = requests.get(url, headers = SINA)
     res_dict = json.loads(res.text)
     month_list = list(set(res_dict["result"]["data"]["contractMonth"]))
+    expiry_list = []
     for month in month_list:
         pretty_month = month[2:4] + month[5:7]
         expiry_list.append(pretty_month)
     expiry_list.sort()
-    return expiry_list
+    OPTIONS["expiry"] = expiry_list
 
-def create_op_list(pre_name, expiry_list):
-    # opdata_list = ['2304','2306','2309','2209']
-    op_str_list = []
-    for item in expiry_list:
-        op_str_list.append(pre_name+item)
-    print(op_str_list)
-    return op_str_list
+def fetch_op(name, sina_name):
+    # op_list = [sina_name + x for x in OPTIONS["expiry"]]
+    # print(op_list)
+    # names_url = "http://hq.sinajs.cn/list=" + ",".join(op_list)
+    # res = requests.get(names_url, headers = SINA, timeout=5)
+    # res_str = res.text
+    # #hq_str_op_list = re.findall('="[A-Z_0-9,]*";',res_str)
+    # hq_str_op_list = re.findall(r'CON_OP_\d*',res_str)
+    # hq_str_code_list = [item.split("_")[-1] for item in hq_str_op_list]
+    # # print(hq_str_code_list)
+    # OPTIONS[name] = hq_str_code_list
+    for expiry in OPTIONS["expiry"]:
+        url = "http://hq.sinajs.cn/list=" + sina_name + expiry
+        res = requests.get(url, headers = SINA, timeout=5)
+        res_str = res.text
+        #hq_str_op_list = re.findall('="[A-Z_0-9,]*";',res_str)
+        hq_str_op_list = re.findall(r'CON_OP_\d*',res_str)
+        hq_str_code_list = [item.split("_")[-1] for item in hq_str_op_list]
+        OPTIONS[name+expiry] = hq_str_code_list
+        # print(hq_str_code_list)
 
-def fetch_op(name, op_list):
-    names_url = "http://hq.sinajs.cn/list=" + ",".join(op_list)
-    res = requests.get(names_url, headers = SINA, timeout=5)
-    res_str = res.text
-    #hq_str_op_list = re.findall('="[A-Z_0-9,]*";',res_str)
-    hq_str_op_list = re.findall(r'CON_OP_\d*',res_str)
-    hq_str_code_list = [item.split("_")[-1] for item in hq_str_op_list]
-    # print(hq_str_code_list)
-    option_dict[name] = hq_str_code_list
+
 
 def create_data():
     intraday_data_json = os.path.join("data", "fox_data.json")
@@ -82,12 +86,17 @@ def create_data():
         print("create chat_config.json")
 
 # def save_redis():
-#     option_json = json.dumps(option_dict)
+#     option_json = json.dumps(OPTIONS)
 #     db.set("data/sina_op_config.json",option_json)
 #     print(db.get("data/sina_op_config.json"))
 
 def add_expiry():
-    code_list = ['CON_OP_' + item for item in option_dict["op_up_300"]]
+    expiry_list = OPTIONS["expiry"]
+    code_list = []
+    for expiry in expiry_list:
+        one_list = ['CON_OP_' + item for item in OPTIONS["510300C"+expiry]]
+        code_list.extend(one_list)
+    # code_list = ['CON_OP_' + item for item in OPTIONS["510300C"]]
     detail_url = "http://hq.sinajs.cn/list=" + ",".join(code_list)
     res = requests.get(detail_url, headers=SINA, timeout=5)
     res_str = res.text
@@ -105,23 +114,20 @@ def add_expiry():
     date_list = list(set(date_list))
     date_list.sort()
     deadline = min(deadline_list)
-    option_dict["expiry"] = date_list
-    print([str(deadline) + " days left.", *date_list])
+    OPTIONS["expiry_day"] = date_list
+    logger.info([str(deadline) + " days left.", *date_list])
 
 def save_json():
     with open("data/fox_op_config.json", 'w', encoding='utf-8') as file:
-        json.dump(option_dict, file, ensure_ascii=False)
+        json.dump(OPTIONS, file, ensure_ascii=False)
 
 def clean():
     # for pytest
-    global option_dict
-    option_dict = {}
-    print(option_dict)
+    global OPTIONS
+    OPTIONS = {}
+    print(OPTIONS)
 
-# op_up_50_list = ["OP_UP_5100502201","OP_UP_5100502202","OP_UP_5100502203","OP_UP_5100502206"]
-# op_down_50_list = ["OP_DOWN_5100502201","OP_DOWN_5100502202","OP_DOWN_5100502203","OP_DOWN_5100502206"]
-# op_up_300_list = ["OP_UP_5103002201","OP_UP_5103002202","OP_UP_5103002203","OP_UP_5103002206"]
-# op_down_300_list = ["OP_DOWN_5103002201","OP_DOWN_5103002202","OP_DOWN_5103002203","OP_DOWN_5103002206"]
+
 
 if __name__ == '__main__':
     launch()
