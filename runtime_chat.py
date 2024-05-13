@@ -11,13 +11,16 @@ import pandas as pd
 
 from envelopes import Envelope, GMailSMTP
 
+from models import jsonDB
+from models import sqliteDB
+
 from loguru import logger
 logger.add("log/chat.log")
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
 
-EMAIL = {}
+OWNER = {}
 ADDR = []
 BOX = []
 ONCE = True
@@ -33,12 +36,7 @@ def launch():
     json_path = os.path.join("data", "fox_data.json")
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
-    with open(json_path, 'r', encoding='utf-8') as file:
-        try:
-            op_dict = json.load(file)
-        except:
-            logger.warning("Main op_dict fail")
-            return
+    op_dict = jsonDB.load_it(json_path)
 
     if "now" in op_dict and op_dict["now"] != "":
         op_df = pd.DataFrame(op_dict["data"])
@@ -56,7 +54,7 @@ def launch():
     if len(op_df.index) > 280:
         zero = op_df["berry_300"].iloc[280]
     else:
-        logger.warning("op_df.index is not enough => " + len(op_df.index))
+        logger.warning("op_df.index is not enough => " + str(len(op_df.index)))
         zero = 0
     if ONCE and now.hour == 9:
         msg = now_str + "\nHorizon🍌\t" + str(round(horizon,4))
@@ -84,14 +82,14 @@ def launch():
         msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
         logger.info("online => " + now_str)
         owl(msg)
-        send_db(arrow, "up")
+        send_pcr(arrow, "up")
     if arrow["berry_300"] < berry_bottom and arrow["std_300"] <= std_horizon:
         BOX.append(now_str)
         # DIRECT.append("down")
         msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
         logger.info("online => " + now_str)
         owl(msg)
-        send_db(arrow, "down")
+        send_pcr(arrow, "down")
     else:
         logger.debug("No Hands Up.")
 
@@ -136,13 +134,13 @@ def dump():
                 msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
                 logger.info("online => " + now_str)
                 owl(msg)
-                send_db(arrow, "up")
+                send_pcr(arrow, "up")
             elif berry_it <= berry_long and berry_it <= berry_short:
                 BOX.append(now)
                 msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
                 logger.info("online => " + now_str)
                 owl(msg)
-                send_db(arrow, "down")
+                send_pcr(arrow, "down")
             else:
                 logger.debug("No Hands Up.")
 
@@ -192,23 +190,15 @@ def owl(msg):
     except:
         logger.warning("Wechat Fail " + msg)
 
-# def save_symbol(arrow):
-#     try:
-#         symbol_path("data", "fox_symbol.json")
-#         with open(symbol_path, 'r', encoding='utf-8') as file:
-#             symbol_dict = json.load(file)
-#         symbol_dict["data"].append(arrow)
-#     except:
-#         logger.warning("Symbol Fail Chat => " + arrow["dt"])
+
 
 def get_mixin():
-    global EMAIL
+    global OWNER
     global ADDR
     info_path = os.path.join("data", "chat_config.json")
+    info_dict = jsonDB.load_it(info_path)
     try:
-        with open(info_path, 'r', encoding='utf-8') as file:
-            info_dict = json.load(file)
-        EMAIL = info_dict['email']
+        OWNER = info_dict['owner']
         ADDR = info_dict['addr_list']
         handle = info_dict['handle']
         if handle == 0:
@@ -228,40 +218,19 @@ def skipbox(box_list, now_str, minutes = 15):
             return True
     return False
 
-def send_db(arrow, symbol = ""):
-    if os.path.exists("db.sqlite3"):
-        # connect
-        conn = sqlite3.connect('db.sqlite3')
-        cursor = conn.cursor()
-    else:
-        return
-    # insert
-    cursor.execute('''INSERT INTO stock (dt, symbol,
-                    chg_50, pcr_50, berry_50,
-                    chg_300, pcr_300, berry_300,
-                    chg_500, pcr_500, berry_500,
-                    inc_t0, burger, vol_300, std_300)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
-                    (arrow.name, symbol,
-                    arrow['chg_50'], arrow['pcr_50'], arrow['berry_50'],
-                    arrow['chg_300'], arrow['pcr_300'], arrow['berry_300'],
-                    arrow['chg_500'], arrow['pcr_500'], arrow['berry_500'],
-                    arrow['inc_t0'], arrow['burger'], arrow['vol_300'], arrow['std_300']))
-    conn.commit()
-    conn.close()
 
 def email(addr,msg):
-    global EMAIL
+    global OWNER
     envelope = Envelope(
-        from_addr = (EMAIL['from'], 'PokeScript'),
+        from_addr = (OWNER['from'], 'PokeScript'),
         to_addr = (addr, 'Hi Jack'),
         subject = 'PokeScript',
         text_body = msg
     )
 
     # Send the envelope using an ad-hoc connection...
-    envelope.send(EMAIL['smtp'], port=EMAIL['port'], login=EMAIL['login'],
-                password=EMAIL['password'], tls=True)
+    envelope.send(OWNER['smtp'], port=OWNER['port'], login=OWNER['login'],
+                password=OWNER['password'], tls=True)
 
 def lumos(cmd):
     # res = 0

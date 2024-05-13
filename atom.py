@@ -13,20 +13,20 @@ from flask import Response
 from flask import redirect, url_for
 from flask import render_template
 from flask import render_template_string
-import flask_login
+
+from models import jsonDB
 
 from loguru import logger
 logger.add("log/atom.log")
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
-SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
+
 json_path = os.path.join("data", "fox_data.json")
 nightly_path = os.path.join("data", "fox_nightly.json")
 
 app = Flask(__name__)
 app.secret_key = "super secret string"  # Change this!
-login_manager = flask_login.LoginManager()
-login_manager.init_app(app)
+
 
 @app.route("/")
 def index(name=None):
@@ -36,8 +36,7 @@ def index(name=None):
 def oppage(code = "IF", name=None):
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
-    with open(json_path, 'r', encoding='utf-8') as file:
-        op_dict = json.load(file)
+    op_dict = jsonDB.load_it(json_path)
     if 'now' not in op_dict:
         mk_margin = pendulum.today("Asia/Shanghai").add(hours=9,minutes=30,seconds=15)
         remain = (mk_margin - now).total_seconds()
@@ -48,10 +47,8 @@ def oppage(code = "IF", name=None):
 def histpage(name=None):
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
-    nightly_path = os.path.join("data","fox_nightly.json")
-    with open(nightly_path, 'r', encoding='utf-8') as file:
-        json_dict = json.load(file)
-    night_list = json_dict["records"][-60:]
+    nightly_dict = jsonDB.load_it(nightly_path)
+    night_list = nightly_dict["records"][-60:]
     night_list.sort(reverse=True)
     night_list.insert(0,"Today")
     return render_template('hist.html', name=name, night_list=night_list)
@@ -99,15 +96,14 @@ def api_remain(name=None):
 @app.route("/api/op")
 def api_op(name=None):
     # get info from sina_option_data
-    with open(json_path, 'r', encoding='utf-8') as file:
-        op_dict = json.load(file)
+    op_dict = jsonDB.load_it(json_path)
 
     if "now" in op_dict and op_dict["now"] != "":
         op_df = pd.DataFrame(op_dict["data"])
         op_df.set_index("dt", inplace = True)
         now = op_dict['now']
     else:
-        return json.dumps({})
+        return {}
 
     arrow = op_df.iloc[-1]
     now_list = list(op_df.index)
@@ -150,10 +146,18 @@ def api_op(name=None):
             'chg_300': round(arrow["chg_300"],4),
             'chg_500': round(arrow["chg_500"],4),
 
+            'pcr_50': round(arrow["pcr_50"],2),
+            'berry_50': round(arrow["berry_50"],2),
+            'pcr_50_list': list(op_df["pcr_50"]),
+            'berry_50_list': list(op_df["berry_50"]),
             'pcr_300': round(arrow["pcr_300"],2),
             'berry_300': round(arrow["berry_300"],2),
             'pcr_300_list': list(op_df["pcr_300"]),
             'berry_300_list': list(op_df["berry_300"]),
+            'pcr_500': round(arrow["pcr_500"],2),
+            'berry_500': round(arrow["berry_300"],2),
+            'pcr_500_list': list(op_df["pcr_500"]),
+            'berry_500_list': list(op_df["berry_500"]),
             'ma_300_list': list(ma_300_se),
             'chg_300_list': list(op_df["chg_300"]),
             'vol_diff': round(vol_diff, 2),
@@ -171,7 +175,7 @@ def api_op(name=None):
 
             'readme': readme,
         }
-    return json.dumps(context)
+    return context
 
 
 @app.route("/api/stock/<date>")
@@ -185,7 +189,7 @@ def api_stock(name = None, date = None):
         conn = sqlite3.connect('db.sqlite3')
         cursor = conn.cursor()
     else:
-        return json.dumps({})
+        return {}
     # select
     query = '''SELECT * FROM stock WHERE dt LIKE "{}%";'''.format(date)
     op_df = pd.read_sql_query(query, conn)
@@ -193,7 +197,7 @@ def api_stock(name = None, date = None):
     # op_df = op_df[op_df["dt"].str.contains(date)]
     op_df.set_index("dt", inplace = True)
     if len(op_df.index) == 0:
-         return json.dumps({})
+         return {}
 
     # op_df = pd.DataFrame(op_dict)
     # op_df.set_index("dt", inplace = True)
@@ -223,7 +227,7 @@ def api_stock(name = None, date = None):
             'color': color_list
 
         }
-    return json.dumps(context)
+    return context
 
 @app.route("/api/hist/<date>")
 def api_hist(name = None, date = None):
@@ -232,7 +236,7 @@ def api_hist(name = None, date = None):
         date = "fox_data"
     hist_path = os.path.join("data", date + ".json")
     if not os.path.exists(hist_path):
-        return json.dumps({})
+        return {}
     with open(hist_path, 'r', encoding='utf-8') as file:
         op_dict = json.load(file)
 
@@ -241,7 +245,7 @@ def api_hist(name = None, date = None):
         op_df.set_index("dt", inplace = True)
         now = op_dict['now']
     else:
-        return json.dumps({})
+        return {}
 
     arrow = op_df.iloc[-1]
     now_list = list(op_df.index)
@@ -306,50 +310,13 @@ def api_hist(name = None, date = None):
 
             'readme': readme,
         }
-    return json.dumps(context)
+    return context
 
-@app.route("/api/symbol/<date>")
-def api_symbol(name = None, date = None):
-    # get info from sina_option_data
-    if date == "Today":
-        date = "fox_data"
-    json_path = os.path.join("data", "fox_symbol.json")
-    if not os.path.exists(json_path):
-        return json.dumps({})
-    with open(json_path, 'r', encoding='utf-8') as file:
-        op_dict = json.load(file)
+# playground login part
+import flask_login
 
-
-    op_df = pd.DataFrame(op_dict["data"])
-    op_df.set_index("dt", inplace = True)
-
-    symbol_list = []
-    position_list = []
-    color_list = []
-    for row_index, row in op_df.iterrows():
-        if row["symbol"] == "up":
-            symbol_list.append("arrow-up")
-            position_list.append(row["chg_300"])
-            color_list.append("red")
-        elif row["symbol"] == "down":
-            symbol_list.append("arrow-down")
-            position_list.append(row["chg_300"])
-            color_list.append("green")
-        elif row["symbol"] == "turn":
-            symbol_list.append("diamond")
-            position_list.append(row["chg_300"])
-            color_list.append("orange")
-
-    readme =  ""
-    context = {
-
-            'dt': list(op_df.index),
-            'symbol': symbol_list,
-            'position': position_list,
-            'color': color_list
-
-        }
-    return json.dumps(context)
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
 
 @app.route('/welogin',methods=['GET','POST'])
 def test_wechat():
@@ -399,8 +366,7 @@ def logout():
     return "Logged out"
 
 
-
-#upload
+# playground upload
 from flask import flash
 from werkzeug.utils import secure_filename
 

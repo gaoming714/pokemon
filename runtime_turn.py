@@ -2,7 +2,7 @@ import re
 import os
 import sys
 import requests
-import sqlite3
+# import sqlite3
 import time
 import json
 import pendulum
@@ -11,13 +11,16 @@ import pandas as pd
 
 from envelopes import Envelope, GMailSMTP
 
+from models import jsonDB
+from models import sqliteDB
+
 from loguru import logger
 logger.add("log/turn.log")
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
 
-EMAIL = {}
+OWNER = {}
 ADDR = []
 BOX = []
 ONCE = True
@@ -33,12 +36,7 @@ def launch():
     json_path = os.path.join("data", "fox_data.json")
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
-    with open(json_path, 'r', encoding='utf-8') as file:
-        try:
-            op_dict = json.load(file)
-        except:
-            logger.warning("Main op_dict fail")
-            return
+    op_dict = jsonDB.load_it(json_path)
 
     if "now" in op_dict and op_dict["now"] != "":
         op_df = pd.DataFrame(op_dict["data"])
@@ -66,7 +64,7 @@ def launch():
         msg = now_str + "\n 🧊 Turn " + "{:8.2f} K".format(round(vol_diff, 2))
         logger.info("online => " + now_str)
         owl(msg)
-        send_db(arrow, "turn")
+        sqliteDB.send_pcr(arrow, "turn")
 
 now = pendulum.now("Asia/Shanghai")
 dawn = pendulum.today("Asia/Shanghai")
@@ -115,13 +113,12 @@ def owl(msg):
         logger.warning("Wechat Fail " + msg)
 
 def get_mixin():
-    global EMAIL
+    global OWNER
     global ADDR
     info_path = os.path.join("data", "chat_config.json")
+    info_dict = jsonDB.load_it(info_path)
     try:
-        with open(info_path, 'r', encoding='utf-8') as file:
-            info_dict = json.load(file)
-        EMAIL = info_dict['email']
+        OWNER = info_dict['owner']
         ADDR = info_dict['addr_list']
         handle = info_dict['handle']
         if handle == 0:
@@ -153,17 +150,17 @@ def send_db(arrow, symbol = ""):
     conn.close()
 
 def email(addr,msg):
-    global EMAIL
+    global OWNER
     envelope = Envelope(
-        from_addr = (EMAIL['from'], 'PokeScript'),
+        from_addr = (OWNER['from'], 'PokeScript'),
         to_addr = (addr, 'Hi Jack'),
         subject = 'PokeScript',
         text_body = msg
     )
 
     # Send the envelope using an ad-hoc connection...
-    envelope.send(EMAIL['smtp'], port=EMAIL['port'], login=EMAIL['login'],
-                password=EMAIL['password'], tls=True)
+    envelope.send(OWNER['smtp'], port=OWNER['port'], login=OWNER['login'],
+                password=OWNER['password'], tls=True)
 
 def lumos(cmd):
     # res = 0
