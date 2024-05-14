@@ -10,7 +10,7 @@ from models import jsonDB
 
 
 from loguru import logger
-logger.add("log/init.log")
+logger.add("logs/init.log")
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}

@@ -13,6 +13,7 @@ from envelopes import Envelope, GMailSMTP
 
 from models import jsonDB
 from models import sqliteDB
+from models import util
 
 from loguru import logger
 logger.add("log/turn.log")
@@ -44,18 +45,15 @@ def launch():
     else:
         return
 
-    arrow = op_df.iloc[-1]
-    if arrow["vol_300"] == 0:
+    start_tick = now.at(0,0,0).add(hours = 9,minutes = 40)
+    if now < start_tick:
+        delay = (start_tick - now).seconds
+        time.sleep(delay)
+        return
+    if util.skipbox(BOX, now_str, minutes = 2):
         return
 
-    if BOX != []:
-        btime = BOX[-1]
-        dtime = BOX[-1].add(minutes = 2)
-        if dtime > btime.at(0,0,0).add(hours = 11,minutes = 30) and dtime < btime.at(0,0,0).add(hours = 13):
-            dtime = dtime.add(hours = 1, minutes = 30)
-        if dtime > now:
-            return
-
+    arrow = op_df.iloc[-1]
     vol_mean = op_df["vol_300"][-13:].mean()
     vol_diff = (arrow["vol_300"] - vol_mean) / 1000
 
@@ -65,40 +63,6 @@ def launch():
         logger.info("online => " + now_str)
         owl(msg)
         sqliteDB.send_pcr(arrow, "turn")
-
-now = pendulum.now("Asia/Shanghai")
-dawn = pendulum.today("Asia/Shanghai")
-mk_mu = dawn.add(hours=9,minutes=20)
-mk_nu = dawn.add(hours=9,minutes=25)
-mk_alpha = dawn.add(hours=9,minutes=40)
-mk_beta = dawn.add(hours=11,minutes=30)
-mk_gamma = dawn.add(hours=13,minutes=0)
-mk_delta = dawn.add(hours=15,minutes=0,seconds=20)
-mk_zeta = pendulum.tomorrow("Asia/Shanghai")
-
-def hold_period():
-    """
-        mu nu  9:35  alpha beta  12  gamma  delta  15:00:20 zeta
-    """
-    while True:
-        now = pendulum.now("Asia/Shanghai")
-
-        if now < mk_alpha:
-            logger.debug(["remain (s) ",(mk_alpha - now).total_seconds()])
-            time.sleep((mk_alpha - now).total_seconds())
-        elif now <= mk_beta:
-            return
-        elif now < mk_gamma:
-            logger.debug(["remain (s) ",(mk_gamma - now).total_seconds()])
-            time.sleep((mk_gamma - now).total_seconds())
-        elif now <= mk_delta:
-            return
-        else:
-            logger.debug("Market Closed")
-            logger.debug(["remain to end (s) ",(mk_zeta - now).total_seconds()])
-            time.sleep((mk_zeta - now).total_seconds() + 3900)
-            # sleep @ 1:05
-            exit(0)
 
 def owl(msg):
     logger.info("Wol => " + msg)
@@ -126,28 +90,6 @@ def get_mixin():
     except:
         logger.warning("chat_config.json is not ready")
         raise
-
-def send_db(arrow, symbol = ""):
-    if os.path.exists("db.sqlite3"):
-        # connect
-        conn = sqlite3.connect('db.sqlite3')
-        cursor = conn.cursor()
-    else:
-        return
-    # insert
-    cursor.execute('''INSERT INTO stock (dt, symbol,
-                    chg_50, pcr_50, berry_50,
-                    chg_300, pcr_300, berry_300,
-                    chg_500, pcr_500, berry_500,
-                    inc_t0, burger, vol_300, std_300)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
-                    (arrow.name, symbol,
-                    arrow['chg_50'], arrow['pcr_50'], arrow['berry_50'],
-                    arrow['chg_300'], arrow['pcr_300'], arrow['berry_300'],
-                    arrow['chg_500'], arrow['pcr_500'], arrow['berry_500'],
-                    arrow['inc_t0'], arrow['burger'], arrow['vol_300'], arrow['std_300']))
-    conn.commit()
-    conn.close()
 
 def email(addr,msg):
     global OWNER
@@ -178,6 +120,6 @@ if __name__ == '__main__':
     get_mixin()
     while True:
         launch()
-        hold_period()
+        util.hold_period()
         now = pendulum.now("Asia/Shanghai").add(seconds = -3)
-        time.sleep(5 - now.second % 5)
+        time.sleep(6 - now.second % 5)

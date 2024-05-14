@@ -5,7 +5,7 @@ import requests
 from loguru import logger
 from rich.console import Console
 
-logger.add("log/loguru_util.log")
+logger.add("logs/loguru_util.log")
 
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
 

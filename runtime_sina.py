@@ -8,7 +8,7 @@ import pickle
 import pandas as pd
 
 from loguru import logger
-logger.add("log/sina.log")
+logger.add("logs/sina.log")
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}

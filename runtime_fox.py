@@ -12,7 +12,7 @@ from models import webDB
 from models import util
 
 from loguru import logger
-logger.add("log/fox.log")
+logger.add("logs/fox.log")
 
 
 def launch():
@@ -82,8 +82,8 @@ def launch():
 
     el["chg_300"] = round(chg_300,4)
     pcr_300 = vol_down_300 / vol_up_300 * 100
-    mid_300 = vol_down_300 / vol_up_300 * 100 - 93
-    berry_300 = (chg_300 * 11) + mid_300
+    mid_300 = vol_down_300 / vol_up_300 * 100 - 92
+    berry_300 = (chg_300 * 10) + mid_300
     el["pcr_300"] = round(pcr_300,4)
     el["berry_300"] = round(berry_300,4)
 
@@ -123,42 +123,6 @@ def fetch_op_sum(op_name):
     return op_vol_sum
 
 
-now = pendulum.now("Asia/Shanghai")
-dawn = pendulum.today("Asia/Shanghai")
-mk_mu = dawn.add(hours=9,minutes=20)
-mk_nu = dawn.add(hours=9,minutes=25)
-mk_alpha = dawn.add(hours=9,minutes=29,seconds=58)
-mk_beta = dawn.add(hours=11,minutes=30)
-mk_gamma = dawn.add(hours=13,minutes=0)
-mk_delta = dawn.add(hours=15,minutes=0,seconds=20)
-mk_zeta = pendulum.tomorrow("Asia/Shanghai")
-
-
-def hold_period():
-    """
-        mu nu  9:30  alpha beta  12  gamma  delta  15:00:20 zeta
-    """
-    while True:
-        now = pendulum.now("Asia/Shanghai")
-
-        if now < mk_alpha:
-            logger.debug(["remain (s) ",(mk_alpha - now).total_seconds()])
-            time.sleep((mk_alpha - now).total_seconds())
-            util.lumos("python init.py")
-        elif now <= mk_beta:
-            return
-        elif now < mk_gamma:
-            logger.debug(["remain (s) ",(mk_gamma - now).total_seconds()])
-            time.sleep((mk_gamma - now).total_seconds())
-        elif now <= mk_delta:
-            return
-        else:
-            logger.debug("Market Closed")
-            logger.debug(["remain to end (s) ",(mk_zeta - now).total_seconds()])
-            time.sleep((mk_zeta - now).total_seconds() + 3600)
-            # sleep @ 1:00
-            exit(0)
-
 def update_nightly(date_online):
     nightly_path = os.path.join("data", "fox_nightly.json")
     json_path = os.path.join("data", "fox_data.json")
@@ -192,10 +156,7 @@ if __name__ == '__main__':
     while True:
         logger.debug("Lanuch")
         launch()
-        if sys.argv[-1] == 'test':
-            pass
-        else:
-            hold_period()
+        util.hold_period(init = True)
         now = pendulum.now("Asia/Shanghai")
         time.sleep(5 - now.second % 5)
         logger.debug("END")

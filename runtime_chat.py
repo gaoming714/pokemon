@@ -13,9 +13,10 @@ from envelopes import Envelope, GMailSMTP
 
 from models import jsonDB
 from models import sqliteDB
+from models import util
 
 from loguru import logger
-logger.add("log/chat.log")
+logger.add("logs/chat.log")
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
@@ -44,10 +45,14 @@ def launch():
     else:
         return
 
-    if now < now.at(0,0,0).add(hours = 9,minutes = 55):
+    start_tick = now.at(0,0,0).add(hours = 9,minutes = 55)
+    if now < start_tick:
+        delay = (start_tick - now).seconds
+        time.sleep(delay)
         return
-    if skipbox(BOX, now_str, minutes = 30):
+    if util.skipbox(BOX, now_str, minutes = 30):
         return
+
     horizon = 9 * pd.Series(op_df["chg_300"][12:280]).std()
 
     # send one day signal
@@ -82,101 +87,17 @@ def launch():
         msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
         logger.info("online => " + now_str)
         owl(msg)
-        send_pcr(arrow, "up")
+        sqliteDB.send_pcr(arrow, "up")
     if arrow["berry_300"] < berry_bottom and arrow["std_300"] <= std_horizon:
         BOX.append(now_str)
         # DIRECT.append("down")
         msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
         logger.info("online => " + now_str)
         owl(msg)
-        send_pcr(arrow, "down")
+        sqliteDB.send_pcr(arrow, "down")
     else:
         logger.debug("No Hands Up.")
 
-def dump():
-    if len(op_df.index) > 280:
-        zero = op_df["berry_300"].iloc[280]
-    else:
-        logger.warning("op_df.index is not enough => " + len(op_df.index))
-        zero = 0
-    if ONCE and now.hour == 9:
-        msg = now_str + "\nHorizon🍌\t" + str(round(horizon,4))
-        if zero >= 10:
-            msg = msg + " 🍓 "
-        elif zero <= -10:
-            msg = msg + " 🍏 "
-        r = requests.get('http://127.0.0.1:8010/msg/' + msg)
-        ONCE = False
-    std_arr = op_df["std_300"][-1:-181:-1]
-    if std_arr.iloc[0] == 0 or std_arr.iloc[120] == 0:
-        return
-    count = 0
-    fail_count = 0
-    for item in std_arr:
-        if item < horizon ** 0.5:
-            count = count + 1
-        elif fail_count < 4 and count < 8:
-            fail_count = fail_count + 1
-        else:
-            break
-
-    if count >= 120:
-        if fail_count != 0:
-            berry_arr = op_df["berry_300"][-1:-181:-1]
-            berry_it = berry_arr.iloc[0]
-            berry_long = sum(berry_arr) / len(berry_arr)
-            berry_short = sum(berry_arr[0:20]) / len(berry_arr[0:20])
-            # margin = round(-1.8 * pd.Series(op_df["chg_300"][-481:-1]).std() * 100, 2)
-            margin = - round(horizon * 12, 2)
-            logger.debug([now_str, berry_it, berry_long, berry_short])
-            if berry_it >= berry_long and berry_it >= berry_short:
-                BOX.append(now)
-                msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
-                logger.info("online => " + now_str)
-                owl(msg)
-                send_pcr(arrow, "up")
-            elif berry_it <= berry_long and berry_it <= berry_short:
-                BOX.append(now)
-                msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
-                logger.info("online => " + now_str)
-                owl(msg)
-                send_pcr(arrow, "down")
-            else:
-                logger.debug("No Hands Up.")
-
-now = pendulum.now("Asia/Shanghai")
-dawn = pendulum.today("Asia/Shanghai")
-mk_mu = dawn.add(hours=9,minutes=20)
-mk_nu = dawn.add(hours=9,minutes=25)
-mk_alpha = dawn.add(hours=9,minutes=55)
-mk_beta = dawn.add(hours=11,minutes=30)
-mk_gamma = dawn.add(hours=13,minutes=0)
-mk_delta = dawn.add(hours=15,minutes=0,seconds=20)
-mk_zeta = pendulum.tomorrow("Asia/Shanghai")
-
-def hold_period():
-    """
-        mu nu  9:35  alpha beta  12  gamma  delta  15:00:20 zeta
-    """
-    while True:
-        now = pendulum.now("Asia/Shanghai")
-
-        if now < mk_alpha:
-            logger.debug(["remain (s) ",(mk_alpha - now).total_seconds()])
-            time.sleep((mk_alpha - now).total_seconds())
-        elif now <= mk_beta:
-            return
-        elif now < mk_gamma:
-            logger.debug(["remain (s) ",(mk_gamma - now).total_seconds()])
-            time.sleep((mk_gamma - now).total_seconds())
-        elif now <= mk_delta:
-            return
-        else:
-            logger.debug("Market Closed")
-            logger.debug(["remain to end (s) ",(mk_zeta - now).total_seconds()])
-            time.sleep((mk_zeta - now).total_seconds() + 3900)
-            # sleep @ 1:05
-            exit(0)
 
 def owl(msg):
     logger.info("Wol => " + msg)
@@ -189,8 +110,6 @@ def owl(msg):
         r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
     except:
         logger.warning("Wechat Fail " + msg)
-
-
 
 def get_mixin():
     global OWNER
@@ -206,18 +125,6 @@ def get_mixin():
     except:
         logger.warning("chat_config.json is not ready")
         raise
-
-def skipbox(box_list, now_str, minutes = 15):
-    now = pendulum.parse(now_str,tz="Asia/Shanghai")
-    if box_list != []:
-        btime = pendulum.parse(BOX[-1],tz="Asia/Shanghai")
-        dtime = btime.add(minutes = minutes)
-        if dtime > btime.at(0,0,0).add(hours = 11,minutes = 30) and dtime < btime.at(0,0,0).add(hours = 13):
-            dtime = dtime.add(hours = 1, minutes = 30)
-        if dtime > now:
-            return True
-    return False
-
 
 def email(addr,msg):
     global OWNER
@@ -248,6 +155,6 @@ if __name__ == '__main__':
     get_mixin()
     while True:
         launch()
-        hold_period()
+        util.hold_period()
         now = pendulum.now("Asia/Shanghai").add(seconds = -2)
-        time.sleep(5 - now.second % 5)
+        time.sleep(6 - now.second % 5)

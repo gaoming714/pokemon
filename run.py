@@ -15,7 +15,7 @@ CODE = ("510300","sh000300")
 # REMOTE = False
 REMOTE = True #download optinos
 # START_DT = "20221001" # for 510500
-START_DT = "20240101"
+START_DT = "20200101"
 
 
 DT = []
