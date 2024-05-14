@@ -6,7 +6,7 @@ import hashlib
 import pendulum
 
 from loguru import logger
-logger.add("log/util.log")
+logger.add("logs/util.log")
 
 def lumos(cmd):
     # res = 0
@@ -65,7 +65,7 @@ def skipbox(box_list, now_str, minutes = 15):
     return False
 
 
-def make_hash(file_path) -> str, str, str:
+def make_hash(file_path) -> (str, str, str):
     md5_hash = hashlib.md5()
     sha1_hash = hashlib.sha1()
     sha256_hash = hashlib.sha256()
