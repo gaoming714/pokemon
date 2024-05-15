@@ -291,11 +291,6 @@ def backup_intraday(date_online):
     with open(source, 'w', encoding='utf-8') as file:
         json.dump(init_dict, file, ensure_ascii=False)
 
-def lumos(cmd):
-    # res = 0
-    logger.debug("CMD ➜ " + cmd)
-    res = os.system(cmd)
-    return res
 
 if __name__ == '__main__':
     while True:

@@ -8,9 +8,8 @@ import pendulum
 from models import webDB
 from models import jsonDB
 
-
-from loguru import logger
-logger.add("logs/init.log")
+from models.util import logConfig, logger
+logConfig("logs/init.log", rotation="10 MB")
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}

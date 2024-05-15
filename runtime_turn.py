@@ -13,10 +13,10 @@ from envelopes import Envelope, GMailSMTP
 
 from models import jsonDB
 from models import sqliteDB
-from models import util
+from models.util import lumos, hold_period
 
-from loguru import logger
-logger.add("log/turn.log")
+from models.util import logConfig, logger
+logConfig("logs/runturn.log", rotation="10 MB")
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
@@ -104,11 +104,6 @@ def email(addr,msg):
     envelope.send(OWNER['smtp'], port=OWNER['port'], login=OWNER['login'],
                 password=OWNER['password'], tls=True)
 
-def lumos(cmd):
-    # res = 0
-    logger.debug("CMD ➜ " + cmd)
-    res = os.system(cmd)
-    return res
 
 def clean():
     # clean box for pytest
@@ -120,6 +115,6 @@ if __name__ == '__main__':
     get_mixin()
     while True:
         launch()
-        util.hold_period()
+        hold_period()
         now = pendulum.now("Asia/Shanghai").add(seconds = -3)
         time.sleep(6 - now.second % 5)

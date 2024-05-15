@@ -16,7 +16,7 @@ import plotly.express as px
 from rich.progress import track
 
 from loguru import logger
-logger.add("log/predict_op.log")
+logger.add("logs/predict_op.log")
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
@@ -100,7 +100,7 @@ def analyse1(op_df):
     horizon = op_df["chg_300"][12:280].std() * 9
     print(horizon)
     if horizon > 1:
-        std_horizon = 1
+        std_horizon = horizon
     else:
         std_horizon = horizon ** 0.5
     for length in range(280, len(op_df.index)):
@@ -170,12 +170,12 @@ def analyse2(op_df):
         berry_300_ma_max = berry_300_ma.iloc[0:pointer].iloc[-180:].max()
         berry_300_ma_min = berry_300_ma.iloc[0:pointer].iloc[-180:].min()
 
-        if arrow["berry_300"] > berry_top and berry_300_ma.iloc[pointer] >= berry_300_ma_max and arrow["std_300"] >= std_horizon and arrow["std_300"] <=1.5:
+        if arrow["berry_300"] > berry_top and berry_300_ma.iloc[pointer] >= berry_300_ma_max and arrow["std_300"] <= std_horizon:
             BOX.append(now_str)
             DIRECT.append("up")
             msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
             # send_db(arrow, "up")
-        if arrow["berry_300"] < berry_bottom and berry_300_ma.iloc[pointer] <= berry_300_ma_min and arrow["std_300"] >= std_horizon and arrow["std_300"] <=1.5:
+        if arrow["berry_300"] < berry_bottom and berry_300_ma.iloc[pointer] <= berry_300_ma_min and arrow["std_300"] <= std_horizon:
             BOX.append(now_str)
             DIRECT.append("down")
             msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
@@ -225,7 +225,7 @@ def play_day(op_df):
 
 def play_core(op_df, direct, berry_300_ma, horizon):
     global PANEL
-    edgeMargin = - horizon * 0.16
+    edgeMargin = - horizon * 0.27
     if edgeMargin < -0.3:
         edgeMargin = -0.3
     # print(["edgeMargin", edgeMargin])
@@ -244,7 +244,7 @@ def play_core(op_df, direct, berry_300_ma, horizon):
                 el["gap"] = gap(origin.name,arrow.name)
                 el["res"] = "stop-ss-up"
                 break
-            if op_df["berry_300"][index] < berry_300_ma[index] - 0.5:
+            if op_df["berry_300"][index] < berry_300_ma[index] - 0.7:
                 el["close_dt"] = arrow.name
                 el["open_chg"] = origin["chg_300"]
                 el["close_chg"] = arrow["chg_300"]
@@ -262,7 +262,7 @@ def play_core(op_df, direct, berry_300_ma, horizon):
                 el["gap"] = gap(origin.name,arrow.name)
                 el["res"] = "stop-ss-dw"
                 break
-            if op_df["berry_300"][index] > berry_300_ma[index]  + 0.5:
+            if op_df["berry_300"][index] > berry_300_ma[index]  + 0.7:
                 el["close_dt"] = arrow.name
                 el["open_chg"] = origin["chg_300"]
                 el["close_chg"] = arrow["chg_300"]
@@ -276,7 +276,12 @@ def play_core(op_df, direct, berry_300_ma, horizon):
         el["close_dt"] = arrow.name
         el["open_chg"] = origin["chg_300"]
         el["close_chg"] = arrow["chg_300"]
-        el["diff_chg"] = arrow["chg_300"] - origin["chg_300"]
+        if direct == "up":
+            el["diff_chg"] = arrow["chg_300"] - origin["chg_300"]
+        elif direct == "down":
+            el["diff_chg"] = -arrow["chg_300"] + origin["chg_300"]
+        else:
+            el["diff_chg"] = 0
         el["gap"] = gap(origin.name,arrow.name)
         el["res"] = "no-stop"
     PANEL.append(el)
