@@ -16,8 +16,6 @@ from flask import render_template_string
 
 from models import jsonDB
 
-from models.util import lumos, hold_period
-
 from models.util import logConfig, logger
 logConfig("logs/fox.log", rotation="10 MB")
 

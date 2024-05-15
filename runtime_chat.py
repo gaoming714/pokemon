@@ -13,7 +13,7 @@ from envelopes import Envelope, GMailSMTP
 
 from models import jsonDB
 from models import sqliteDB
-from models.util import lumos, hold_period
+from models import util
 
 from models.util import logConfig, logger
 logConfig("logs/runchat.log", rotation="10 MB")

@@ -13,7 +13,7 @@ from envelopes import Envelope, GMailSMTP
 
 from models import jsonDB
 from models import sqliteDB
-from models.util import lumos, hold_period
+from models import util
 
 from models.util import logConfig, logger
 logConfig("logs/runturn.log", rotation="10 MB")
@@ -115,6 +115,6 @@ if __name__ == '__main__':
     get_mixin()
     while True:
         launch()
-        hold_period()
+        util.hold_period()
         now = pendulum.now("Asia/Shanghai").add(seconds = -3)
         time.sleep(6 - now.second % 5)

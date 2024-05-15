@@ -9,7 +9,7 @@ import pandas as pd
 
 from models import jsonDB
 from models import webDB
-from models.util import lumos, hold_period
+from models import util
 
 from models.util import logConfig, logger
 logConfig("logs/fox.log", rotation="10 MB")
@@ -143,7 +143,7 @@ def backup_intraday(date_online):
     target = os.path.join("data", date_online + ".json")
     mv_cmd = "mv " + source + " " + target
     if not os.path.exists(target):
-        lumos(mv_cmd)
+        util.lumos(mv_cmd)
     else:
         logger.debug("backup_intraday twice!! ERR")
         raise
@@ -154,6 +154,6 @@ def backup_intraday(date_online):
 if __name__ == '__main__':
     while True:
         launch()
-        hold_period(init = True)
+        util.hold_period(init = True)
         now = pendulum.now("Asia/Shanghai")
         time.sleep(5 - now.second % 5)
