@@ -85,14 +85,14 @@ def launch():
         BOX.append(now_str)
         # DIRECT.append("up")
         msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
-        logger.info("online => " + now_str)
+        logger.info("Online => " + now_str)
         owl(msg)
         sqliteDB.send_pcr(arrow, "up")
     if arrow["berry_300"] < berry_bottom and arrow["std_300"] <= std_horizon:
         BOX.append(now_str)
         # DIRECT.append("down")
         msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
-        logger.info("online => " + now_str)
+        logger.info("Online => " + now_str)
         owl(msg)
         sqliteDB.send_pcr(arrow, "down")
     else:

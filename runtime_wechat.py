@@ -6,7 +6,6 @@ import pendulum
 from flask import Flask, request, jsonify, Response
 import itchat
 from envelopes import Envelope, GMailSMTP
-from util import color, lumos
 
 from models import jsonDB
 
@@ -73,7 +72,6 @@ def callbackEC():
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
     email(ME, now_str)
-    color('Logout wechat')
     time.sleep(5)
     lumos("pm2 reload wechat")
 
