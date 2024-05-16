@@ -151,9 +151,26 @@ def backup_intraday(date_online):
     init_dict = { "data":[] }
     jsonDB.save_it(source, init_dict)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     while True:
-        launch()
-        util.hold_period(init = True)
-        now = pendulum.now("Asia/Shanghai")
-        time.sleep(5 - now.second % 5)
+        opening, info = util.fetch_opening()
+        logger.debug(info["status"])
+        if opening:
+            launch()
+            now = pendulum.now("Asia/Shanghai")
+            delay = 5 - (now.second % 5) - (now.microsecond / 1e6)
+            logger.debug("Wait "+delay+" (s)")
+            time.sleep(delay)
+        else:
+            if info["status"] == "dawn":
+                # this launch only for backup
+                launch()
+                delay = info["delay"] - 5
+                logger.debug("Wait " + str(delay) + " (s)")
+                time.sleep(delay)
+                util.lumos("python init.py")
+            else:
+                delay = info["delay"]
+                logger.debug("Wait " + str(delay) + " (s)")
+                time.sleep(delay)
+

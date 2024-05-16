@@ -16,37 +16,61 @@ now = pendulum.now("Asia/Shanghai")
 dawn = pendulum.today("Asia/Shanghai")
 mk_mu = dawn.add(hours=9,minutes=20)
 mk_nu = dawn.add(hours=9,minutes=25)
-mk_alpha = dawn.add(hours=9,minutes=29,seconds=58)
-mk_beta = dawn.add(hours=11,minutes=30)
+mk_alpha = dawn.add(hours=9,minutes=30)
+mk_beta = dawn.add(hours=11,minutes=30,seconds=5)
 mk_gamma = dawn.add(hours=13,minutes=0)
-mk_delta = dawn.add(hours=15,minutes=0,seconds=20)
-mk_zeta = pendulum.tomorrow("Asia/Shanghai")
+mk_delta = dawn.add(hours=15,minutes=0,seconds=5)
+mk_epsilon = dawn.add(hours=20,minutes=0)
+mk_zeta = pendulum.tomorrow("Asia/Shanghai") # actually tomorrow 1:00
 
-
-def hold_period(init = False):
+def fetch_opening(market = "stockCN") -> (bool, dict):
     """
-        mu nu  9:30  alpha beta  12  gamma  delta  15:00:20 zeta
+    market is opening or not
+    payload : delay
+            status
     """
+    payload = {}
     now = pendulum.now("Asia/Shanghai")
     if now < mk_alpha:
-        logger.debug(["remain (s) ",(mk_alpha - now).total_seconds()])
-        time.sleep((mk_alpha - now).total_seconds())
-        exit(0)
-        if init == True:
-            lumos("python init.py")
-    elif now <= mk_beta:
-        return
+        # dawn
+        payload["delay"] = (mk_alpha - now).total_seconds()
+        payload["status"] = "dawn"
+        payload["dtime"] = now
+    elif now < mk_beta:
+        # morning
+        payload["delay"] = 0
+        payload["status"] = "morning"
+        payload["dtime"] = now
     elif now < mk_gamma:
-        logger.debug(["remain (s) ",(mk_gamma - now).total_seconds()])
-        time.sleep((mk_gamma - now).total_seconds())
-    elif now <= mk_delta:
-        return
+        # noon
+        payload["delay"] = (mk_gamma - now).total_seconds()
+        payload["status"] = "noon"
+        payload["dtime"] = now
+    elif now < mk_delta:
+        # afternoon
+        payload["delay"] = 0
+        payload["status"] = "afternoon"
+        payload["dtime"] = now
+    elif now < mk_epsilon:
+        # evening
+        payload["delay"] = (mk_epsilon - now).total_seconds()
+        payload["status"] = "evening"
+        payload["dtime"] = now
+    elif now < mk_zeta:
+        # night
+        payload["delay"] = (mk_zeta - now).total_seconds() + 3600
+        payload["status"] = "night"
+        payload["dtime"] = now
     else:
-        logger.debug("Market Closed")
-        logger.debug(["remain to end (s) ",(mk_zeta - now).total_seconds()])
-        time.sleep((mk_zeta - now).total_seconds() + 3600)
-        # sleep @ 1:00
-        exit(0)
+        # error
+        logger.error([])
+        payload["delay"] = 0
+        payload["status"] = "error"
+        payload["dtime"] = now
+
+    # logger.debug(payload)
+    return payload["delay"] == 0, payload
+
 
 
 def skipbox(box_list, now_str, minutes = 15):
@@ -78,7 +102,10 @@ def make_hash(file_path) -> (str, str, str):
     return md5_hash.hexdigest(), sha1_hash.hexdigest(), sha256_hash.hexdigest()
 
 
-def logConfig(log_file="app.log", rotation="10 MB"):
+def set_datetime(record):
+    record["extra"]["datetime"] = pendulum.now("Asia/Shanghai")
+
+def logConfig(log_file="logs/default.log", rotation="10 MB"):
 
     """
     配置 Loguru 日志记录
@@ -94,15 +121,13 @@ def logConfig(log_file="app.log", rotation="10 MB"):
     logger.info("This is an info message")
     logger.debug("This is a debug message")
     """
-    tick = pendulum.now("Asia/Shanghai")
-    tick_str = tick.to_datetime_string()
     logger.remove()  # 移除默认的处理程序（如果有的话）
-    style = "<green>"+tick_str+"</green>" +\
+    style = "<green>{extra[datetime]}</green>" +\
             " [ <level>{level: <8}</level>] " +\
-            "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - " +\
+            "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan>" +\
+            "<green> ➲ </green>" +\
             "<level>{message}</level>"
-    text = tick_str+" [ {level: <8}] {name}:{function}:{line} - {message}"
-
+    logger.configure(patcher=set_datetime)
     logger.add(sys.stdout, colorize=True, format=style)
-    logger.add(log_file, rotation=rotation, colorize=True, format=text)
+    logger.add(log_file, rotation=rotation, colorize=False, format=style)
     logger.add(log_file+".rich", rotation=rotation, colorize=True, format=style)

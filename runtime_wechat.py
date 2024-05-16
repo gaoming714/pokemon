@@ -18,14 +18,6 @@ ME = ""
 USERS = []
 CHATROOMS = []
 
-## wechat profile
-# chat_path = os.path.join("data", "chat_config.json")
-# with open(chat_path, 'r', encoding='utf-8') as f:
-#     chat_dict = json.load(f)
-
-# USERS = chat_list["user_list"]
-# CHATROOMS = chat_list["chatroom_list"]
-
 app = Flask(__name__)
 
 def get_mixin():

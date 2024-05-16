@@ -11,10 +11,7 @@ from models import jsonDB
 from models.util import logConfig, logger
 logConfig("logs/init.log", rotation="10 MB")
 
-# db = redis.Redis(host='localhost', port=6379, db=0)
-SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
 OPTIONS = {}
-
 
 def launch():
     OPTIONS["expiry"] = webDB.option_expiry()

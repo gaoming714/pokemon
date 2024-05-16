@@ -18,9 +18,6 @@ from models import util
 from models.util import logConfig, logger
 logConfig("logs/runturn.log", rotation="10 MB")
 
-# db = redis.Redis(host='localhost', port=6379, db=0)
-SINA = {'Referer':'http://vip.stock.finance.sina.com.cn/'}
-
 OWNER = {}
 ADDR = []
 BOX = []
@@ -111,10 +108,17 @@ def clean():
     BOX = []
 
 
-if __name__ == '__main__':
-    get_mixin()
+if __name__ == "__main__":
     while True:
-        launch()
-        util.hold_period()
-        now = pendulum.now("Asia/Shanghai").add(seconds = -3)
-        time.sleep(6 - now.second % 5)
+        opening, info = util.fetch_opening()
+        logger.debug(info["status"])
+        if opening:
+            launch()
+            now = pendulum.now("Asia/Shanghai")
+            delay = 6 - (now.second % 5) - (now.microsecond / 1e6)
+            logger.debug("Wait "+delay+" (s)")
+            time.sleep(delay)
+        else:
+            delay = info["delay"]
+            logger.debug("Wait " + str(delay) + " (s)")
+            time.sleep(delay)

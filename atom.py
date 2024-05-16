@@ -17,7 +17,7 @@ from flask import render_template_string
 from models import jsonDB
 
 from models.util import logConfig, logger
-logConfig("logs/fox.log", rotation="10 MB")
+logConfig("logs/atom.log", rotation="10 MB")
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 
