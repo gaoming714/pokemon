@@ -163,12 +163,19 @@ if __name__ == "__main__":
             time.sleep(delay)
         else:
             if info["status"] == "dawn":
-                # this launch only for backup
-                launch()
-                delay = info["delay"] - 5
+                delay = info["delay"] - 30
                 logger.debug("Wait " + str(delay) + " (s)")
                 time.sleep(delay)
-                util.lumos("python init.py")
+                util.lumos("python init.py") # run init
+                now = pendulum.now("Asia/Shanghai")
+                delay = 60 - (now.second % 60) - (now.microsecond / 1e6)
+                time.sleep(delay)
+            elif info["status"] == "night":
+                delay = info["delay"]
+                logger.debug("Wait " + str(delay) + " (s)")
+                time.sleep(delay)
+                launch() # this launch only for backup
+                exit(0) # refresh date in util
             else:
                 delay = info["delay"]
                 logger.debug("Wait " + str(delay) + " (s)")

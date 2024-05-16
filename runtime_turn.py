@@ -118,6 +118,11 @@ if __name__ == "__main__":
             delay = 6 - (now.second % 5) - (now.microsecond / 1e6)
             logger.debug("Wait " + str(delay) + " (s)")
             time.sleep(delay)
+        elif info["status"] == "night":
+            delay = info["delay"]
+            logger.debug("Wait " + str(delay) + " (s)")
+            time.sleep(delay)
+            exit(0) # refresh date in util
         else:
             delay = info["delay"]
             logger.debug("Wait " + str(delay) + " (s)")
