@@ -159,7 +159,7 @@ if __name__ == "__main__":
             launch()
             now = pendulum.now("Asia/Shanghai")
             delay = 5 - (now.second % 5) - (now.microsecond / 1e6)
-            logger.debug("Wait "+delay+" (s)")
+            logger.debug("Wait " + str(delay) + " (s)")
             time.sleep(delay)
         else:
             if info["status"] == "dawn":
