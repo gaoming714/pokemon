@@ -39,7 +39,14 @@ def launch():
     if "now" in op_dict and op_dict["now"] != "":
         op_df = pd.DataFrame(op_dict["data"])
         op_df.set_index("dt", inplace = True)
+    elif util.is_holiday():
+        mk_zeta = pendulum.tomorrow("Asia/Shanghai")
+        delay = (mk_zeta - now).total_seconds
+        logger.warning("Holiday today. Sleep to 24:00. " + mk_zeta.diff_for_humans())
+        time.sleep(delay)
+        return
     else:
+        logger.error("Error at checking opening or holiday")
         return
 
     start_tick = now.at(0,0,0).add(hours = 9,minutes = 40)
@@ -47,7 +54,7 @@ def launch():
         delay = (start_tick - now).seconds
         time.sleep(delay)
         return
-    if util.skipbox(BOX, now_str, minutes = 2):
+    if util.skipbox(BOX, now, minutes = 2):
         return
 
     arrow = op_df.iloc[-1]
@@ -107,7 +114,6 @@ def clean():
     global BOX
     BOX = []
 
-
 if __name__ == "__main__":
     while True:
         opening, info = util.fetch_opening()
@@ -116,14 +122,10 @@ if __name__ == "__main__":
             launch()
             now = pendulum.now("Asia/Shanghai")
             delay = 6 - (now.second % 5) - (now.microsecond / 1e6)
-            logger.debug("Wait " + str(delay) + " (s)")
+            logger.debug("Wait (s) " + str(delay))
             time.sleep(delay)
-        elif info["status"] == "night":
-            delay = info["delay"]
-            logger.debug("Wait " + str(delay) + " (s)")
-            time.sleep(delay)
-            exit(0) # refresh date in util
         else:
             delay = info["delay"]
-            logger.debug("Wait " + str(delay) + " (s)")
+            logger.debug("Wait (s) " + str(delay))
             time.sleep(delay)
+

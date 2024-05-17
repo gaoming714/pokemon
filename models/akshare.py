@@ -5,7 +5,7 @@ from models import demjson
 
 
 def stock_zh_index_daily_em(
-        symbol: str = "csi931151",
+        symbol: str = "sh000300",
         start_date: str = "19900101",
         end_date: str = "20500101",
 ) -> pd.DataFrame:

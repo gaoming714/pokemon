@@ -49,16 +49,16 @@ def launch():
 
     if pendulum.today("Asia/Shanghai") == pendulum.parse(now_online,tz="Asia/Shanghai").at(0,0,0):
         op_dict = jsonDB.load_it(json_path)
-    else:
-        record_path = os.path.join("data", date_online + ".json")
-        if not os.path.exists(record_path):
-            update_nightly(date_online)
-            backup_intraday(date_online)
-        elif now.hour == 9 and now.minute == 30:
-            logger.debug("Market is not opened today. Sleep 6 hours.")
-            time.sleep(60*60*6)
-        logger.debug('after backup_intraday return')
+    elif util.is_holiday():
+        mk_zeta = pendulum.tomorrow("Asia/Shanghai")
+        delay = (mk_zeta - now).total_seconds
+        logger.warning("Holiday today. Sleep to 24:00. " + mk_zeta.diff_for_humans())
+        time.sleep(delay)
         return
+    else:
+        logger.error("Error at checking opening or holiday")
+        return
+
     if "now" in op_dict and op_dict["now"] != "":
         op_df = pd.DataFrame(op_dict["data"])
         op_df.set_index("dt", inplace = True)
@@ -121,6 +121,15 @@ def fetch_op_sum(op_name):
     op_vol_sum = webDB.option_vol_sum(code_list)
     return op_vol_sum
 
+def tape_archive():
+    now_online = webDB.fetch_time()
+    date_online = now_online.split()[0]
+    source_path = os.path.join("data", "fox_data.json")
+    archive_path = os.path.join("data", date_online + ".json")
+    op_dict = jsonDB.load_it(source_path)
+    if "now" in op_dict and not os.path.exists(archive_path):
+        update_nightly(date_online)
+        archive_intraday(date_online)
 
 def update_nightly(date_online):
     nightly_path = os.path.join("data", "fox_nightly.json")
@@ -138,14 +147,14 @@ def update_nightly(date_online):
     jsonDB.save_it(nightly_path, nightly_dict)
     logger.debug("update nightly complete!")
 
-def backup_intraday(date_online):
+def archive_intraday(date_online):
     source = os.path.join("data", "fox_data.json")
     target = os.path.join("data", date_online + ".json")
     mv_cmd = "mv " + source + " " + target
     if not os.path.exists(target):
         util.lumos(mv_cmd)
     else:
-        logger.debug("backup_intraday twice!! ERR")
+        logger.error("archive_intraday twice!! ERR")
         raise
     # create new fox_data.json
     init_dict = { "data":[] }
@@ -159,25 +168,25 @@ if __name__ == "__main__":
             launch()
             now = pendulum.now("Asia/Shanghai")
             delay = 5 - (now.second % 5) - (now.microsecond / 1e6)
-            logger.debug("Wait " + str(delay) + " (s)")
+            logger.debug("Wait (s) " + str(delay))
             time.sleep(delay)
         else:
             if info["status"] == "dawn":
                 delay = info["delay"] - 30
-                logger.debug("Wait " + str(delay) + " (s)")
+                logger.debug("Wait (s) " + str(delay))
                 time.sleep(delay)
-                util.lumos("python init.py") # run init
+                # run init @ 9:29:30
+                util.lumos("python init.py")
                 now = pendulum.now("Asia/Shanghai")
                 delay = 60 - (now.second % 60) - (now.microsecond / 1e6)
                 time.sleep(delay)
             elif info["status"] == "night":
                 delay = info["delay"]
-                logger.debug("Wait " + str(delay) + " (s)")
+                logger.debug("Wait (s) " + str(delay))
                 time.sleep(delay)
-                launch() # this launch only for backup
-                exit(0) # refresh date in util
+                tape_archive()
             else:
                 delay = info["delay"]
-                logger.debug("Wait " + str(delay) + " (s)")
+                logger.debug("Wait (s) " + str(delay))
                 time.sleep(delay)
 

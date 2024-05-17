@@ -39,7 +39,14 @@ def launch():
     if "now" in op_dict and op_dict["now"] != "":
         op_df = pd.DataFrame(op_dict["data"])
         op_df.set_index("dt", inplace = True)
+    elif util.is_holiday():
+        mk_zeta = pendulum.tomorrow("Asia/Shanghai")
+        delay = (mk_zeta - now).total_seconds
+        logger.warning("Holiday today. Sleep to 24:00. " + mk_zeta.diff_for_humans())
+        time.sleep(delay)
+        return
     else:
+        logger.error("Error at checking opening or holiday")
         return
 
     start_tick = now.at(0,0,0).add(hours = 9,minutes = 55)
@@ -47,7 +54,7 @@ def launch():
         delay = (start_tick - now).seconds
         time.sleep(delay)
         return
-    if util.skipbox(BOX, now_str, minutes = 30):
+    if util.skipbox(BOX, now, minutes = 2):
         return
 
     horizon = 9 * pd.Series(op_df["chg_300"][12:280]).std()
@@ -79,14 +86,14 @@ def launch():
     print(berry_bottom)
     print(arrow["berry_300"])
     if arrow["berry_300"] > berry_top and arrow["std_300"] <= std_horizon:
-        BOX.append(now_str)
+        BOX.append(now)
         # DIRECT.append("up")
         msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
         logger.info("Online => " + now_str)
         owl(msg)
         sqliteDB.send_pcr(arrow, "up")
     if arrow["berry_300"] < berry_bottom and arrow["std_300"] <= std_horizon:
-        BOX.append(now_str)
+        BOX.append(now)
         # DIRECT.append("down")
         msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
         logger.info("Online => " + now_str)
@@ -150,14 +157,9 @@ if __name__ == "__main__":
             launch()
             now = pendulum.now("Asia/Shanghai")
             delay = 6 - (now.second % 5) - (now.microsecond / 1e6)
-            logger.debug("Wait " + str(delay) + " (s)")
+            logger.debug("Wait (s) " + str(delay))
             time.sleep(delay)
-        elif info["status"] == "night":
-            delay = info["delay"]
-            logger.debug("Wait " + str(delay) + " (s)")
-            time.sleep(delay)
-            exit(0) # refresh date in util
         else:
             delay = info["delay"]
-            logger.debug("Wait " + str(delay) + " (s)")
+            logger.debug("Wait (s) " + str(delay))
             time.sleep(delay)

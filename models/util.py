@@ -4,10 +4,11 @@ import time
 import hashlib
 import pendulum
 from loguru import logger
+from models import akshare as ak
 
 def lumos(cmd):
     # res = 0
-    logger.debug("CMD ➜ " + cmd)
+    logger.warning("➜  " + cmd)
     res = os.system(cmd)
     return res
 
@@ -17,9 +18,9 @@ dawn = pendulum.today("Asia/Shanghai")
 mk_mu = dawn.add(hours=9,minutes=20)
 mk_nu = dawn.add(hours=9,minutes=25)
 mk_alpha = dawn.add(hours=9,minutes=30)
-mk_beta = dawn.add(hours=11,minutes=30,seconds=5)
-mk_gamma = dawn.add(hours=13,minutes=0)
-mk_delta = dawn.add(hours=15,minutes=0,seconds=5)
+mk_beta = dawn.add(hours=11,minutes=30,seconds=6)
+mk_gamma = dawn.add(hours=13,minutes=0,seconds=1)
+mk_delta = dawn.add(hours=15,minutes=0,seconds=6)
 mk_epsilon = dawn.add(hours=20,minutes=0)
 mk_zeta = pendulum.tomorrow("Asia/Shanghai") # actually tomorrow 1:00
 
@@ -28,9 +29,16 @@ def fetch_opening(market = "stockCN") -> (bool, dict):
     market is opening or not
     payload : delay
             status
+            dtime
     """
     payload = {}
     now = pendulum.now("Asia/Shanghai")
+    # if now.day_of_week in [pendulum.FRIDAY, pendulum.SATURDAY, pendulum.SUNDAY]:
+    #     # weekend
+    #     payload["delay"] = (mk_zeta - now).total_seconds()
+    #     payload["status"] = "weekend"
+    #     payload["dtime"] = now
+    #     return False, payload
     if now < mk_alpha:
         # dawn
         payload["delay"] = (mk_alpha - now).total_seconds()
@@ -58,32 +66,33 @@ def fetch_opening(market = "stockCN") -> (bool, dict):
         payload["dtime"] = now
     elif now < mk_zeta:
         # night
-        payload["delay"] = (mk_zeta - now).total_seconds() + 3600
+        payload["delay"] = (mk_zeta - now).total_seconds()
         payload["status"] = "night"
         payload["dtime"] = now
     else:
         # error
-        logger.error([])
-        payload["delay"] = 0
-        payload["status"] = "error"
-        payload["dtime"] = now
+        logger.info("Clean mk_clock, exit(0)")
+        exit(0)
 
     # logger.debug(payload)
     return payload["delay"] == 0, payload
 
+def is_holiday():
+    # only works @ 9:25 ~ 24:00
+    date_online = ak.stock_zh_index_daily_em().iloc[-1]["date"]
+    date_local = now.to_datetime_string()[:10]
+    logger.debug([date_online, date_local])
+    return  date_online != date_local
 
-
-def skipbox(box_list, now_str, minutes = 15):
-    now = pendulum.parse(now_str,tz="Asia/Shanghai")
+def skipbox(box_list, now_input, minutes = 15):
     if box_list != []:
-        btime = pendulum.parse(box_list[-1],tz="Asia/Shanghai")
-        dtime = btime.add(minutes = minutes)
-        if dtime > btime.at(0,0,0).add(hours = 11,minutes = 30) and dtime < btime.at(0,0,0).add(hours = 13):
-            dtime = dtime.add(hours = 1, minutes = 30)
-        if dtime > now:
+        left_time = box_list[-1]
+        right_time = left_time.add(minutes = minutes)
+        if right_time > left_time.at(0,0,0).add(hours = 11,minutes = 30) and right_time < left_time.at(0,0,0).add(hours = 13):
+            right_time = right_time.add(hours = 1, minutes = 30)
+        if right_time > now_input:
             return True
     return False
-
 
 def make_hash(file_path) -> (str, str, str):
     md5_hash = hashlib.md5()
@@ -125,8 +134,9 @@ def logConfig(log_file="logs/default.log", rotation="10 MB"):
     style = "<green>{extra[datetime]}</green>" +\
             " [ <level>{level: <8}</level>] " +\
             "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan>" +\
-            "<green> ➲ </green>" +\
+            "<green>♻ </green>" +\
             "<level>{message}</level>"
+    # alternative ➲ ⛏ ☄ ➜ ♻
     logger.configure(patcher=set_datetime)
     logger.add(sys.stdout, colorize=True, format=style)
     logger.add(log_file, rotation=rotation, colorize=False, format=style)
