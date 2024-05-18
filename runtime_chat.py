@@ -41,7 +41,7 @@ def launch():
         op_df.set_index("dt", inplace = True)
     elif util.is_holiday():
         mk_zeta = pendulum.tomorrow("Asia/Shanghai")
-        delay = (mk_zeta - now).total_seconds
+        delay = (mk_zeta - now).total_seconds()
         logger.warning("Holiday today. Sleep to 24:00. " + mk_zeta.diff_for_humans())
         time.sleep(delay)
         return
