@@ -39,14 +39,11 @@ def launch():
     if "now" in op_dict and op_dict["now"] != "":
         op_df = pd.DataFrame(op_dict["data"])
         op_df.set_index("dt", inplace = True)
-    elif util.is_holiday():
+    else:
         mk_zeta = pendulum.tomorrow("Asia/Shanghai")
         delay = (mk_zeta - now).total_seconds()
         logger.warning("Holiday today. Sleep to 24:00. " + mk_zeta.diff_for_humans())
         time.sleep(delay)
-        return
-    else:
-        logger.error("Error at checking opening or holiday")
         return
 
     start_tick = now.at(0,0,0).add(hours = 9,minutes = 40)
@@ -125,7 +122,11 @@ if __name__ == "__main__":
             logger.debug("Wait (s) " + str(delay))
             time.sleep(delay)
         else:
-            delay = info["delay"]
-            logger.debug("Wait (s) " + str(delay))
-            time.sleep(delay)
-
+            if info["status"] == "dawn":
+                delay = info["delay"] + 60
+                logger.debug("Wait (s) " + str(delay))
+                time.sleep(delay)
+            else:
+                delay = info["delay"]
+                logger.debug("Wait (s) " + str(delay))
+                time.sleep(delay)

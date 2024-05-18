@@ -49,14 +49,11 @@ def launch():
 
     if pendulum.today("Asia/Shanghai") == pendulum.parse(now_online,tz="Asia/Shanghai").at(0,0,0):
         op_dict = jsonDB.load_it(json_path)
-    elif util.is_holiday():
+    else:
         mk_zeta = pendulum.tomorrow("Asia/Shanghai")
         delay = (mk_zeta - now).total_seconds()
         logger.warning("Holiday today. Sleep to 24:00. " + mk_zeta.diff_for_humans())
         time.sleep(delay)
-        return
-    else:
-        logger.error("Error at checking opening or holiday")
         return
 
     if "now" in op_dict and op_dict["now"] != "":
