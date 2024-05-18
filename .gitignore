@@ -3,6 +3,7 @@ data/
 log/
 logs/
 node_modules/
+uploads/
 poetry.lock
 package-lock.json
 QR.png
