@@ -47,7 +47,7 @@ def launch():
     if vol_up_300 == 0:
         return
 
-    if pendulum.today("Asia/Shanghai") == pendulum.parse(now_online,tz="Asia/Shanghai").at(0,0,0):
+    if pendulum.today("Asia/Shanghai") == pendulum.parse(date_online,tz="Asia/Shanghai"):
         op_dict = jsonDB.load_it(json_path)
     else:
         mk_zeta = pendulum.tomorrow("Asia/Shanghai")

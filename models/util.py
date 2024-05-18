@@ -1,7 +1,9 @@
 import os
 import sys
 import time
+import json
 import hashlib
+import requests
 import pendulum
 from loguru import logger
 from models import akshare as ak
@@ -24,7 +26,7 @@ mk_delta = dawn.add(hours=15,minutes=0,seconds=6)
 mk_epsilon = dawn.add(hours=20,minutes=0)
 mk_zeta = pendulum.tomorrow("Asia/Shanghai") # actually tomorrow 1:00
 
-def fetch_opening(market = "stockCN") -> (bool, dict):
+def fetch_opening(market = "stockCN"):
     """
     market is opening or not
     payload : delay
@@ -94,7 +96,20 @@ def skipbox(box_list, now_input, minutes = 15):
             return True
     return False
 
-def make_hash(file_path) -> (str, str, str):
+def owl(msg):
+    logger.info("Wol => " + msg)
+    # email
+    try:
+        r = requests.get('http://127.0.0.1:8011/emit/' + msg, timeout=10)
+    except:
+        logger.warning("Email Fail " + msg)
+    # wechat
+    try:
+        r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
+    except:
+        logger.warning("Wechat Fail " + msg)
+
+def make_hash(file_path):
     md5_hash = hashlib.md5()
     sha1_hash = hashlib.sha1()
     sha256_hash = hashlib.sha256()

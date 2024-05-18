@@ -1,16 +1,17 @@
 import os
 import sys
-import json
 import time
+import json
 import pendulum
-from flask import Flask, request, jsonify, Response
+from flask import Flask
 import itchat
 from envelopes import Envelope, GMailSMTP
 
 from models import jsonDB
+from models import util
 
-from loguru import logger
-logger.add("log/wechat.log")
+from models.util import logConfig, logger
+logConfig("logs/wechat.log", rotation="10 MB")
 
 OWNER = {}
 ME = ""
@@ -61,11 +62,12 @@ def send_message(msg):
     return {"msg": msg}
 
 def callbackEC():
+    logger.warning("Wechat logout!")
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
     email(ME, now_str)
     time.sleep(5)
-    lumos("pm2 reload wechat")
+    util.lumos("pm2 reload wechat")
 
 def email(addr, msg):
     global OWNER

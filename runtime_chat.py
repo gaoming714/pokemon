@@ -1,15 +1,9 @@
-import re
 import os
 import sys
-import requests
-import sqlite3
 import time
 import json
 import pendulum
-import pickle
 import pandas as pd
-
-from envelopes import Envelope, GMailSMTP
 
 from models import jsonDB
 from models import sqliteDB
@@ -68,7 +62,7 @@ def launch():
             msg = msg + " 🍓 "
         elif zero <= -10:
             msg = msg + " 🍏 "
-        owl(msg)
+        util.owl(msg)
         ONCE = False
 
     # send real chat
@@ -87,58 +81,17 @@ def launch():
         # DIRECT.append("up")
         msg = now_str + "\n 🍓 up" + "\nStop-loss\t" + str(margin)
         logger.info("Online => " + now_str)
-        owl(msg)
+        util.owl(msg)
         sqliteDB.send_pcr(arrow, "up")
     if arrow["berry_300"] < berry_bottom and arrow["std_300"] <= std_horizon:
         BOX.append(now)
         # DIRECT.append("down")
         msg = now_str + "\n 🍏 down" + "\nStop-loss\t" + str(margin)
         logger.info("Online => " + now_str)
-        owl(msg)
+        util.owl(msg)
         sqliteDB.send_pcr(arrow, "down")
     else:
         logger.debug("No Hands Up.")
-
-
-def owl(msg):
-    logger.info("Wol => " + msg)
-    for user in ADDR:
-        try:
-            email(user,msg)
-        except:
-            logger.warning("Email Fail " + user)
-    try:
-        r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
-    except:
-        logger.warning("Wechat Fail " + msg)
-
-def get_mixin():
-    global OWNER
-    global ADDR
-    info_path = os.path.join("data", "chat_config.json")
-    info_dict = jsonDB.load_it(info_path)
-    try:
-        OWNER = info_dict['owner']
-        ADDR = info_dict['addr_list']
-        handle = info_dict['handle']
-        if handle == 0:
-            ADDR = []
-    except:
-        logger.warning("chat_config.json is not ready")
-        raise
-
-def email(addr,msg):
-    global OWNER
-    envelope = Envelope(
-        from_addr = (OWNER['from'], 'PokeScript'),
-        to_addr = (addr, 'Hi Jack'),
-        subject = 'PokeScript',
-        text_body = msg
-    )
-
-    # Send the envelope using an ad-hoc connection...
-    envelope.send(OWNER['smtp'], port=OWNER['port'], login=OWNER['login'],
-                password=OWNER['password'], tls=True)
 
 def clean():
     # clean box for pytest
