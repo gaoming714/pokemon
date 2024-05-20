@@ -45,7 +45,7 @@ def launch():
         delay = (start_tick - now).seconds
         time.sleep(delay)
         return
-    if util.skipbox(BOX, now, minutes = 2):
+    if util.skipbox(BOX, now, minutes = 20):
         return
 
     horizon = 9 * pd.Series(op_df["chg_300"][12:280]).std()
