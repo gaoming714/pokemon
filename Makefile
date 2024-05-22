@@ -1,5 +1,6 @@
 all: server ranger algo tool
 	@echo "Done!"
+	pm2 status
 
 server:
 	pm2 start daemon.atom.sh --name atom --silent --log
