@@ -36,9 +36,7 @@ def option_str_code(
     hq_str_code_list = [item.split("_")[-1] for item in hq_str_op_list]
     return hq_str_code_list
 
-def option_expiry_left(
-    code_list
-) -> (int, list):
+def option_expiry_left(code_list):
     # code_list = ['CON_OP_' + item for item in OPTIONS["510300C"]]
     detail_url = "http://hq.sinajs.cn/list=" + ",".join(code_list)
     res = requests.get(detail_url, headers=SINA, timeout=5)
@@ -131,6 +129,36 @@ def option_vol_sum(code_list):
         # vol_sum += abs(int(op_detail[4])*float(op_detail[5]))
         # vol_sum += int(op_detail[4])
         vol_sum += int(op_detail[41])
+    return vol_sum
+
+def option_vol_delta_sum(code_list):
+    codeplus_list = ['CON_SO_' + item for item in code_list]
+    detail_url = "http://hq.sinajs.cn/list=" + ",".join(codeplus_list)
+    res = requests.get(detail_url, headers=SINA, timeout=5)
+    res_str = res.text
+    # hq_str_con_op_list = re.findall('="[\w,. -:购沽月]*',res_str)
+    hq_str_con_op_list = res_str.split(";\n")
+    vol_sum = 0
+    # print(hq_str_con_op_list)
+    for oneline in hq_str_con_op_list:
+        op_detail = oneline.split(",")
+        if op_detail == [""]:
+            continue
+        if "var hq_str_CON_SO_" not in op_detail[0] or len(op_detail) < 10:
+            print(op_detail)
+            continue
+        if "C" in op_detail[12]:
+            sign = 1
+        else:
+            sign = -1
+        vol_sum += int(op_detail[4])*(sign*float(op_detail[5]))
+        # var hq_str_CON_SO_10007234="
+        # '500ETF沽12月6500', '', '', '', '13', '-0.6462', '0.272', '-0.2126', '1.6678', '0.2753', '0.9775', '0.9504',
+        # '510500P2412M06500', '6.5000', '0.9612', '1.0097', 'M
+        # 0期权合约简称，，，,4成交量,5Delta,6Gamma,7Theta,8vega,9隐含波动率,10最高价,11最低价,
+        # 12交易代码,13行权价,14最新价,15理论价值
+        # vol_sum += abs(int(op_detail[4])*float(op_detail[5]))
+        # vol_sum += int(op_detail[4])
     return vol_sum
 
 def fetch_time():

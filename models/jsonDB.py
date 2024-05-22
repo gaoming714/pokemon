@@ -4,6 +4,8 @@ import json
 def create_init_data():
     intraday_data_json = os.path.join("data", "fox_data.json")
     nightly_data_json = os.path.join("data", "fox_nightly.json")
+    intraday_claw_json = os.path.join("data", "claw_data.json")
+    nightly_claw_json = os.path.join("data", "claw_nightly.json")
     chat_config_json = os.path.join("data", "chat_config.json")
     if not os.path.exists(intraday_data_json):
         init_intraday = { "data":[] }
@@ -15,6 +17,16 @@ def create_init_data():
         with open(nightly_data_json, 'w', encoding='utf-8') as file:
             json.dump(init_nightly, file, ensure_ascii=False)
         print("create nightly_data.json")
+    if not os.path.exists(intraday_claw_json):
+        init_intraday = { "data":[] }
+        with open(intraday_claw_json, 'w', encoding='utf-8') as file:
+            json.dump(init_intraday, file, ensure_ascii=False)
+        print("create claw_data.json")
+    if not os.path.exists(nightly_claw_json):
+        init_nightly = {"data": [], "records":["1970-01-01"]}
+        with open(nightly_claw_json, 'w', encoding='utf-8') as file:
+            json.dump(init_nightly, file, ensure_ascii=False)
+        print("create claw_nightly_data.json")
     if not os.path.exists(chat_config_json):
         init_chat = {
                 "owner": {
