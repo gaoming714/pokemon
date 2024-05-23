@@ -2,11 +2,10 @@
 <html lang="en">
 
 <head>
+
   {% include 'components/meta.html' %}
 
   {% include 'components/analytics.html' %}
-
-  <link href="{{ url_for('static', filename='mate.css') }}" rel="stylesheet" />
 
   <title>Poke PCR Optimized</title>
 
@@ -20,23 +19,69 @@
 
     {% include 'components/navbar.html' %}
 
-    <div class="progress">
-      <div class="indeterminate"></div>
+    <div class="ui segment">
+      <div class="row">
+        <div class="col-3">
+          <div class="text-center">
+            <div class="fluid ui animated compact large primary active basic button" tabindex="0">
+              <div class="visible content" v-text="arrow.berry_300.toFixed(2)" v-show="gear==0"></div>
+              <div class="visible content" v-text="onEdge" v-show="gear!=0"></div>
+              <div class="hidden content" v-text="arrow.chg_300">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="ui indicating large progress" style="height: 34px; margin-bottom: 0px;" v-show="gear==0"
+            :data-percent="onProgress">
+            <div class="bar" :style="{width: onProgress+'%'}"></div>
+          </div>
+          <div class="ui indicating large progress" style="height: 34px; margin-bottom: 0px;" v-show="gear!=0"
+            :data-percent="onEdge">
+            <div class="bar" :style="{width: onEdge+'%'}"></div>
+          </div>
+        </div>
+      </div>
     </div>
-
     <div class="row">
-      <div class="col align-self-center text-center">
-        <div class="input-group input-group-lg">
-          <span class="input-group-text">Date</span>
-          <span class="input-group-text"><i class="fa-regular fa-calendar-days"></i></span>
-          <button class="btn btn-lg dropdown-toggle" :class="hasHist ? 'btn-primary' : 'btn-secondary'" type="button"
-            data-bs-toggle="dropdown" aria-expanded="false" v-text="date"></button>
-          <ul class="dropdown-menu">
-            {% for night in night_list %}
-            <li><a class="dropdown-item" @click="dateUpdate('{{ night }}')">{{ night }}</a></li>
-            {% endfor %}
-          </ul>
-          <input type="text" class="form-control" aria-label="Text input with dropdown button" v-model.lazy="date">
+      <div class="col">
+        <div class="small ui floating icon message" :class="{ blue: isActive }" @click="fetch">
+          <i class="notched icon" :class="{'superpowers loading': isActive , 'nintendo switch': !isActive}"></i>
+          <div class="content">
+            <div class="header">current: <span v-text="now"></span></div>
+            <p>Auto refresh during market opening.</p>
+          </div>
+          <div class="ui right buttons">
+            <button class="ui button" :class="{negative: xbox_shuffle==1, positive: xbox_shuffle==-1}"><img
+                src="{{ url_for('static', filename='xbox.svg') }}" /></button>
+            <div class="or"></div>
+            <button class="ui button" :class="{negative: apple_shuffle==1, positive: apple_shuffle==-1}"><img
+                src="{{ url_for('static', filename='apple.svg') }}" /></button>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3">
+        <div class="small ui floating icon message" :class="{ teal: gear!==0}">
+          <!-- <div class="small ui floating icon message"> -->
+          <i class="notched icon amazon" v-show="gear==0" style="width: 39px;"></i>
+          <i class="notched icon red arrow circle up" v-show="gear==1"></i>
+          <i class="notched icon green arrow circle down" v-show="gear==-1"></i>
+          <div class="content" v-show="gear===0">
+            <div class="header"><span v-text="arrow.vol_diff.toFixed(2)"></span><span> K</span></div>
+            <p v-show="gear==0">Vol diff</p>
+          </div>
+          <div class="content" v-show="gear!=0">
+            <div class="header" v-show="gear==1"><span v-text="gearTextCall"></span></div>
+            <div class="header" v-show="gear==-1"><span v-text="gearTextPut"></span></div>
+            <p v-show="gear!=0">Edge %%</p>
+          </div>
+          <div class="ui right buttons">
+            <button class="ui button twitter" @click="gear=-1"><img
+                src="{{ url_for('static', filename='hand-thumbs-down-fill.svg') }}" /></button>
+            <div class="or" @click="gear=0;cache=[];"></div>
+            <button class="ui button twitter" @click="gear=1"><img
+                src="{{ url_for('static', filename='hand-thumbs-up-fill.svg') }}" /></button>
+          </div>
         </div>
       </div>
     </div>
@@ -56,11 +101,33 @@
         <div id="std_chart" style="width: 100%; height: 200px"></div>
       </div>
     </div>
-
     <h4 class="ui horizontal divider header">
       <i class="tag icon"></i>
       Winner Winner Chicken Dinner
     </h4>
+    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom"
+      aria-controls="offcanvasBottom"><i class="fa-solid fa-microchip"></i>
+      Readme 使用说明
+    </button>
+
+    <div class="offcanvas offcanvas-bottom" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasBottomLabel">
+          Offcanvas bottom
+        </h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body small">
+        <div>动态止损线参数 <span v-text="arrow.horizon"></span></div>
+        <div class="content">
+          <div class="header"><span>蓝色线位调制后的PCR（标的沪深300指数），红色为当前指标的MA（10min）。</span></div>
+          <p>通常突破平台是一种失衡状态，考虑参与。</p>
+          <p>9:55决定当天主力方向，PCR大于+10在10:00到14:00择机做多,PCR小于-10在10:00到14:00择机做空。</p>
+          <p>MA（红色线）持续可以在当前方向上持有至蓝线破均线。中部苹果图标给出建议。</p>
+          <p>右上角手势箭头可以进行手动生成交易信号，用于分析动态止损。</p>
+        </div>
+      </div>
+    </div>
 
     {% include 'components/footer.html' %}
 
@@ -94,29 +161,110 @@
         const xbox_shuffle = ref(0)
         const apple_shuffle = ref(0)
         const readme = ref("")
+
         const timer = ref(0)
         const gear = ref(0)
         const cache = ref([])
-        const date = ref("Today")
-        const hasHist = ref(false)
-        const symbol = ref([])
-        const symbX = ref([])
-        const symbY = ref([])
-        const symbC = ref([])
 
-
+        const isActive = computed(() => {
+          return timer.value <= 0
+        })
+        const gearTextCall = computed(() => {
+          var chg = arrow.value["chg_300"]
+          var cache_arr = cache.value
+          var horizon = arrow.value["horizon"]
+          return ((chg - Math.max(...cache_arr)) * 100 + horizon * 20).toFixed(2)
+        })
+        const gearTextPut = computed(() => {
+          var chg = arrow.value["chg_300"]
+          var cache_arr = cache.value
+          var horizon = arrow.value["horizon"]
+          return (-(chg - Math.min(...cache_arr)) * 100 + horizon * 20).toFixed(2)
+        })
+        const onEdge = computed(() => {
+          var chg_300 = arrow.value.chg_300
+          if (gear.value == 0) {
+            return 0
+          }
+          if (chg_300 != null) {
+            cache.value.push(chg_300)
+          }
+          var edgeMargin = - arrow.value.horizon * 0.12
+          if (gear.value > 0) {
+            var edge = Math.max(...cache.value) + edgeMargin
+            var gain = chg_300 - cache.value[0] - edgeMargin
+            if (chg_300 >= edge) {
+              return Math.round(100 * (chg_300 - edge + gain) * (-0.2) / edgeMargin)
+            }
+          }
+          else {
+            var edge = Math.min(...cache.value) - edgeMargin
+            var gain = chg_300 - cache.value[0] + edgeMargin
+            if (chg_300 <= edge) {
+              return Math.round(-100 * (chg_300 - edge + gain) * (-0.2) / edgeMargin)
+            }
+          }
+          gear.value = 0
+          cache.value = []
+          return 0
+        })
+        const onProgress = computed(() => {
+          var hori = arrow.value["horizon"]
+          var berry_300_arr = berry_300_list.value
+          var std_arr = std_list.value.slice().reverse().slice(0, 180)
+          if (hori == 0) { return 0 }
+          var count = 0
+          var fail_count = 0
+          var std_part = std_arr[0] / hori
+          for (item of std_arr) {
+            if (item < Math.sqrt(hori)) { count = count + 1 }
+            else if (fail_count < 4 && count < 8) {
+              fail_count = fail_count + 1
+            }
+            else { break }
+          }
+          if (count == 0) {
+            return 0
+          }
+          else if (count < 120) {
+            return Math.round(count * (2 + std_part) / 360 * 100)
+          }
+          else {
+            if (fail_count != 0) {
+              var berry_arr = berry_300_arr.slice().reverse().slice(0, 180)
+              var berry_it = berry_arr[0]
+              var berry_long = berry_arr.reduce((acc, curr) => acc + curr) / berry_arr.length;
+              var berry_short = berry_arr.slice(0, 20).reduce((acc, curr) => acc + curr) / berry_arr.slice(0, 20).length;
+              if (berry_it >= berry_long && berry_it >= berry_short) {
+                gear.value = 1
+                return 100
+              }
+              else if (berry_it <= berry_long && berry_it <= berry_short) {
+                gear.value = -1
+                return 100
+              }
+              else {
+                // gear.value = 0
+                // return 0
+              }
+            }
+            return Math.round(120 * (2 + std_part) / 360 * 100)
+          }
+        })
+        function fetch() {
+          axios
+            .get("/api/remain")
+            .then((response) => {
+              timer.value = response.data
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+            .then(() => { })
+        }
         function refresh() {
           axios
-            .get("/api/stock/" + date.value)
-            .then((response) => {
-              console.log(response)
-              symbol.value = response.data["symbol"]
-              symbX.value = response.data["dt"]
-              symbY.value = response.data["position"]
-              symbC.value = response.data["color"]
-            })
-          axios
-            .get("/api/hist/" + date.value)
+            .get("/api/fox")
             .then((response) => {
               console.log(response)
               now.value = response.data["now"]
@@ -134,11 +282,9 @@
               std_list.value = response.data["std_list"]
               xbox_shuffle.value = response.data["xbox_shuffle"]
               apple_shuffle.value = response.data["apple_shuffle"]
-              hasHist.value = true
             })
             .catch((error) => {
-              hasHist.value = false
-              // console.log(error)
+              console.log(error)
             })
             .then(() => {
               getplotly()
@@ -150,7 +296,6 @@
           var chg_300 = arrow.value.chg_300 * 10
           var berry_300 = arrow.value.berry_300
           var chg_300_arr = chg_300_list.value.map(item => item * 10)
-          var symbY_arr = symbY.value.map(item => item * 10)
           if (main_chart) {
             var traceIF = {
               x: now_list.value,
@@ -194,18 +339,6 @@
                 width: 2
               }
             }
-            var traceSymbol = {
-              x: symbX.value,
-              y: symbY_arr,
-              name: 'HS300 Symbol',
-              mode: 'markers',
-              marker: {
-                color: symbC.value,
-                size: 16,
-                symbol: symbol.value,
-              },
-              type: 'scatter'
-            }
             var traceCur = {
               x: [now.value.slice(0, 11) + "09:30:00", now.value.slice(0, 11) + "15:30:00", now.value.slice(0, 11) + "15:30:00", now.value.slice(0, 11) + "09:30:00"],
               y: [berry_300, berry_300, chg_300, chg_300],
@@ -242,7 +375,7 @@
               },
               grid: { rows: 1, columns: 2, pattern: 'coupled' }
             }
-            var plot_set = [...dup(traceLine), ...dup(traceMa), ...dup(traceIndex), ...dup(traceIF), ...dup(traceSymbol)]
+            var plot_set = [...dup(traceLine), ...dup(traceMa), ...dup(traceIndex), ...dup(traceIF), ...dup(traceCur)]
             Plotly.newPlot(main_chart, plot_set, layout, { staticPlot: isMobile() })
           }
           var std_chart = document.getElementById('std_chart')
@@ -383,16 +516,25 @@
             return false
           }
         }
-        function dateUpdate(item) {
-          console.log(item)
-          date.value = item
-          refresh()
-        }
-        watch(date, (newVal, oldVal) => {
-          dateUpdate(newVal)
+        watch(gear, (newVal, oldVal) => {
+          if (newVal !== 0) {
+            setTimeout(() => {
+              gear.value = 0;
+              cache.value = [];
+              console.log("Gear reset and cache cleared");
+            }, 1000 * 60 * 30);
+          }
         })
         onMounted(() => {
-          dateUpdate('Today')
+          fetch()
+          refresh()
+          setInterval(() => {
+            if (timer.value <= -2) {
+              fetch()
+              refresh()
+            }
+            timer.value--
+          }, 1000)
         })
         return {
           now,
@@ -412,14 +554,16 @@
           apple_shuffle,
           timer,
           gear,
-          date,
-          hasHist,
-          dateUpdate
+          gearTextCall,
+          gearTextPut,
+          onEdge,
+          onProgress,
+          isActive,
+          fetch,
         }
       }
     }).mount('#app')
   </script>
-
 </body>
 
 </html>

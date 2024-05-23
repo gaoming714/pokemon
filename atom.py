@@ -93,8 +93,8 @@ def api_remain(name=None):
     return str(int(remain))
 
 
-@app.route("/api/op")
-def api_op(name=None):
+@app.route("/api/fox")
+def api_fox(name=None):
     # get info from sina_option_data
     op_dict = jsonDB.load_it(json_path)
 
@@ -140,43 +140,123 @@ def api_op(name=None):
     readme =  "Watch the fork and progress"
     context = {
             'now': now,
+            'arrow':{
+                'chg_50': round(arrow["chg_50"],4),
+                'chg_300': round(arrow["chg_300"],4),
+                'chg_500': round(arrow["chg_500"],4),
+                'pcr_50': round(arrow["pcr_50"],2),
+                'pcr_300': round(arrow["pcr_300"],2),
+                'pcr_500': round(arrow["pcr_500"],2),
+                'berry_50': round(arrow["berry_50"],2),
+                'berry_300': round(arrow["berry_300"],2),
+                'berry_500': round(arrow["berry_300"],2),
+                'vol_diff': round(vol_diff, 2),
+                'margin': round(margin,4),
+                'horizon': round(horizon,4),
+                'std_300': round(arrow["std_300"],4),
+                'burger': round(arrow["burger"],2),
+            },
             'now_list': now_list,
-
-            'chg_50': round(arrow["chg_50"],4),
-            'chg_300': round(arrow["chg_300"],4),
-            'chg_500': round(arrow["chg_500"],4),
-
-            'pcr_50': round(arrow["pcr_50"],2),
-            'berry_50': round(arrow["berry_50"],2),
             'pcr_50_list': list(op_df["pcr_50"]),
-            'berry_50_list': list(op_df["berry_50"]),
-            'pcr_300': round(arrow["pcr_300"],2),
-            'berry_300': round(arrow["berry_300"],2),
             'pcr_300_list': list(op_df["pcr_300"]),
-            'berry_300_list': list(op_df["berry_300"]),
-            'pcr_500': round(arrow["pcr_500"],2),
-            'berry_500': round(arrow["berry_300"],2),
             'pcr_500_list': list(op_df["pcr_500"]),
+            'berry_50_list': list(op_df["berry_50"]),
+            'berry_300_list': list(op_df["berry_300"]),
             'berry_500_list': list(op_df["berry_500"]),
             'ma_300_list': list(ma_300_se),
             'chg_300_list': list(op_df["chg_300"]),
-            'vol_diff': round(vol_diff, 2),
             'vol_list' : list(vol_diff_se),
-            'margin': round(margin,4),
-            'horizon': round(horizon,4),
-            'std': round(arrow["std_300"],4),
             'std_list': list(op_df["std_300"]),
-
-            'burger': round(arrow["burger"],2),
-            'burger_list': list(op_df["burger"]),
-
+            # 'burger_list': list(op_df["burger"]),
             'xbox_shuffle': xbox_shuffle,
             'apple_shuffle': apple_shuffle,
-
-            'readme': readme,
-        }
+            'readme': readme
+    }
     return context
 
+@app.route("/api/claw")
+def api_op_claw(name=None):
+    # get info from sina_option_data
+    json_path = os.path.join("data", "claw_data.json")
+    op_dict = jsonDB.load_it(json_path)
+
+    if "now" in op_dict and op_dict["now"] != "":
+        op_df = pd.DataFrame(op_dict["data"])
+        op_df.set_index("dt", inplace = True)
+        now = op_dict['now']
+    else:
+        return {}
+
+    arrow = op_df.iloc[-1]
+    now_list = list(op_df.index)
+
+    ma_300_se = op_df['berry_300'].rolling(120, min_periods = 1).mean().values
+    vol_mean_se = op_df["vol_300"].rolling(13, min_periods = 1).mean().values
+    vol_diff_se = (op_df["vol_300"] - vol_mean_se) / 1000
+    # vol_diff_se.fillna(0, inplace=True)
+    vol_diff = vol_diff_se.iloc[-1]
+
+    margin = -1.5 * op_df["chg_300"][-481:-1].std()
+    if len(now_list) >= 300:
+        horizon = 9 * op_df["chg_300"][12:280].std()
+    else:
+        horizon = 0
+
+    if len(now_list) > 300:
+        if arrow["berry_300"] > ma_300_se[-1] + 1.0:
+            xbox_shuffle = 1
+        elif arrow["berry_300"] < ma_300_se[-1] - 1.0:
+            xbox_shuffle = -1
+        else:
+            xbox_shuffle = 0
+        if ma_300_se[-1] > pd.Series(ma_300_se[-47:]).mean() + 0.47:
+            apple_shuffle = 1
+        elif ma_300_se[-1] < pd.Series(ma_300_se[-47:]).mean() - 0.47:
+            apple_shuffle = -1
+        else:
+            apple_shuffle = 0
+    else:
+        xbox_shuffle = 0
+        apple_shuffle = 0
+
+    readme =  "Watch the fork and progress"
+    context = {
+            'now': now,
+            'arrow':{
+                'chg_50': round(arrow["chg_50"],4),
+                'chg_300': round(arrow["chg_300"],4),
+                'chg_500': round(arrow["chg_500"],4),
+                'pcr_50': round(arrow["pcr_50"],2),
+                'pcr_300': round(arrow["pcr_300"],2),
+                'pcr_500': round(arrow["pcr_500"],2),
+                'berry_50': round(arrow["berry_50"],2),
+                'berry_300': round(arrow["berry_300"],2),
+                'berry_500': round(arrow["berry_300"],2),
+                'vol_diff': round(vol_diff, 2),
+                'margin': round(margin,4),
+                'horizon': round(horizon,4),
+                'std_300': round(arrow["std_300"],4),
+                # 'burger': round(arrow["burger"],2),
+            },
+            'now_list': now_list,
+            'pcr_50_list': list(op_df["pcr_50"]),
+            'pcr_300_list': list(op_df["pcr_300"]),
+            'pcr_500_list': list(op_df["pcr_500"]),
+            'berry_50_list': list(op_df["berry_50"]),
+            'berry_300_list': list(op_df["berry_300"]),
+            'berry_500_list': list(op_df["berry_500"]),
+            'chg_50_list': list(op_df["chg_50"]),
+            'chg_300_list': list(op_df["chg_300"]),
+            'chg_500_list': list(op_df["chg_500"]),
+            'ma_300_list': list(ma_300_se),
+            'vol_list' : list(vol_diff_se),
+            'std_list': list(op_df["std_300"]),
+            # 'burger_list': list(op_df["burger"]),
+            'xbox_shuffle': xbox_shuffle,
+            'apple_shuffle': apple_shuffle,
+            'readme': readme
+    }
+    return context
 
 @app.route("/api/stock/<date>")
 def api_stock(name = None, date = None):
@@ -196,8 +276,8 @@ def api_stock(name = None, date = None):
     # op_df = pd.read_sql_query("SELECT * FROM stock;", conn)
     # op_df = op_df[op_df["dt"].str.contains(date)]
     op_df.set_index("dt", inplace = True)
-    if len(op_df.index) == 0:
-         return {}
+    # if len(op_df.index) == 0:
+    #      return {}
 
     # op_df = pd.DataFrame(op_dict)
     # op_df.set_index("dt", inplace = True)
@@ -283,31 +363,34 @@ def api_hist(name = None, date = None):
     readme =  "Watch the fork and progress"
     context = {
             'now': now,
+            'arrow':{
+                'chg_50': round(arrow["chg_50"],4),
+                'chg_300': round(arrow["chg_300"],4),
+                'chg_500': round(arrow["chg_500"],4),
+                'pcr_50': round(arrow["pcr_50"],2),
+                'pcr_300': round(arrow["pcr_300"],2),
+                'pcr_500': round(arrow["pcr_500"],2),
+                'berry_50': round(arrow["berry_50"],2),
+                'berry_300': round(arrow["berry_300"],2),
+                'berry_500': round(arrow["berry_300"],2),
+                'vol_diff': round(vol_diff, 2),
+                'margin': round(margin,4),
+                'horizon': round(horizon,4),
+                'std_300': round(arrow["std_300"],4),
+            },
             'now_list': now_list,
-
-            'chg_50': round(arrow["chg_50"],4),
-            'chg_300': round(arrow["chg_300"],4),
-            'chg_500': round(arrow["chg_500"],4),
-
-            'pcr_300': round(arrow["pcr_300"],2),
-            'berry_300': round(arrow["berry_300"],2),
+            'pcr_50_list': list(op_df["pcr_50"]),
             'pcr_300_list': list(op_df["pcr_300"]),
+            'pcr_500_list': list(op_df["pcr_500"]),
+            'berry_50_list': list(op_df["berry_50"]),
             'berry_300_list': list(op_df["berry_300"]),
-            'ma_300_list': list(ma_300_se),
+            'berry_500_list': list(op_df["berry_500"]),
+            'chg_50_list': list(op_df["chg_50"]),
             'chg_300_list': list(op_df["chg_300"]),
-            'vol_diff': round(vol_diff, 2),
+            'chg_500_list': list(op_df["chg_500"]),
+            'ma_300_list': list(ma_300_se),
             'vol_list' : list(vol_diff_se),
-            'margin': round(margin,4),
-            'horizon': round(horizon,4),
-            'std': round(arrow["std_300"],4),
             'std_list': list(op_df["std_300"]),
-
-            'burger': round(arrow["burger"],2),
-            'burger_list': list(op_df["burger"]),
-
-            'xbox_shuffle': xbox_shuffle,
-            'apple_shuffle': apple_shuffle,
-
             'readme': readme,
         }
     return context
