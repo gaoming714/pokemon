@@ -3,6 +3,7 @@ import sys
 import time
 import json
 import pendulum
+from pathlib import Path
 from flask import Flask
 from envelopes import Envelope, GMailSMTP
 
@@ -20,7 +21,7 @@ app = Flask(__name__)
 def get_mixin():
     global OWNER
     global ADDR
-    info_path = os.path.join("data", "chat_config.json")
+    info_path = Path()/"data"/"chat_config.json"
     info_dict = jsonDB.load_it(info_path)
     try:
         OWNER = info_dict['owner']

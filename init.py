@@ -4,6 +4,7 @@ import requests
 import time
 import json
 import pendulum
+from pathlib import Path
 
 from models import webDB
 from models import jsonDB
@@ -25,7 +26,7 @@ def launch():
         fetch_op("510500P", 'OP_DOWN_510500', expiry)
     jsonDB.create_init_data()
     add_expiry()
-    json_path = os.path.join("data", "fox_op_config.json")
+    json_path = Path()/"data"/"fox_op_config.json"
     jsonDB.save_it(json_path, OPTIONS)
 
 def fetch_op(symbol, sina_symbol, expiry):

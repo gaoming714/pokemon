@@ -21,8 +21,8 @@ logConfig("logs/atom.log", rotation="10 MB")
 
 # db = redis.Redis(host='localhost', port=6379, db=0)
 
-json_path = os.path.join("data", "fox_data.json")
-nightly_path = os.path.join("data", "fox_nightly.json")
+json_path = Path()/"data"/"fox_data.json"
+nightly_path = Path()/"data"/"fox_nightly.json"
 
 app = Flask(__name__)
 app.secret_key = "super secret string"  # Change this!
@@ -177,7 +177,7 @@ def api_fox(name=None):
 @app.route("/api/claw")
 def api_op_claw(name=None):
     # get info from sina_option_data
-    json_path = os.path.join("data", "claw_data.json")
+    json_path = Path()/"data"/"claw_data.json"
     op_dict = jsonDB.load_it(json_path)
 
     if "now" in op_dict and op_dict["now"] != "":
@@ -264,7 +264,7 @@ def api_stock(name = None, date = None):
     if date == "Today":
         now = pendulum.now("Asia/Shanghai")
         date = now.to_datetime_string()[:10]
-    if os.path.exists("db.sqlite3"):
+    if Path("db.sqlite3").exists():
         # connect
         conn = sqlite3.connect('db.sqlite3')
         cursor = conn.cursor()
@@ -314,8 +314,8 @@ def api_hist(name = None, date = None):
     # get info from sina_option_data
     if date == "Today":
         date = "fox_data"
-    hist_path = os.path.join("data", date + ".json")
-    if not os.path.exists(hist_path):
+    hist_path = Path()/"data"/(date + ".json")
+    if not hist_path.exists():
         return {}
     with open(hist_path, 'r', encoding='utf-8') as file:
         op_dict = json.load(file)
@@ -492,7 +492,7 @@ def upload_file():
         if file and allowed_file(file.filename):
             now = pendulum.now("Asia/Shanghai")
             filename = str(now.timestamp()) + "__" + secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file.save(Path()/app.config['UPLOAD_FOLDER']/ filename)
             return "<p>OK</p>"
             # return redirect(url_for('show_file', name=filename))
 

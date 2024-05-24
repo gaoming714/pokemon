@@ -3,6 +3,7 @@ import os
 
 import time
 import pendulum
+from pathlib import Path
 import pandas as pd
 
 from models import akshare
@@ -26,7 +27,7 @@ def launch():
 
 def optionMain():
     global BOX
-    pkl_path = os.path.join("data",  "op_" + CODE[0] + ".pkl")
+    pkl_path = Path()/"data"/("op_" + CODE[0] + ".pkl")
 
     if REMOTE == False:
         # load local

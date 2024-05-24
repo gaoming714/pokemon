@@ -6,6 +6,7 @@ import json
 import pendulum
 import pickle
 import pandas as pd
+from pathlib import Path
 
 from models import jsonDB
 from models import webDB
@@ -19,8 +20,8 @@ def launch():
     now_str is local
     now_online is the online time
     '''
-    json_path = os.path.join("data", "fox_data.json")
-    # pickle_path = os.path.join("data", "fox_option_data.pickle")
+    json_path = Path()/"data"/"fox_data.json"
+    # pickle_path = Path()/"data", "fox_option_data.pickle")
 
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
@@ -121,16 +122,16 @@ def fetch_op_sum(op_name):
 def tape_archive():
     now_online = webDB.fetch_time()
     date_online = now_online.split()[0]
-    source_path = os.path.join("data", "fox_data.json")
-    archive_path = os.path.join("data", date_online + ".json")
+    source_path = Path()/"data"/"fox_data.json"
+    archive_path = Path()/"data"/(date_online + ".json")
     op_dict = jsonDB.load_it(source_path)
-    if "now" in op_dict and not os.path.exists(archive_path):
+    if "now" in op_dict and not archive_path.exists():
         update_nightly(date_online)
         archive_intraday(date_online)
 
 def update_nightly(date_online):
-    nightly_path = os.path.join("data", "fox_nightly.json")
-    json_path = os.path.join("data", "fox_data.json")
+    nightly_path = Path()/"data"/"fox_nightly.json"
+    json_path = Path()/"data"/"fox_data.json"
     nightly_dict = jsonDB.load_it(nightly_path)
     op_dict = jsonDB.load_it(json_path)
 
@@ -145,10 +146,10 @@ def update_nightly(date_online):
     logger.debug("update nightly complete!")
 
 def archive_intraday(date_online):
-    source = os.path.join("data", "fox_data.json")
-    target = os.path.join("data", date_online + ".json")
+    source = Path()/"data"/"fox_data.json"
+    target = Path()/"data"/(date_online + ".json")
     mv_cmd = "mv " + source + " " + target
-    if not os.path.exists(target):
+    if not target.exists():
         util.lumos(mv_cmd)
     else:
         logger.error("archive_intraday twice!! ERR")

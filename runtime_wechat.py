@@ -3,6 +3,7 @@ import sys
 import time
 import json
 import pendulum
+from pathlib import Path
 from flask import Flask
 import itchat
 from envelopes import Envelope, GMailSMTP
@@ -27,7 +28,7 @@ def get_mixin():
     global USERS
     global CHATROOMS
 
-    info_path = os.path.join("data", "chat_config.json")
+    info_path = Path()/"data"/"chat_config.json"
     try:
         info_dict = jsonDB.load_it(info_path)
         OWNER = info_dict['owner']

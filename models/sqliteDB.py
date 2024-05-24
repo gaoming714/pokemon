@@ -1,10 +1,11 @@
 import os
 import sys
 import sqlite3
+from pathlib import Path
 
 
 def send_pcr(arrow, symbol = ""):
-    if os.path.exists("db.sqlite3"):
+    if Path("db.sqlite3").exists():
         # connect
         conn = sqlite3.connect('db.sqlite3')
         cursor = conn.cursor()

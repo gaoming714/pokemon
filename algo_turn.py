@@ -4,6 +4,7 @@ import time
 import json
 import pendulum
 import pandas as pd
+from pathlib import Path
 
 from models import jsonDB
 from models import sqliteDB
@@ -25,7 +26,7 @@ def launch():
     now_str is local
     now_online is the online time
     '''
-    json_path = os.path.join("data", "fox_data.json")
+    json_path = Path()/"data"/"fox_data.json"
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
     op_dict = jsonDB.load_it(json_path)
