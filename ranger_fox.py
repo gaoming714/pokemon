@@ -13,7 +13,7 @@ from models import webDB
 from models import util
 
 from models.util import logConfig, logger
-logConfig("logs/fox.log", rotation="10 MB")
+logConfig("logs/ranger_fox.log", rotation="10 MB")
 
 def launch():
     '''
@@ -21,7 +21,6 @@ def launch():
     now_online is the online time
     '''
     json_path = Path()/"data"/"fox_data.json"
-    # pickle_path = Path()/"data", "fox_option_data.pickle")
 
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
@@ -148,7 +147,7 @@ def update_nightly(date_online):
 def archive_intraday(date_online):
     source = Path()/"data"/"fox_data.json"
     target = Path()/"data"/(date_online + ".json")
-    mv_cmd = "mv " + source + " " + target
+    mv_cmd = "mv '{}' '{}'".format(source, target)
     if not target.exists():
         util.lumos(mv_cmd)
     else:

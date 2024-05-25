@@ -148,7 +148,7 @@ def update_nightly(date_online):
 def archive_intraday(date_online):
     source = Path()/"data"/"claw_data.json"
     target = Path()/"data"/("claw." + date_online + ".json")
-    mv_cmd = "mv " + source + " " + target
+    mv_cmd = "mv '{}' '{}'".format(source, target)
     if not target.exists():
         util.lumos(mv_cmd)
     else:

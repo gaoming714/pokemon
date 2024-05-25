@@ -109,6 +109,10 @@ def owl(msg):
     except:
         logger.warning("Wechat Fail " + msg)
 
+def quote(path):
+    path_str = str(path)
+    return '"{}"'.format(path_str)
+
 def make_hash(file_path):
     md5_hash = hashlib.md5()
     sha1_hash = hashlib.sha1()
