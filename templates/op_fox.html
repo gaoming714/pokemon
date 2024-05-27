@@ -255,7 +255,13 @@
           axios
             .get("/api/remain")
             .then((response) => {
-              timer.value = response.data
+                if (response.data["opening"] == true) {
+                    timer.value = response.data["delay"]
+                }
+                else {
+                    timer.value = response.data["delay"] - 2
+                    console.log(response.data["status"] + " - delay => " + response.data["delay"])
+                }
             })
             .catch((error) => {
               console.log(error)
@@ -266,7 +272,7 @@
           axios
             .get("/api/fox")
             .then((response) => {
-              console.log(response)
+            //   console.log(response)
               now.value = response.data["now"]
               arrow.value = response.data["arrow"]
               now_list.value = response.data["now_list"]

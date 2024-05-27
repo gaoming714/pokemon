@@ -38,7 +38,7 @@ def add_expiry():
     codeplus_list = ['CON_OP_' + item for item in code_list]
     deadline, left_list = webDB.option_expiry_left(codeplus_list)
     OPTIONS["expiry_day"] = left_list
-    logger.info([str(deadline) + " days left.", *left_list])
+    logger.info(["{} days left.".format(deadline), *left_list])
 
 
 def clean():

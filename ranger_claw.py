@@ -21,7 +21,6 @@ def launch():
     now_online is the online time
     '''
     json_path = Path()/"data"/"claw_data.json"
-    # pickle_path = Path()/"data", "fox_option_data.pickle")
 
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
@@ -166,12 +165,12 @@ if __name__ == "__main__":
             launch()
             now = pendulum.now("Asia/Shanghai")
             delay = 65 - (now.second % 60) - (now.microsecond / 1e6)
-            logger.debug("Wait (s) " + str(delay))
+            logger.debug("Wait {:.2f} (s)".format(delay))
             time.sleep(delay)
         else:
             if info["status"] == "dawn":
                 delay = info["delay"] - 30
-                logger.debug("Wait (s) " + str(delay))
+                logger.debug("Wait {:.2f} (s)".format(delay))
                 time.sleep(delay)
                 # run init @ 9:29:30
                 # util.lumos("python init.py")
@@ -180,11 +179,11 @@ if __name__ == "__main__":
                 time.sleep(delay)
             elif info["status"] == "night":
                 delay = info["delay"]
-                logger.debug("Wait (s) " + str(delay))
+                logger.debug("Wait {:.2f} (s)".format(delay))
                 time.sleep(delay)
                 tape_archive()
             else:
                 delay = info["delay"]
-                logger.debug("Wait (s) " + str(delay))
+                logger.debug("Wait {:.2f} (s)".format(delay))
                 time.sleep(delay)
 

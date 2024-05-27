@@ -110,8 +110,7 @@ def owl(msg):
         logger.warning("Wechat Fail " + msg)
 
 def quote(path):
-    path_str = str(path)
-    return '"{}"'.format(path_str)
+    return '"{}"'.format(path)
 
 def make_hash(file_path):
     md5_hash = hashlib.md5()
@@ -134,7 +133,6 @@ def set_datetime(record):
     record["extra"]["datetime"] = pendulum.now("Asia/Shanghai")
 
 def logConfig(log_file="logs/default.log", rotation="10 MB"):
-
     """
     配置 Loguru 日志记录
     :param log_level: 日志级别，如 "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
@@ -156,7 +154,9 @@ def logConfig(log_file="logs/default.log", rotation="10 MB"):
             "<green>♻ </green>" +\
             "<level>{message}</level>"
     # alternative ➲ ⛏ ☄ ➜ ♻
+    if type(log_file) != type(""):
+        log_file = str(log_file)
     logger.configure(patcher=set_datetime)
     logger.add(sys.stdout, colorize=True, format=style)
-    logger.add(log_file, rotation=rotation, colorize=False, format=style)
-    logger.add(log_file+".rich", rotation=rotation, colorize=True, format=style)
+    logger.add(log_file, colorize=False, encoding="utf8", format=style, rotation=rotation)
+    logger.add(log_file+".rich", colorize=True, encoding="utf8", format=style, rotation=rotation)

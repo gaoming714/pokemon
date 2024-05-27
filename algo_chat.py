@@ -11,7 +11,7 @@ from models import sqliteDB
 from models import util
 
 from models.util import logConfig, logger
-logConfig("logs/runchat.log", rotation="10 MB")
+logConfig("logs/algo_chat.log", rotation="10 MB")
 
 OWNER = {}
 ADDR = []
@@ -108,14 +108,14 @@ if __name__ == "__main__":
             launch()
             now = pendulum.now("Asia/Shanghai")
             delay = 6 - (now.second % 5) - (now.microsecond / 1e6)
-            logger.debug("Wait (s) " + str(delay))
+            logger.debug("Wait {:.2f} (s)".format(delay))
             time.sleep(delay)
         else:
             if info["status"] == "dawn":
                 delay = info["delay"] + 60
-                logger.debug("Wait (s) " + str(delay))
+                logger.debug("Wait {:.2f} (s)".format(delay))
                 time.sleep(delay)
             else:
                 delay = info["delay"]
-                logger.debug("Wait (s) " + str(delay))
+                logger.debug("Wait {:.2f} (s)".format(delay))
                 time.sleep(delay)

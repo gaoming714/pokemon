@@ -165,12 +165,12 @@ if __name__ == "__main__":
             launch()
             now = pendulum.now("Asia/Shanghai")
             delay = 5 - (now.second % 5) - (now.microsecond / 1e6)
-            logger.debug("Wait (s) " + str(delay))
+            logger.debug("Wait {:.2f} (s)".format(delay))
             time.sleep(delay)
         else:
             if info["status"] == "dawn":
                 delay = info["delay"] - 30
-                logger.debug("Wait (s) " + str(delay))
+                logger.debug("Wait {:.2f} (s)".format(delay))
                 time.sleep(delay)
                 # run init @ 9:29:30
                 util.lumos("python init.py")
@@ -179,11 +179,11 @@ if __name__ == "__main__":
                 time.sleep(delay)
             elif info["status"] == "night":
                 delay = info["delay"]
-                logger.debug("Wait (s) " + str(delay))
+                logger.debug("Wait {:.2f} (s)".format(delay))
                 time.sleep(delay)
                 tape_archive()
             else:
                 delay = info["delay"]
-                logger.debug("Wait (s) " + str(delay))
+                logger.debug("Wait {:.2f} (s)".format(delay))
                 time.sleep(delay)
 

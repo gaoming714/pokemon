@@ -15,6 +15,7 @@ from flask import render_template
 from flask import render_template_string
 
 from models import jsonDB
+from models import util
 
 from models.util import logConfig, logger
 logConfig("logs/atom.log", rotation="10 MB")
@@ -59,38 +60,15 @@ def show_404_page(e):
 
 @app.route("/api/remain")
 def api_remain(name=None):
-    now = pendulum.now("Asia/Shanghai")
-    dawn = pendulum.today("Asia/Shanghai")
-    mk_mu = dawn.add(hours=9,minutes=20)
-    mk_nu = dawn.add(hours=9,minutes=25)
-    mk_alpha = dawn.add(hours=9,minutes=30)
-    mk_beta = dawn.add(hours=11,minutes=30)
-    mk_gamma = dawn.add(hours=13,minutes=0)
-    mk_delta = dawn.add(hours=15,minutes=1)
-    mk_zeta = pendulum.tomorrow("Asia/Shanghai")
-    remain = 0
-
-    """
-        mu nu  9:30  alpha beta  12  gamma  delta  16 zeta
-    """
-    now = pendulum.now("Asia/Shanghai")
-
-    if now < mk_alpha:
-        # print(["remain (s) ",(mk_alpha - now).total_seconds()])
-        remain = (mk_alpha - now).total_seconds()
-    elif now < mk_beta:
-        pass
-    elif now < mk_gamma:
-        # print(["remain (s) ",(mk_gamma - now).total_seconds()])
-        remain = (mk_gamma - now).total_seconds()
-    elif now < mk_delta:
-        pass
+    opening, info = util.fetch_opening()
+    if opening:
+        return {"opening":True,
+                "status":info["status"],
+                "delay":0}
     else:
-        # print("Market Closed")
-        # print(["remain to end (s) ",(mk_zeta - now).total_seconds()])
-        remain = (mk_zeta - now).total_seconds()
-        # print("update to tomorrow")
-    return str(int(remain))
+        return {"opening":False,
+                "status":info["status"],
+                "delay":info["delay"]}
 
 
 @app.route("/api/fox")
@@ -491,8 +469,8 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             now = pendulum.now("Asia/Shanghai")
-            filename = str(now.timestamp()) + "__" + secure_filename(file.filename)
-            file.save(Path()/app.config['UPLOAD_FOLDER']/ filename)
+            filename = "{}__{}".format(now.timestamp(),secure_filename(file.filename))
+            file.save(Path()/app.config['UPLOAD_FOLDER']/filename)
             return "<p>OK</p>"
             # return redirect(url_for('show_file', name=filename))
 
