@@ -8,6 +8,7 @@ import pendulum
 from loguru import logger
 from models import akshare as ak
 
+
 def lumos(cmd):
     # res = 0
     logger.warning("➜  " + cmd)
@@ -17,16 +18,17 @@ def lumos(cmd):
 
 now = pendulum.now("Asia/Shanghai")
 dawn = pendulum.today("Asia/Shanghai")
-mk_mu = dawn.add(hours=9,minutes=20)
-mk_nu = dawn.add(hours=9,minutes=25)
-mk_alpha = dawn.add(hours=9,minutes=30)
-mk_beta = dawn.add(hours=11,minutes=30,seconds=6)
-mk_gamma = dawn.add(hours=13,minutes=0,seconds=1)
-mk_delta = dawn.add(hours=15,minutes=0,seconds=6)
-mk_epsilon = dawn.add(hours=20,minutes=0)
-mk_zeta = pendulum.tomorrow("Asia/Shanghai") # actually tomorrow 1:00
+mk_mu = dawn.add(hours=9, minutes=20)
+mk_nu = dawn.add(hours=9, minutes=25)
+mk_alpha = dawn.add(hours=9, minutes=30)
+mk_beta = dawn.add(hours=11, minutes=30, seconds=6)
+mk_gamma = dawn.add(hours=13, minutes=0, seconds=1)
+mk_delta = dawn.add(hours=15, minutes=0, seconds=6)
+mk_epsilon = dawn.add(hours=20, minutes=0)
+mk_zeta = pendulum.tomorrow("Asia/Shanghai")  # actually tomorrow 1:00
 
-def fetch_opening(market = "stockCN"):
+
+def fetch_opening(market="stockCN"):
     """
     market is opening or not
     payload : delay
@@ -79,45 +81,52 @@ def fetch_opening(market = "stockCN"):
     # logger.debug(payload)
     return payload["delay"] == 0, payload
 
+
 def is_holiday():
     # only works @ 9:25 ~ 24:00
     date_online = ak.stock_zh_index_daily_em().iloc[-1]["date"]
     date_local = now.to_datetime_string()[:10]
     logger.debug([date_online, date_local])
-    return  date_online != date_local
+    return date_online != date_local
 
-def skipbox(box_list, now_input, minutes = 15):
+
+def skipbox(box_list, now_input, minutes=15):
     if box_list != []:
         left_time = box_list[-1]
-        right_time = left_time.add(minutes = minutes)
-        if right_time > left_time.at(0,0,0).add(hours = 11,minutes = 30) and right_time < left_time.at(0,0,0).add(hours = 13):
-            right_time = right_time.add(hours = 1, minutes = 30)
+        right_time = left_time.add(minutes=minutes)
+        if right_time > left_time.at(0, 0, 0).add(
+            hours=11, minutes=30
+        ) and right_time < left_time.at(0, 0, 0).add(hours=13):
+            right_time = right_time.add(hours=1, minutes=30)
         if right_time > now_input:
             return True
     return False
+
 
 def owl(msg):
     logger.info("Wol => " + msg)
     # email
     try:
-        r = requests.get('http://127.0.0.1:8011/emit/' + msg, timeout=10)
+        r = requests.get("http://127.0.0.1:8011/emit/" + msg, timeout=10)
     except:
         logger.warning("Email Fail " + msg)
     # wechat
     try:
-        r = requests.get('http://127.0.0.1:8010/msg/' + msg, timeout=10)
+        r = requests.get("http://127.0.0.1:8010/msg/" + msg, timeout=10)
     except:
         logger.warning("Wechat Fail " + msg)
 
+
 def quote(path):
     return '"{}"'.format(path)
+
 
 def make_hash(file_path):
     md5_hash = hashlib.md5()
     sha1_hash = hashlib.sha1()
     sha256_hash = hashlib.sha256()
 
-    with open(file_path, 'rb') as f:
+    with open(file_path, "rb") as f:
         while True:
             data = f.read(4096)
             if not data:
@@ -131,6 +140,7 @@ def make_hash(file_path):
 
 def set_datetime(record):
     record["extra"]["datetime"] = pendulum.now("Asia/Shanghai")
+
 
 def logConfig(log_file="logs/default.log", rotation="10 MB"):
     """
@@ -148,15 +158,25 @@ def logConfig(log_file="logs/default.log", rotation="10 MB"):
     logger.debug("This is a debug message")
     """
     logger.remove()  # 移除默认的处理程序（如果有的话）
-    style = "<green>{extra[datetime]}</green>" +\
-            " [ <level>{level: <8}</level>] " +\
-            "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan>" +\
-            "<green>♻ </green>" +\
-            "<level>{message}</level>"
+    style = (
+        "<green>{extra[datetime]}</green>"
+        + " [ <level>{level: <8}</level>] "
+        + "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan>"
+        + "<green>♻ </green>"
+        + "<level>{message}</level>"
+    )
     # alternative ➲ ⛏ ☄ ➜ ♻
     if type(log_file) != type(""):
         log_file = str(log_file)
     logger.configure(patcher=set_datetime)
     logger.add(sys.stdout, colorize=True, format=style)
-    logger.add(log_file, colorize=False, encoding="utf8", format=style, rotation=rotation)
-    logger.add(log_file+".rich", colorize=True, encoding="utf8", format=style, rotation=rotation)
+    logger.add(
+        log_file, colorize=False, encoding="utf8", format=style, rotation=rotation
+    )
+    logger.add(
+        log_file + ".rich",
+        colorize=True,
+        encoding="utf8",
+        format=style,
+        rotation=rotation,
+    )

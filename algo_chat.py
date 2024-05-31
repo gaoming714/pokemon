@@ -11,6 +11,7 @@ from models import sqliteDB
 from models import util
 
 from models.util import logConfig, logger
+
 logConfig("logs/algo_chat.log", rotation="10 MB")
 
 OWNER = {}
@@ -18,22 +19,23 @@ ADDR = []
 BOX = []
 ONCE = True
 
+
 def launch():
     global BOX
     global ADDR
     global ONCE
-    '''
+    """
     now_str is local
     now_online is the online time
-    '''
-    json_path = Path()/"data"/"fox_data.json"
+    """
+    json_path = Path() / "data" / "fox_data.json"
     now = pendulum.now("Asia/Shanghai")
     now_str = now.to_datetime_string()
     op_dict = jsonDB.load_it(json_path)
 
     if "now" in op_dict and op_dict["now"] != "":
         op_df = pd.DataFrame(op_dict["data"])
-        op_df.set_index("dt", inplace = True)
+        op_df.set_index("dt", inplace=True)
     else:
         mk_zeta = pendulum.tomorrow("Asia/Shanghai")
         delay = (mk_zeta - now).total_seconds()
@@ -41,12 +43,12 @@ def launch():
         time.sleep(delay)
         return
 
-    start_tick = now.at(0,0,0).add(hours = 9,minutes = 55)
+    start_tick = now.at(0, 0, 0).add(hours=9, minutes=55)
     if now < start_tick:
         delay = (start_tick - now).seconds
         time.sleep(delay)
         return
-    if util.skipbox(BOX, now, minutes = 20):
+    if util.skipbox(BOX, now, minutes=20):
         return
 
     horizon = 9 * pd.Series(op_df["chg_300"][12:280]).std()
@@ -58,7 +60,7 @@ def launch():
         logger.warning("op_df.index is not enough => " + str(len(op_df.index)))
         zero = 0
     if ONCE and now.hour == 9:
-        msg = now_str + "\nHorizon🍌\t" + str(round(horizon,4))
+        msg = now_str + "\nHorizon🍌\t" + str(round(horizon, 4))
         if zero >= 10:
             msg = msg + " 🍓 "
         elif zero <= -10:
@@ -68,7 +70,7 @@ def launch():
 
     # send real chat
     arrow = op_df.iloc[-1]
-    margin = - round(horizon * 12, 2)
+    margin = -round(horizon * 12, 2)
     if horizon > 1:
         std_horizon = 1
     else:
@@ -93,6 +95,7 @@ def launch():
         sqliteDB.send_pcr(arrow, "down")
     else:
         logger.debug("No Hands Up.")
+
 
 def clean():
     # clean box for pytest

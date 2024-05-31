@@ -5,9 +5,9 @@ from models import demjson
 
 
 def stock_zh_index_daily_em(
-        symbol: str = "sh000300",
-        start_date: str = "19900101",
-        end_date: str = "20500101",
+    symbol: str = "sh000300",
+    start_date: str = "19900101",
+    end_date: str = "20500101",
 ) -> pd.DataFrame:
     """
     东方财富网-股票指数数据
@@ -45,7 +45,7 @@ def stock_zh_index_daily_em(
     }
     r = requests.get(url, params=params)
     data_text = r.text
-    data_json = demjson.decode(data_text[data_text.find("{"): -2])
+    data_json = demjson.decode(data_text[data_text.find("{") : -2])
     temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["klines"]])
     # check temp_df data availability before further transformations which may raise errors
     if temp_df.empty:
