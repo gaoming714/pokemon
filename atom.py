@@ -14,10 +14,10 @@ from flask import redirect, url_for
 from flask import render_template
 from flask import render_template_string
 
-from models import jsonDB
-from models import util
+from mars import jsonDB
+from mars import util
 
-from models.util import logConfig, logger
+from mars.util import logConfig, logger
 
 logConfig("logs/atom.log", rotation="10 MB")
 

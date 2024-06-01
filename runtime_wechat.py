@@ -8,10 +8,10 @@ from flask import Flask
 import itchat
 from envelopes import Envelope, GMailSMTP
 
-from models import jsonDB
-from models import util
+from mars import jsonDB
+from mars import util
 
-from models.util import logConfig, logger
+from mars.util import logConfig, logger
 
 logConfig("logs/wechat.log", rotation="10 MB")
 

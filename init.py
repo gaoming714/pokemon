@@ -6,10 +6,10 @@ import json
 import pendulum
 from pathlib import Path
 
-from models import webDB
-from models import jsonDB
+from mars import webDB
+from mars import jsonDB
 
-from models.util import logConfig, logger
+from mars.util import logConfig, logger
 
 logConfig("logs/init.log", rotation="10 MB")
 

@@ -6,11 +6,11 @@ import pendulum
 from pathlib import Path
 import pandas as pd
 
-from models import jsonDB
-from models import sqliteDB
-from models import util
+from mars import jsonDB
+from mars import sqliteDB
+from mars import util
 
-from models.util import logConfig, logger
+from mars.util import logConfig, logger
 
 logConfig("logs/algo_chat.log", rotation="10 MB")
 

@@ -6,9 +6,9 @@ import pendulum
 from pathlib import Path
 import pandas as pd
 
-from models import akshare
-from models import pickleDB
-from models import webDB
+from mars import akshare
+from mars import pickleDB
+from mars import webDB
 
 # CODE = ("510050","sh000016")
 CODE = ("510300","sh000300")
@@ -71,9 +71,9 @@ def magic():
     print("Prod = ", round(BOX["mixin"].std(),3), "(need less than 1.2)")
 
     # ADF and SM
-    from statsmodels.tsa.stattools import adfuller
+    from statsmars.tsa.stattools import adfuller
     result = adfuller(BOX["mixin"])
-    import statsmodels.api as sm
+    import statsmars.api as sm
     model = sm.OLS(BOX["cp"], BOX["chg"])
     results = model.fit()
     print(results.summary())

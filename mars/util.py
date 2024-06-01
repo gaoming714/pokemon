@@ -6,7 +6,7 @@ import hashlib
 import requests
 import pendulum
 from loguru import logger
-from models import akshare as ak
+from mars import akshare as ak
 
 
 def lumos(cmd):

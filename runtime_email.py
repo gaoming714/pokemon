@@ -7,7 +7,7 @@ from pathlib import Path
 from flask import Flask
 from envelopes import Envelope, GMailSMTP
 
-from models import jsonDB
+from mars import jsonDB
 
 from loguru import logger
 

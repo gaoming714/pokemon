@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 
-from models import demjson
+from mars import demjson
 
 
 def stock_zh_index_daily_em(

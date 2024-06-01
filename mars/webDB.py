@@ -4,8 +4,8 @@ import requests
 import pandas as pd
 from tqdm import tqdm
 
-from models import akshare
-from models import jsonDB
+from mars import akshare
+from mars import jsonDB
 
 SINA = {"Referer": "http://vip.stock.finance.sina.com.cn/"}
 

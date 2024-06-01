@@ -8,11 +8,11 @@ import pickle
 import pandas as pd
 from pathlib import Path
 
-from models import jsonDB
-from models import webDB
-from models import util
+from mars import jsonDB
+from mars import webDB
+from mars import util
 
-from models.util import logConfig, logger
+from mars.util import logConfig, logger
 
 logConfig("logs/ranger_claw.log", rotation="10 MB")
 
