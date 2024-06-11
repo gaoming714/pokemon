@@ -3,7 +3,7 @@ all: atom router algo tool
 	@echo "Done!"
 	pm2 status
 atom:
-	pm2 start ./daemon/atom.sh --name atom --silent --log
+	pm2 start ./daemon/atom.sh --name atom --silent --log --cron-restart="1 0 * * *"
 
 router:
 	pm2 start ./daemon/ranger_fox.sh --name ranger_fox --silent --log
