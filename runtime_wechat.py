@@ -79,6 +79,7 @@ def email(addr, msg):
         tls=True,
     )
 
+
 def boot():
     global OWNER
     global ME
@@ -111,6 +112,7 @@ def boot():
     except:
         logger.warning("chat_config.json is not ready")
         raise
+
 
 if __name__ == "__main__":
     boot()
