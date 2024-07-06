@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import json
+import tomlkit
 import pendulum
 from pathlib import Path
 from flask import Flask
@@ -15,6 +16,7 @@ from mars.util import logConfig, logger
 
 logConfig("logs/wechat.log", rotation="10 MB")
 
+# send logout msg
 OWNER = {}
 ME = ""
 
@@ -22,24 +24,6 @@ USERS = []
 CHATROOMS = []
 
 app = Flask(__name__)
-
-
-def get_mixin():
-    global OWNER
-    global ME
-    global USERS
-    global CHATROOMS
-
-    info_path = Path() / "data" / "chat_config.json"
-    try:
-        info_dict = jsonDB.load_it(info_path)
-        OWNER = info_dict["owner"]
-        ME = info_dict["addr_list"][0]
-        USERS = info_dict["user_list"]
-        CHATROOMS = info_dict["chatroom_list"]
-    except:
-        logger.warning("chat_config.json is not ready")
-        raise
 
 
 def login_wechat():
@@ -95,8 +79,40 @@ def email(addr, msg):
         tls=True,
     )
 
+def boot():
+    global OWNER
+    global ME
+    global USERS
+    global CHATROOMS
+
+    config_path = Path() / "data" / "chat_config.toml"
+    with open(config_path, "r", encoding="utf-8") as f:
+        config = tomlkit.parse(f.read())
+    try:
+        # skip
+        if not config.get("active", False) or config.get("active") == 0:
+            logger.info("Inactive Boot")
+            return
+        logger.success("Active Boot")
+        OWNER = config["owner"]
+        for client in config["client"]:
+            if client.get("skip"):
+                continue
+            if client.get("channel") == "wechat":
+                USERS.append(client["symbol"])
+            if client.get("channel") == "chatroom":
+                CHATROOMS.append(client["symbol"])
+            if client.get("channel") == "email" and ME == "":
+                ME = client["symbol"]
+        logger.debug(OWNER)
+        logger.debug(ME)
+        logger.debug(USERS)
+        logger.debug(CHATROOMS)
+    except:
+        logger.warning("chat_config.json is not ready")
+        raise
 
 if __name__ == "__main__":
-    get_mixin()
+    boot()
     login_wechat()
     app.run(port=8010)

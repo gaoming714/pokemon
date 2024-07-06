@@ -3,8 +3,8 @@ import sys
 import time
 import json
 import pendulum
-import pandas as pd
 from pathlib import Path
+import pandas as pd
 
 from mars import jsonDB
 from mars import sqliteDB
@@ -14,15 +14,12 @@ from mars.util import logConfig, logger
 
 logConfig("logs/algo_turn.log", rotation="10 MB")
 
-OWNER = {}
-ADDR = []
 BOX = []
 ONCE = True
 
 
 def launch():
     global BOX
-    global ADDR
     global ONCE
     """
     now_str is local

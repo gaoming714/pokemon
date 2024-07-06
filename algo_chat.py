@@ -14,15 +14,12 @@ from mars.util import logConfig, logger
 
 logConfig("logs/algo_chat.log", rotation="10 MB")
 
-OWNER = {}
-ADDR = []
 BOX = []
 ONCE = True
 
 
 def launch():
     global BOX
-    global ADDR
     global ONCE
     """
     now_str is local

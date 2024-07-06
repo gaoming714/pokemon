@@ -1,0 +1,23 @@
+# active = true
+
+[owner]
+smtp = "smtp.******.com"
+port = "587"
+login = "name@hotmail.com"
+password = "secret"
+from = "name@hotmail.com"
+
+[[client]]
+name = "nick_name"
+channel = "email"
+symbol = "name@126.com"
+
+[[client]]
+name = "nick_name"
+channel = "wechat"
+symbol = "master"
+
+[[client]]
+name = "nick_name"
+channel = "chatroom"
+symbol = "PokeScript"

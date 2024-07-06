@@ -2,45 +2,27 @@ import os
 import sys
 import time
 import json
+import tomlkit
 import pendulum
 from pathlib import Path
 from flask import Flask
 from envelopes import Envelope, GMailSMTP
 
-from mars import jsonDB
 
 from loguru import logger
 
-logger.add("log/email.log")
+logger.add("logs/email.log")
 
 OWNER = {}
-ME = ""
 ADDR = []
 
 app = Flask(__name__)
-
-
-def get_mixin():
-    global OWNER
-    global ADDR
-    info_path = Path() / "data" / "chat_config.json"
-    info_dict = jsonDB.load_it(info_path)
-    try:
-        OWNER = info_dict["owner"]
-        ADDR = info_dict["addr_list"]
-        handle = info_dict["handle"]
-        if handle == 0:
-            ADDR = []
-    except:
-        logger.warning("chat_config.json is not ready")
-        raise
 
 
 @app.route("/emit/<msg>", methods=["GET", "POST"])
 def emit_message(msg):
     global ADDR
     logger.info("emit => " + msg)
-    print(ADDR)
     for email_addr in ADDR:
         try:
             send(email_addr, msg)
@@ -68,6 +50,31 @@ def send(addr, msg):
     )
 
 
+def boot():
+    global OWNER
+    global ADDR
+    config_path = Path() / "data" / "chat_config.toml"
+    with open(config_path, "r", encoding="utf-8") as f:
+        config = tomlkit.parse(f.read())
+    try:
+        # skip
+        if not config.get("active", False) or config.get("active") == 0:
+            logger.info("Inactive Boot")
+            return
+        logger.success("Active Boot")
+        OWNER = config["owner"]
+        for client in config["client"]:
+            if client.get("skip"):
+                continue
+            if client.get("channel") == "email":
+                ADDR.append(client["symbol"])
+        logger.debug(OWNER)
+        logger.debug(ADDR)
+    except:
+        logger.warning("chat_config.toml is not ready")
+        raise
+
+
 if __name__ == "__main__":
-    get_mixin()
+    boot()
     app.run(port=8011)
