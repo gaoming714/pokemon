@@ -6,10 +6,11 @@ import tomlkit
 import pendulum
 from pathlib import Path
 from flask import Flask
-from envelopes import Envelope, GMailSMTP
+# from envelopes import Envelope, GMailSMTP
 import smtplib
 from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from email.header import Header
+import base64
 
 
 from loguru import logger
@@ -56,35 +57,46 @@ def send(addr, msg):
     smtp_port = OWNER["port"]  # SSL 端口
     sender_email = OWNER["login"]  # 替换为你的 QQ 邮箱
     sender_password = OWNER["password"]  # 替换为你的 SMTP 授权码（非邮箱登录密码）
+    auth_code = sender_password
+    recipient = addr
 
-    # 配置收件人信息
-    recipient_email = addr
-
-    # 创建邮件内容
-    subject = "Hi Jack"  # 邮件主题
-    body = msg  # 邮件正文
-
-    # 创建 MIME 邮件对象
-    msg = MIMEMultipart()
-    msg["From"] = sender_email
-    msg["To"] = recipient_email
-    msg["Subject"] = subject
-
-    # 添加邮件正文
-    msg.attach(MIMEText(body, "plain"))
-
+    subject = msg
+    body = msg
+    msg = MIMEText(body, "plain", "utf-8")  # 正文，纯文本，UTF-8 编码
+    msg["Subject"] = Header(subject, "utf-8")  # 主题
+    msg["From"] = encode_from(sender_email.split('@')[0], sender_email)
+    msg["To"] = Header(addr, "utf-8")     # 收件人
+    
+    
+    # 登录并发送邮件
     try:
-        # 连接到 QQ 邮箱 SMTP 服务器
-        with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
-            # server.set_debuglevel(1)  # 开启调试模式
-            server.login(sender_email, sender_password)  # 登录邮箱
-            server.sendmail(sender_email, recipient_email, msg.as_string())  # 发送邮件
-            print("邮件发送成功！")
-    except smtplib.SMTPException as e:
-        pass
-        # print(f"SMTP 错误：{e}")
-    # except Exception as e:
-    #     print(f"邮件发送失败：{e}")
+        # 连接 SMTP 服务器
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()  # 启用 TLS 加密
+        server.login(sender_email, auth_code)  # 使用授权码登录
+        server.sendmail(email, recipient, msg.as_string())  # 发送邮件
+        print("邮件发送成功！")
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"认证失败，请检查邮箱或授权码: {e}")
+    except Exception as e:
+        print(f"发送失败: {e}")
+    finally:
+        server.quit()  # 关闭连接
+
+def encode_from(display_name, email_address, charset="utf-8"):
+    """
+    使用 Base64 编码 From 字段。
+
+    Args:
+        display_name: 发件人显示名称。
+        email_address: 发件人邮箱地址。
+        charset: 字符集。
+
+    Returns:
+        编码后的 From 字段字符串。
+    """
+    encoded_display_name = base64.b64encode(display_name.encode(charset)).decode(charset)
+    return f"=?{charset}?B?{encoded_display_name}?= <{email_address}>"
 
 def boot():
     global OWNER
