@@ -55,7 +55,8 @@ def send_bac(addr, msg):
 def send(addr, msg):
     smtp_server = OWNER["smtp"]  # QQ 邮箱的 SMTP 服务器地址
     smtp_port = OWNER["port"]  # SSL 端口
-    sender_email = OWNER["login"]  # 替换为你的 QQ 邮箱
+    qq = OWNER["login"]  # 替换为你的 QQ 邮箱
+    email = OWNER["from"]  # 替换为你的 QQ 邮箱
     sender_password = OWNER["password"]  # 替换为你的 SMTP 授权码（非邮箱登录密码）
     auth_code = sender_password
     recipient = addr
@@ -64,7 +65,7 @@ def send(addr, msg):
     body = msg
     msg = MIMEText(body, "plain", "utf-8")  # 正文，纯文本，UTF-8 编码
     msg["Subject"] = Header(subject, "utf-8")  # 主题
-    msg["From"] = encode_from(sender_email.split('@')[0], sender_email)
+    msg["From"] = encode_from(qq, email)
     msg["To"] = Header(addr, "utf-8")     # 收件人
     
     
@@ -73,7 +74,7 @@ def send(addr, msg):
         # 连接 SMTP 服务器
         server = smtplib.SMTP(smtp_server, smtp_port)
         server.starttls()  # 启用 TLS 加密
-        server.login(sender_email, auth_code)  # 使用授权码登录
+        server.login(email, auth_code)  # 使用授权码登录
         server.sendmail(email, recipient, msg.as_string())  # 发送邮件
         print("邮件发送成功！")
     except smtplib.SMTPAuthenticationError as e:
